@@ -189,7 +189,6 @@ HEADERS += src/activemasternode.h \
            src/qt/coincontroltreewidget.h \
            src/qt/csvmodelwriter.h \
            src/qt/editaddressdialog.h \
-           src/qt/encryptdialog.h \
            src/qt/entermnemonics.h \
            src/qt/guiconstants.h \
            src/qt/guiutil.h \
@@ -512,7 +511,6 @@ SOURCES += src/activemasternode.cpp \
            src/qt/dapscoin.cpp \
            src/qt/dapscoinstrings.cpp \
            src/qt/editaddressdialog.cpp \
-           src/qt/encryptdialog.cpp \
            src/qt/entermnemonics.cpp \
            src/qt/guiutil.cpp \
            src/qt/historypage.cpp \

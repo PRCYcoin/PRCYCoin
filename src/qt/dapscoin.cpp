@@ -40,7 +40,6 @@
 #include "wallet/wallet.h"
 #endif
 
-#include "encryptdialog.h"
 #include "entermnemonics.h"
 
 #include <signal.h>
@@ -522,11 +521,11 @@ void BitcoinApplication::initializeResult(int retval)
                 Q_EMIT requestedRegisterNodeSignal();
             }
             if (!walletUnlocked && walletModel->getEncryptionStatus() == WalletModel::Unencrypted) {
-                EncryptDialog dlg;
-                dlg.setModel(walletModel);
-                dlg.setWindowTitle("Encrypt Wallet");
-                dlg.setStyleSheet(GUIUtil::loadStyleSheet());
-                dlg.exec();
+                AskPassphraseDialog *dlg = new AskPassphraseDialog(AskPassphraseDialog::Mode::Encrypt, nullptr, walletModel, AskPassphraseDialog::Context::Encrypt);
+                dlg->setStyleSheet(GUIUtil::loadStyleSheet());
+                // setFixedHeight here due to dialog not sizing properly
+                dlg->setFixedHeight(dlg->height() * 1.2);
+                dlg->exec();
 
                 Q_EMIT requestedRegisterNodeSignal();
                 walletModel->updateStatus();
