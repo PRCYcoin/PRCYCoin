@@ -238,6 +238,8 @@ void HistoryPage::updateTableData(CWallet* wallet)
                 case 3: /*amount*/
                     if (wallet->IsLocked()) {
                         cell->setData(0, QString("Locked; Hidden"));
+                    } else if (settings.value("fHideBalance", false).toBool()) {  {
+                        cell->setData(0, QString("Hidden"));
                     } else {
                         cell->setData(0, data);
                     }
