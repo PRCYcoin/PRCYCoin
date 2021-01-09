@@ -124,6 +124,8 @@ void SendCoinsDialog::setBalance(const CAmount& balance, const CAmount& unconfir
     int status = model->getEncryptionStatus();
     if (status == WalletModel::Locked || status == WalletModel::UnlockedForAnonymizationOnly) {
         ui->labelBalance->setText("Locked; Hidden");
+    } else if (settings.value("fHideBalance", false).toBool()) {
+        ui->labelBalance->setText("Hidden");
     } else {
         ui->labelBalance->setText(BitcoinUnits::formatHtmlWithUnit(0, balance, false, BitcoinUnits::separatorAlways));
     }

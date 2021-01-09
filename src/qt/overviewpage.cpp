@@ -175,6 +175,10 @@ void OverviewPage::setBalance(const CAmount& balance, const CAmount& unconfirmed
         ui->labelBalance->setText("Locked; Hidden");
         ui->labelUnconfirmed->setText("Locked; Hidden");
         ui->btnLockUnlock->setStyleSheet("border-image: url(:/images/lock) 0 0 0 0 stretch stretch; width: 20px;");
+    } else if (settings.value("fHideBalance", false).toBool()) {
+        ui->labelBalance_2->setText("Hidden");
+        ui->labelBalance->setText("Hidden");
+        ui->labelUnconfirmed->setText("Hidden");
     } else {
         if (stkStatus && !nLastCoinStakeSearchInterval && !fLiteMode) {
             ui->labelBalance_2->setText("Enabling Staking...");
@@ -493,6 +497,8 @@ void OverviewPage::updateRecentTransactions() {
                     int64_t txTime = wtx.GetComputedTxTime();
                     if (pwalletMain->IsLocked()) {
                         entry->setData(txTime, "Locked; Hidden", "Locked; Hidden", "Locked; Hidden", "Locked; Hidden");
+                    } else if (settings.value("fHideBalance", false).toBool()) {
+                        entry->setData(txTime, "Hidden", "Hidden", "Hidden", "Hidden");
                     } else {
                         entry->setData(txTime, txs[i]["address"] , txs[i]["amount"], txs[i]["id"], txs[i]["type"]);
                     }
