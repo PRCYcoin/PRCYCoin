@@ -159,7 +159,8 @@ OptionsPage::OptionsPage(QWidget* parent) : QDialog(parent, Qt::WindowSystemMenu
     connect(ui->minimizeToTray, SIGNAL(stateChanged(int)), this, SLOT(minimizeToTray_clicked(int)));
     connect(ui->minimizeOnClose, SIGNAL(stateChanged(int)), this, SLOT(minimizeOnClose_clicked(int)));
     connect(ui->alwaysRequest2FA, SIGNAL(stateChanged(int)), this, SLOT(alwaysRequest2FA_clicked(int)));
-    connect(ui->hideBalance, SIGNAL(stateChanged(int)), this, SLOT(hideBalance_clicked(int)));
+    connect(ui->hideBalanceStaking, SIGNAL(stateChanged(int)), this, SLOT(hideBalanceStaking_clicked(int)));
+    connect(ui->lockSendStaking, SIGNAL(stateChanged(int)), this, SLOT(lockSendStaking_clicked(int)));
 }
 
 void OptionsPage::setStakingToggle()
@@ -1012,7 +1013,7 @@ void OptionsPage::alwaysRequest2FA_clicked(int state)
     }
 }
 
-void OptionsPage::hideBalance_clicked(int state) {
+void OptionsPage::hideBalanceStaking_clicked(int state) {
     int status = model->getEncryptionStatus();
     if (status == WalletModel::Locked || status == WalletModel::UnlockedForAnonymizationOnly) {
         QMessageBox msgBox;
@@ -1023,9 +1024,27 @@ void OptionsPage::hideBalance_clicked(int state) {
         msgBox.exec();
         return;
     }
-    if (ui->hideBalance->isChecked()) {
+    if (ui->hideBalanceStaking->isChecked()) {
         settings.setValue("fHideBalance", true);
     } else {
         settings.setValue("fHideBalance", false);
+    }
+}
+
+void OptionsPage::lockSendStakingclicked(int state) {
+    int status = model->getEncryptionStatus();
+    if (status == WalletModel::Locked || status == WalletModel::UnlockedForAnonymizationOnly) {
+        QMessageBox msgBox;
+        msgBox.setWindowTitle("Balance Settings");
+        msgBox.setIcon(QMessageBox::Information);
+        msgBox.setText("Please unlock the keychain wallet with your passphrase before attempting to change this setting.");
+        msgBox.setStyleSheet(GUIUtil::loadStyleSheet());
+        msgBox.exec();
+        return;
+    }
+    if (ui->lockSendStaking->isChecked()) {
+        settings.setValue("fLockSendStaking", true);
+    } else {
+        settings.setValue("fLockSendStaking", false);
     }
 }
