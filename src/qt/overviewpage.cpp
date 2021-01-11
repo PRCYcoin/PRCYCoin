@@ -21,7 +21,6 @@
 
 #include <QAbstractItemDelegate>
 #include <QPainter>
-#include <QSettings>
 #include <QTimer>
 #include <QtMath>
 

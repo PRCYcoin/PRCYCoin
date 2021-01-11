@@ -12,6 +12,7 @@
 #include <QElapsedTimer>
 #include <QDialog>
 #include <QSizeGrip>
+#include <QSettings>
 
 class ClientModel;
 class TransactionFilterProxy;
