@@ -1035,7 +1035,7 @@ void OptionsPage::lockSendStakingclicked(int state) {
     int status = model->getEncryptionStatus();
     if (status == WalletModel::Locked || status == WalletModel::UnlockedForAnonymizationOnly) {
         QMessageBox msgBox;
-        msgBox.setWindowTitle("Balance Settings");
+        msgBox.setWindowTitle("Lock Send Settings");
         msgBox.setIcon(QMessageBox::Information);
         msgBox.setText("Please unlock the keychain wallet with your passphrase before attempting to change this setting.");
         msgBox.setStyleSheet(GUIUtil::loadStyleSheet());
