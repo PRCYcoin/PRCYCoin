@@ -272,7 +272,6 @@ void OverviewPage::setWalletModel(WalletModel* model)
     updateDisplayUnit();
 
     // Hide orphans
-    QSettings settings;
     hideOrphans(settings.value("fHideOrphans", false).toBool());
 }
 

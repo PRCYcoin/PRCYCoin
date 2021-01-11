@@ -43,7 +43,6 @@ HistoryPage::HistoryPage(QWidget* parent) : QDialog(parent, Qt::WindowSystemMenu
     connectWidgets();
     updateTableData(pwalletMain);
     updateAddressBookData(pwalletMain);
-    QSettings settings;
 }
 
 
@@ -51,6 +50,7 @@ HistoryPage::~HistoryPage()
 {
     delete ui;
 }
+
 void HistoryPage::initWidgets()
 {
     //set String for all addresses
