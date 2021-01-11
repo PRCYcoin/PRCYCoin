@@ -1031,7 +1031,7 @@ void OptionsPage::hideBalanceStaking_clicked(int state) {
     }
 }
 
-void OptionsPage::lockSendStakingclicked(int state) {
+void OptionsPage::lockSendStaking_clicked(int state) {
     int status = model->getEncryptionStatus();
     if (status == WalletModel::Locked || status == WalletModel::UnlockedForAnonymizationOnly) {
         QMessageBox msgBox;
