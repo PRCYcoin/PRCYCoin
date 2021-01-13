@@ -12,6 +12,7 @@
 #include <QElapsedTimer>
 #include <QDialog>
 #include <QSizeGrip>
+#include <QNetworkReply>
 
 class ClientModel;
 class TransactionFilterProxy;
@@ -62,6 +63,7 @@ Q_SIGNALS:
 private:
     QTimer* timer;
     QTimer* pingNetworkInterval;
+    QTimer* checkUSDInterval;
     Ui::OverviewPage* ui;
     ClientModel* clientModel;
     WalletModel* walletModel;
@@ -96,6 +98,8 @@ private Q_SLOTS:
     void updateWatchOnlyLabels(bool showWatchOnly);
     void on_lockUnlock();
     void updateLockStatus(int status);
+    void checkUSD();
+    void checkUSDserviceRequestFinished(QNetworkReply* reply);
 };
 
 #endif // BITCOIN_QT_OVERVIEWPAGE_H

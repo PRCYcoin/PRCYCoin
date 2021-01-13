@@ -24,6 +24,8 @@
 #include <QSettings>
 #include <QTimer>
 #include <QtMath>
+#include <QNetworkAccessManager>
+#include <QJsonDocument>
 
 #define DECORATION_SIZE 48
 #define ICON_OFFSET 16
@@ -121,6 +123,11 @@ OverviewPage::OverviewPage(QWidget* parent) : QDialog(parent, Qt::WindowSystemMe
     connect(pingNetworkInterval, SIGNAL(timeout()), this, SLOT(tryNetworkBlockCount()));
     pingNetworkInterval->setInterval(3000);
     pingNetworkInterval->start();
+
+    checkUSDInterval = new QTimer(this);
+    connect(checkUSDInterval, SIGNAL(timeout()), this, SLOT(checkUSD()));
+    checkUSDInterval->setInterval(60000);
+    checkUSDInterval->start();
 
     initSyncCircle(.8);
 
@@ -544,4 +551,32 @@ void OverviewPage::updateLockStatus(int status) {
         ui->btnLockUnlock->setStyleSheet("border-image: url(:/images/lock) 0 0 0 0 stretch stretch; width: 20px;");
     else
         ui->btnLockUnlock->setStyleSheet("border-image: url(:/images/unlock) 0 0 0 0 stretch stretch; width: 30px;");
+}
+
+void OverviewPage::checkUSD()
+{
+    QString defaultCurrency = "USD";
+    QUrl serviceUrl = QUrl("https://api.coingecko.com/api/v3/simple/price?ids=daps-token&vs_currencies=" + defaultCurrency + "&include_market_cap=false&include_24hr_vol=false&include_24hr_change=false&include_last_updated_at=false");
+    QNetworkAccessManager *manager = new QNetworkAccessManager(this);
+    connect(manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(checkUSDserviceRequestFinished(QNetworkReply*)));
+    QNetworkRequest request;
+    request.setUrl(serviceUrl);
+    QNetworkReply* reply = manager->get(request);
+}
+
+void OverviewPage::checkUSDserviceRequestFinished(QNetworkReply* reply)
+{
+    reply->deleteLater();
+    if(reply->error() == QNetworkReply::NoError) {
+        QByteArray data = reply->readAll();
+        //Parse data
+        // ...
+        //convert to int
+        //int balance = walletModel->getBalance();
+        //LogPrintf("%s: %d\n", __func__, balance);
+        //int valueUSD = data.trimmed().toInt();
+        ui->label_9->setText("USD Value: " + data.trimmed()); //balance * valueUSD
+    } else {
+        LogPrintf("%s: Error checking for USD value.\n", __func__);
+    }
 }
