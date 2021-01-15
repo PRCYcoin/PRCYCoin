@@ -63,7 +63,7 @@ Q_SIGNALS:
 private:
     QTimer* timer;
     QTimer* pingNetworkInterval;
-    QTimer* checkUSDInterval;
+    QTimer* checkDollarValueInterval;
     Ui::OverviewPage* ui;
     ClientModel* clientModel;
     WalletModel* walletModel;
@@ -98,8 +98,8 @@ private Q_SLOTS:
     void updateWatchOnlyLabels(bool showWatchOnly);
     void on_lockUnlock();
     void updateLockStatus(int status);
-    void checkUSD();
-    void checkUSDserviceRequestFinished(QNetworkReply* reply);
+    void checkDollarValue();
+    void checkDollarValueserviceRequestFinished(QNetworkReply* reply);
 };
 
 #endif // BITCOIN_QT_OVERVIEWPAGE_H
