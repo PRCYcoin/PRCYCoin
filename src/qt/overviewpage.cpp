@@ -575,7 +575,8 @@ void OverviewPage::checkDollarValueserviceRequestFinished(QNetworkReply* reply)
         //int balance = walletModel->getBalance();
         //LogPrintf("%s: %d\n", __func__, balance);
         //int valueDollar = data.trimmed().toInt();
-        ui->label_9->setText("Dollar Value: " + data.trimmed()); //balance * valueDollar
+        QString defaultCurrency = "USD"; // Will be a setting
+        ui->label_9->setText(defaultCurrency + " Value: " + data.trimmed()); //balance * valueDollar
     } else {
         LogPrintf("%s: Error checking for Dollar value.\n", __func__);
     }
