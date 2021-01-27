@@ -408,6 +408,7 @@ SOURCES += src/activemasternode.cpp \
            src/clientversion.cpp \
            src/coins.cpp \
            src/compressor.cpp \
+		   src/consensus/merkle.cpp \
            src/core_read.cpp \
            src/core_write.cpp \
            src/crypter.cpp \
