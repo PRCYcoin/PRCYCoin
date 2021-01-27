@@ -1046,6 +1046,14 @@ bool CWallet::AddToWallet(const CWalletTx& wtxIn, bool fFromLoadWallet, CWalletD
             wtxOrdered.insert(make_pair(wtx.nOrderPos, TxPair(&wtx, (CAccountingEntry*)0)));
             wtx.nTimeSmart = ComputeTimeSmart(wtx);
             AddToSpends(hash);
+            for (const CTxIn& txin : wtx.vin) {
+                if (mapWallet.count(txin.prevout.hash)) {
+                    CWalletTx& prevtx = mapWallet[txin.prevout.hash];
+                    if (prevtx.nIndex == -1 && !prevtx.hashBlock.IsNull()) {
+                        MarkConflicted(prevtx.hashBlock, wtx.GetHash());
+                    }
+                }
+            }
         }
 
         bool fUpdated = false;
@@ -1100,6 +1108,20 @@ bool CWallet::AddToWalletIfInvolvingMe(const CTransaction& tx, const CBlock* pbl
 {
     {
         AssertLockHeld(cs_wallet);
+
+        if (pblock) {
+            for (const CTxIn& txin : tx.vin) {
+                std::pair<TxSpends::const_iterator, TxSpends::const_iterator> range = mapTxSpends.equal_range(txin.prevout);
+                while (range.first != range.second) {
+                    if (range.first->second != tx.GetHash()) {
+                        LogPrintf("Transaction %s (in block %s) conflicts with wallet transaction %s (both spend %s:%i)\n", tx.GetHash().ToString(), pblock->GetHash().ToString(), range.first->second.ToString(), range.first->first.hash.ToString(), range.first->first.n);
+                        MarkConflicted(pblock->GetHash(), range.first->second);
+                    }
+                    range.first++;
+                }
+            }
+        }
+
         bool fExisted = mapWallet.count(tx.GetHash()) != 0;
         if (fExisted && !fUpdate) return false;
         IsTransactionForMe(tx);
@@ -1125,6 +1147,53 @@ bool CWallet::AddToWalletIfInvolvingMe(const CTransaction& tx, const CBlock* pbl
         }
     }
     return false;
+}
+
+void CWallet::MarkConflicted(const uint256& hashBlock, const uint256& hashTx)
+{
+    LOCK2(cs_main, cs_wallet);
+
+    CBlockIndex* pindex;
+    assert(mapBlockIndex.count(hashBlock));
+    pindex = mapBlockIndex[hashBlock];
+    int conflictconfirms = 0;
+    if (chainActive.Contains(pindex)) {
+        conflictconfirms = -(chainActive.Height() - pindex->nHeight + 1);
+    }
+    assert(conflictconfirms < 0);
+
+    // Do not flush the wallet here for performance reasons
+    CWalletDB walletdb(strWalletFile, "r+", false);
+
+    std::deque<uint256> todo;
+    std::set<uint256> done;
+
+    todo.push_back(hashTx);
+
+    while (!todo.empty()) {
+        uint256 now = todo.front();
+        todo.pop_front();
+        done.insert(now);
+        assert(mapWallet.count(now));
+        CWalletTx& wtx = mapWallet[now];
+        int currentconfirm = wtx.GetDepthInMainChain();
+        if (conflictconfirms < currentconfirm) {
+            // Block is 'more conflicted' than current confirm; update.
+            // Mark transaction as conflicted with this block.
+            wtx.nIndex = -1;
+            wtx.hashBlock = hashBlock;
+            wtx.MarkDirty();
+            wtx.WriteToDisk(&walletdb);
+            // Iterate over all its outputs, and mark transactions in the wallet that spend them conflicted too
+            TxSpends::const_iterator iter = mapTxSpends.lower_bound(COutPoint(now, 0));
+            while (iter != mapTxSpends.end() && iter->first.hash == now) {
+                 if (!done.count(iter->second)) {
+                     todo.push_back(iter->second);
+                 }
+                 iter++;
+            }
+        }
+    }
 }
 
 void CWallet::SyncTransaction(const CTransaction& tx, const CBlock* pblock)
@@ -1679,7 +1748,7 @@ void CWallet::ReacceptWalletTransactions()
 
         int nDepth = wtx.GetDepthInMainChain();
 
-        if (!wtx.IsCoinBase() && nDepth < 0) {
+        if (!wtx.IsCoinBase() && nDepth == 0) {
             // Try to add to memory pool
             LOCK(mempool.cs);
             wtx.AcceptToMemoryPool(false);
@@ -2980,6 +3049,7 @@ bool CWallet::CreateTransaction(const vector<pair<CScript, CAmount> >& vecSend,
                     //a chance at a free transaction.
                     //But mempool inputs might still be in the mempool, so their age stays 0
                     int age = pcoin.first->GetDepthInMainChain();
+                    assert(age >= 0);
                     if (age != 0)
                         age += 1;
                     dPriority += (double)nCredit * age;
@@ -5587,7 +5657,7 @@ int CMerkleTx::SetMerkleBranch(const CBlock& block)
 
 int CMerkleTx::GetDepthInMainChainINTERNAL(const CBlockIndex*& pindexRet) const
 {
-    if (hashBlock == 0 || nIndex == -1)
+    if (hashBlock == 0)
         return 0;
     AssertLockHeld(cs_main);
 
@@ -5600,7 +5670,7 @@ int CMerkleTx::GetDepthInMainChainINTERNAL(const CBlockIndex*& pindexRet) const
         return 0;
 
     pindexRet = pindex;
-    return chainActive.Height() - pindex->nHeight + 1;
+    return ((nIndex == -1) ? (-1) : 1) * (chainActive.Height() - pindex->nHeight + 1);
 }
 
 int CMerkleTx::GetDepthInMainChain(bool enableIX) const
@@ -5920,6 +5990,7 @@ bool CWalletTx::IsTrusted() const
         return false;
     if (!bSpendZeroConfChange || !IsFromMe(ISMINE_ALL)) // using wtx's cached debit
         return false;
+
      // Don't trust unconfirmed transactions from us unless they are in the mempool.
     {
         LOCK(mempool.cs);
@@ -5927,6 +5998,7 @@ bool CWalletTx::IsTrusted() const
             return false;
         }
     }
+	
     // Trusted if all inputs are from us and are in the mempool:
     for (const CTxIn& txin : vin) {
         // Transactions not sent by us: not trusted
