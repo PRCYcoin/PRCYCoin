@@ -5674,7 +5674,7 @@ int CMerkleTx::SetMerkleBranch(const CBlock& block)
 
 int CMerkleTx::GetDepthInMainChain(const CBlockIndex*& pindexRet, bool enableIX) const
 {
-    if (hashUnset())
+    if (hashBlock == 0)
         return 0;
     AssertLockHeld(cs_main);
     int nResult;
