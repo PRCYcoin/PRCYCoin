@@ -712,7 +712,7 @@ struct COutputEntry {
 class CMerkleTx : public CTransaction
 {
 private:
-    int GetDepthInMainChainINTERNAL(const CBlockIndex*& pindexRet) const;
+    int GetDepthInMainChain(const CBlockIndex*& pindexRet) const;
 
 public:
     uint256 hashBlock;
