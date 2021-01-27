@@ -11,6 +11,7 @@
 #include "miner.h"
 
 #include "amount.h"
+#include "consensus/merkle.h"
 #include "hash.h"
 #include "main.h"
 #include "masternode-sync.h"
@@ -550,8 +551,8 @@ CBlockTemplate* CreateNewPoABlock(const CScript& scriptPubKeyIn, const CPubKey& 
     assert(txCoinbase.vin[0].scriptSig.size() <= 100);
 
     pblock->vtx[0] = txCoinbase;
-    pblock->hashMerkleRoot = pblock->ComputeMerkleRoot();
-
+    pblock->hashMerkleRoot = BlockMerkleRoot(*pblock);
+	
     pblock->hashPoAMerkleRoot = pblock->BuildPoAMerkleTree();
     pblock->minedHash = pblock->ComputeMinedHash();
 
