@@ -2381,7 +2381,7 @@ bool CWallet::SelectCoinsMinConf(bool needFee, CAmount& feeNeeded, int ringSize,
             nValueRet += coinLowestLarger.first;
             return true;
         } else {
-            CAmount maxFee = ComputeFee(50, numOut, ringSize);
+            CAmount maxFee = ComputeFee(MAX_TX_INPUTS, numOut, ringSize);
             if (vValue.size() <= MAX_TX_INPUTS) {
                 //putting all into the transaction
                 string s = "CWallet::SelectCoinsMinConf best subset: ";
@@ -2413,9 +2413,9 @@ bool CWallet::SelectCoinsMinConf(bool needFee, CAmount& feeNeeded, int ringSize,
 
     // Solve subset sum by stochastic approximation
     sort(vValue.rbegin(), vValue.rend(), CompareValueOnly());
-    //fees for 50 inputs
-    feeNeeded = ComputeFee(50, numOut, ringSize);
-    //check if the sum of first 50 largest UTXOs > nTargetValue + nfeeNeeded
+    //fees for MAX_TX_INPUTS
+    feeNeeded = ComputeFee(MAX_TX_INPUTS, numOut, ringSize);
+    //check if the sum of first MAX_TX_INPUTS largest UTXOs > nTargetValue + nfeeNeeded
     for (unsigned int i = 0; i <= MAX_TX_INPUTS; i++) {
         nValueRet += vValue[i].first;
     }
@@ -2772,7 +2772,7 @@ bool CWallet::CreateTransactionBulletProof(const CKey& txPrivDes, const CPubKey&
                                 strFailReason = "Insufficient reserved funds! Your wallet is staking with a reserve balance of " + ValueFromAmountToString(nReserveBalance) + " less than the sending amount " + ValueFromAmountToString(nTotalValue);
                         } else if (setCoins.size() > MAX_TX_INPUTS) {
                             //max inputs
-                            strFailReason = _("You have attempted to send more than 50 UTXOs in a single transaction. To work around this limitation, please either lower the total amount of the transaction or send two separate transactions with 50% of your total desired amount.");
+                            strFailReason = _("You have attempted to send more than " + MAX_TX_INPUTS.toString() + " UTXOs in a single transaction. To work around this limitation, please either lower the total amount of the transaction or send two separate transactions with 50% of your total desired amount.");
                         } else {
                             //other
                             strFailReason = _("Error in CreateTransactionBulletProof. Please try again.");
@@ -3132,7 +3132,7 @@ bool CWallet::makeRingCT(CTransaction& wtxNew, int ringSize, std::string& strFai
     const size_t MAX_VOUT = 5;
 
     if (wtxNew.vin.size() > MAX_TX_INPUTS || wtxNew.vin.size() == 0) {
-        strFailReason = _("You have attempted to send a total value that is comprised of more than 50 smaller deposits. This is a rare occurrence, and lowering the total value sent, or sending the same total value in two separate transactions will usually work around this limitation.");
+        strFailReason = _("You have attempted to send a total value that is comprised of more than " + MAX_TX_INPUTS + " smaller deposits. This is a rare occurrence, and lowering the total value sent, or sending the same total value in two separate transactions will usually work around this limitation.");
         return false;
     }
 
@@ -5423,7 +5423,7 @@ bool CWallet::estimateStakingConsolidationFees(CAmount& minFee, CAmount& maxFee)
 }
 
 int CWallet::MaxTxSizePerTx() {
-    return ComputeTxSize(50, 2, 15);
+    return ComputeTxSize(MAX_TX_INPUTS, 2, 15);
 }
 
 bool CWallet::MultiSend()

@@ -300,7 +300,7 @@ void SendCoinsDialog::sendTx() {
         );
     } catch (const std::exception& err) {
         std::string errMes(err.what());
-        if (errMes.find("You have attempted to send more than 50 UTXOs in a single transaction") != std::string::npos) {
+        if (errMes.find("You have attempted to send more than " + MAX_TX_INPUTS.toString() + " UTXOs in a single transaction") != std::string::npos) {
             QMessageBox::StandardButton reply;
             reply = QMessageBox::question(this, "Transaction Size Too Large", QString(err.what()) + QString("\n\nDo you want to combine small UTXOs into a larger one?"), QMessageBox::Yes|QMessageBox::No);
             if (reply == QMessageBox::Yes) {
