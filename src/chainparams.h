@@ -104,6 +104,7 @@ public:
     int START_POA_BLOCK() const { return nStartPOABlock; }
 //    int REMOVE_REWARD_BLOCK() const { return nRemoveRewardBlock; }
     int Block_Enforce_Invalid() const { return nBlockEnforceInvalidUTXO; }
+    int SoftFork() const { return nSoftForkBlock;}
 
     //For PoA block time
     int POA_BLOCK_TIME() const { return nPoABlockTime; }
@@ -132,6 +133,7 @@ protected:
     int64_t nTargetTimespan;
     int64_t nTargetSpacing;
     int nStartPOABlock;
+    int nSoftForkBlock;
     int nMasternodeCountDrift;
     int nMaturity;
     int nModifierUpdateBlock;

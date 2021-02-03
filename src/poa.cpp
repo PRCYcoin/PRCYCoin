@@ -17,11 +17,15 @@
 #include <math.h>
 
 unsigned int N_BITS = 0x1e050000;
+unsigned int N_BITS_SF = 0x1e050000;
 
 unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHeader* pblock)
 {
     if (N_BITS != 0 && pblock->IsPoABlockByVersion()) {
-        return N_BITS;
+        if (pindexLast->nHeight < Params().SoftFork()) {
+            return N_BITS;
+        }
+        return N_BITS_SF;
     }
     /* current difficulty formula, prcycoin - DarkGravity v3, written by Evan Duffield - evan@dashpay.io */
     const CBlockIndex* BlockLastSolved = pindexLast;
@@ -59,7 +63,15 @@ unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHead
         // ppcoin: target change every block
         // ppcoin: retarget with exponential moving toward target spacing
         uint256 bnNew;
-        bnNew.SetCompact(pindexLast->nBits);
+        if (pindexLast->nHeight < Params().SoftFork()) {
+            bnNew.SetCompact(pindexLast->nBits);
+        } else {
+            if (pindexLast->IsProofOfStake()) {
+                bnNew.SetCompact(pindexLast->nBits);
+            } else {
+                bnNew.SetCompact(pLastPoS->nBits);
+            }
+        }
 
         int64_t nInterval = nTargetTimespan / nTargetSpacing;
         bnNew *= ((nInterval - 1) * nTargetSpacing + nActualSpacing + nActualSpacing);
