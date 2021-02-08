@@ -21,6 +21,7 @@
 #include "base58.h"
 #include "coincontrol.h"
 #include "guiinterface.h"
+#include "main.h"
 #include "utilmoneystr.h"
 #include "wallet/wallet.h"
 #include "2faconfirmdialog.h"
