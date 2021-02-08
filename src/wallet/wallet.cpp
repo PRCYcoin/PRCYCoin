@@ -3132,7 +3132,7 @@ bool CWallet::makeRingCT(CTransaction& wtxNew, int ringSize, std::string& strFai
     const size_t MAX_VOUT = 5;
 
     if (wtxNew.vin.size() > MAX_TX_INPUTS || wtxNew.vin.size() == 0) {
-        strFailReason = _("You have attempted to send a total value that is comprised of more than " + MAX_TX_INPUTS + " smaller deposits. This is a rare occurrence, and lowering the total value sent, or sending the same total value in two separate transactions will usually work around this limitation.");
+        strFailReason = _("You have attempted to send a total value that is comprised of more than " + MAX_TX_INPUTS.toString() + " smaller deposits. This is a rare occurrence, and lowering the total value sent, or sending the same total value in two separate transactions will usually work around this limitation.");
         return false;
     }
 
