@@ -5,7 +5,7 @@ qt_packages = protobuf zlib
 
 qrencode_packages = qrencode
 
-qt_linux_packages:=qt expat libxcb xcb_proto libXau xproto freetype fontconfig libX11 xextproto libXext xtrans
+qt_linux_packages:=qt expat libxcb xcb_proto libXau xproto freetype fontconfig
 
 qt_android_packages=qt
 qt_darwin_packages=qt

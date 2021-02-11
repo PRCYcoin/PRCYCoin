@@ -5,10 +5,10 @@ $(package)_suffix=opensource-src-$($(package)_version).tar.xz
 $(package)_file_name=qtbase-$($(package)_suffix)
 $(package)_sha256_hash=d5a97381b9339c0fbaf13f0c05d599a5c999dcf94145044058198987183fed65
 $(package)_dependencies=openssl zlib
-$(package)_linux_dependencies=freetype fontconfig libxcb libX11 xproto libXext
+$(package)_linux_dependencies=freetype fontconfig libxcb
 $(package)_build_subdir=qtbase
 $(package)_qt_libs=corelib network widgets gui plugins testlib concurrent
-$(package)_patches=fix_qt_pkgconfig.patch mac-qmake.conf fix_configure_mac.patch fix_no_printer.patch fix_rcc_determinism.patch fix_riscv64_arch.patch fix_s390x_powerpc_mips_mipsel_architectures.patch xkb-default.patch fix_android_qmake_conf.patch fix_android_jni_static.patch
+$(package)_patches=fix_qt_pkgconfig.patch mac-qmake.conf fix_configure_mac.patch fix_no_printer.patch fix_rcc_determinism.patch fix_riscv64_arch.patch fix_s390x_powerpc_mips_mipsel_architectures.patch xkb-default.patch fix_android_qmake_conf.patch fix_android_jni_static.patch no-xlib.patch
 
 # Update OSX_QT_TRANSLATIONS when this is updated
 $(package)_qttranslations_file_name=qttranslations-$($(package)_suffix)
@@ -100,6 +100,8 @@ endif
 
 $(package)_config_opts_linux  = -qt-xkbcommon-x11
 $(package)_config_opts_linux += -qt-xcb
+$(package)_config_opts_linux += -no-xcb-xlib
+$(package)_config_opts_linux += -no-feature-xlib
 $(package)_config_opts_linux += -system-freetype
 $(package)_config_opts_linux += -no-feature-sessionmanager
 $(package)_config_opts_linux += -fontconfig
@@ -196,6 +198,7 @@ define $(package)_preprocess_cmds
   echo "!host_build: QMAKE_LFLAGS     += $($(package)_ldflags)" >> qtbase/mkspecs/common/gcc-base.conf && \
   patch -p1 -i $($(package)_patch_dir)/fix_riscv64_arch.patch &&\
   patch -p1 -i $($(package)_patch_dir)/fix_s390x_powerpc_mips_mipsel_architectures.patch &&\
+  patch -p1 -i $($(package)_patch_dir)/no-xlib.patch &&\
   echo "QMAKE_LINK_OBJECT_MAX = 10" >> qtbase/mkspecs/win32-g++/qmake.conf &&\
   echo "QMAKE_LINK_OBJECT_SCRIPT = object_script" >> qtbase/mkspecs/win32-g++/qmake.conf &&\
   sed -i.old "s|QMAKE_CFLAGS           += |!host_build: QMAKE_CFLAGS            = $($(package)_cflags) $($(package)_cppflags) |" qtbase/mkspecs/win32-g++/qmake.conf && \
