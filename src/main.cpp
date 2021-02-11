@@ -2205,27 +2205,24 @@ int64_t GetBlockValue(const CBlockIndex* ptip)
 
 CAmount GetSeeSaw(const CAmount& blockValue, int nMasternodeCount, int nHeight)
 {
-    int64_t nMoneySupply = chainActive.Tip()->nMoneySupply;
-
     //if a mn count is inserted into the function we are looking for a specific result for a masternode count
     if (nMasternodeCount < 1) {
         nMasternodeCount = mnodeman.size();
     }
-
+	
+    int64_t nMoneySupply = chainActive.Tip()->nMoneySupply;
     int64_t mNodeCoins = nMasternodeCount * 5000 * COIN;
 
     // Use this log to compare the masternode count for different clients
-    LogPrintf("Adjusting seesaw at height %d with %d masternodes (without drift: %d) at %ld\n", nHeight,
-        nMasternodeCount, nMasternodeCount - Params().MasternodeCountDrift(), GetTime());
+    LogPrintf("Adjusting seesaw at height %d with %d masternodes (without drift: %d) at %ld\n", nHeight,nMasternodeCount, nMasternodeCount - Params().MasternodeCountDrift(), GetTime());
 
     if (fDebug)
-        LogPrintf("GetMasternodePayment(): moneysupply=%s, nodecoins=%s \n", FormatMoney(nMoneySupply).c_str(),
-            FormatMoney(mNodeCoins).c_str());
+        LogPrintf("GetMasternodePayment(): moneysupply=%s, nodecoins=%s \n", FormatMoney(nMoneySupply).c_str(), FormatMoney(mNodeCoins).c_str());
 
     CAmount ret = 0;
     if (mNodeCoins == 0) {
         ret = 0;
-    } else {
+    } else if (nHeight <= Params.SoftFork()) {
         if (mNodeCoins <= (nMoneySupply * .05) && mNodeCoins > 0) {
             ret = blockValue * .6;
         } else if (mNodeCoins <= (nMoneySupply * .1) && mNodeCoins > (nMoneySupply * .05)) {
@@ -2269,8 +2266,91 @@ CAmount GetSeeSaw(const CAmount& blockValue, int nMasternodeCount, int nHeight)
         } else {
             ret = blockValue * .40;
         }
+	} else if (nHeight >= Params.SoftFork()) {
+		if (mNodeCoins <= (nMoneySupply * .025) && mNodeCoins > 0) {
+            ret = blockValue * .6;
+        } else if (mNodeCoins <= (nMoneySupply * .05) && mNodeCoins > (nMoneySupply * .025)) {
+            ret = blockValue * .595;
+        } else if (mNodeCoins <= (nMoneySupply * .075) && mNodeCoins > (nMoneySupply * .05)) {
+            ret = blockValue * .59;
+        } else if (mNodeCoins <= (nMoneySupply * .1) && mNodeCoins > (nMoneySupply * .075)) {
+            ret = blockValue * .585;
+        } else if (mNodeCoins <= (nMoneySupply * .125) && mNodeCoins > (nMoneySupply * .1)) {
+            ret = blockValue * .58;
+        } else if (mNodeCoins <= (nMoneySupply * .15) && mNodeCoins > (nMoneySupply * .125)) {
+            ret = blockValue * .575;
+        } else if (mNodeCoins <= (nMoneySupply * .175) && mNodeCoins > (nMoneySupply * .15)) {
+            ret = blockValue * .57;
+        } else if (mNodeCoins <= (nMoneySupply * .2) && mNodeCoins > (nMoneySupply * .175)) {
+            ret = blockValue * .565;			
+        } else if (mNodeCoins <= (nMoneySupply * .225) && mNodeCoins > (nMoneySupply * .2)) {
+            ret = blockValue * .56;
+        } else if (mNodeCoins <= (nMoneySupply * .25) && mNodeCoins > (nMoneySupply * .225)) {
+            ret = blockValue * .555;
+        } else if (mNodeCoins <= (nMoneySupply * .275) && mNodeCoins > (nMoneySupply * .25)) {
+            ret = blockValue * .55;
+        } else if (mNodeCoins <= (nMoneySupply * .3) && mNodeCoins > (nMoneySupply * .275)) {
+            ret = blockValue * .545;
+        } else if (mNodeCoins <= (nMoneySupply * .325) && mNodeCoins > (nMoneySupply * .3)) {
+            ret = blockValue * .54;
+        } else if (mNodeCoins <= (nMoneySupply * .35) && mNodeCoins > (nMoneySupply * .325)) {
+            ret = blockValue * .535;
+        } else if (mNodeCoins <= (nMoneySupply * .375) && mNodeCoins > (nMoneySupply * .35)) {
+            ret = blockValue * .53;
+        } else if (mNodeCoins <= (nMoneySupply * .4) && mNodeCoins > (nMoneySupply * .375)) {
+            ret = blockValue * .525;
+        } else if (mNodeCoins <= (nMoneySupply * .425) && mNodeCoins > (nMoneySupply * .4)) {
+            ret = blockValue * .52;
+        } else if (mNodeCoins <= (nMoneySupply * .45) && mNodeCoins > (nMoneySupply * .425)) {
+            ret = blockValue * .515;
+        } else if (mNodeCoins <= (nMoneySupply * .475) && mNodeCoins > (nMoneySupply * .45)) {
+            ret = blockValue * .51;
+        } else if (mNodeCoins <= (nMoneySupply * .5) && mNodeCoins > (nMoneySupply * .475)) {
+            ret = blockValue * .505;
+        } else if (mNodeCoins <= (nMoneySupply * .525) && mNodeCoins > (nMoneySupply * .5)) {
+            ret = blockValue * .50;
+        } else if (mNodeCoins <= (nMoneySupply * .55) && mNodeCoins > (nMoneySupply * .525)) {
+            ret = blockValue * .495;
+        } else if (mNodeCoins <= (nMoneySupply * .575) && mNodeCoins > (nMoneySupply * .55)) {
+            ret = blockValue * .49;
+        } else if (mNodeCoins <= (nMoneySupply * .6) && mNodeCoins > (nMoneySupply * .575)) {
+            ret = blockValue * .485;
+        } else if (mNodeCoins <= (nMoneySupply * .625) && mNodeCoins > (nMoneySupply * .6)) {
+            ret = blockValue * .48;
+        } else if (mNodeCoins <= (nMoneySupply * .65) && mNodeCoins > (nMoneySupply * .625)) {
+            ret = blockValue * .475;
+        } else if (mNodeCoins <= (nMoneySupply * .675) && mNodeCoins > (nMoneySupply * .65)) {
+            ret = blockValue * .47;
+        } else if (mNodeCoins <= (nMoneySupply * .7) && mNodeCoins > (nMoneySupply * .675)) {
+            ret = blockValue * .465;
+        } else if (mNodeCoins <= (nMoneySupply * .725) && mNodeCoins > (nMoneySupply * .7)) {
+            ret = blockValue * .46;
+        } else if (mNodeCoins <= (nMoneySupply * .75) && mNodeCoins > (nMoneySupply * .725)) {
+            ret = blockValue * .455;
+        } else if (mNodeCoins <= (nMoneySupply * .775) && mNodeCoins > (nMoneySupply * .75)) {
+            ret = blockValue * .45;
+        } else if (mNodeCoins <= (nMoneySupply * .8) && mNodeCoins > (nMoneySupply * .775)) {
+            ret = blockValue * .445;
+        } else if (mNodeCoins <= (nMoneySupply * .825) && mNodeCoins > (nMoneySupply * .8)) {
+            ret = blockValue * .44;
+        } else if (mNodeCoins <= (nMoneySupply * .85) && mNodeCoins > (nMoneySupply * .825)) {
+            ret = blockValue * .435;
+        } else if (mNodeCoins <= (nMoneySupply * .875) && mNodeCoins > (nMoneySupply * .85)) {
+            ret = blockValue * .43;
+        } else if (mNodeCoins <= (nMoneySupply * .9) && mNodeCoins > (nMoneySupply * .875)) {
+            ret = blockValue * .425;
+        } else if (mNodeCoins <= (nMoneySupply * .925) && mNodeCoins > (nMoneySupply * .9)) {
+            ret = blockValue * .42;
+        } else if (mNodeCoins <= (nMoneySupply * .95) && mNodeCoins > (nMoneySupply * .925)) {
+            ret = blockValue * .415;
+        } else if (mNodeCoins <= (nMoneySupply * .975) && mNodeCoins > (nMoneySupply * .95)) {
+            ret = blockValue * .41;
+        } else if (mNodeCoins <= (nMoneySupply * .99) && mNodeCoins > (nMoneySupply * .975)) {
+            ret = blockValue * .405;
+        } else {
+            ret = blockValue * .40;
+        }
     }
-
     return ret;
 }
 
