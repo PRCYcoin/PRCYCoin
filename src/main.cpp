@@ -431,7 +431,7 @@ bool VerifyRingSignatureWithTxFee(const CTransaction& tx, CBlockIndex* pindex)
             CBlockIndex* tip = chainActive.Tip();
             if (!pindex) tip = pindex;
 
-            uint256 hashTip = tip->GetBlockHash();
+            //uint256 hashTip = tip->GetBlockHash();
             //verify that tip and hashBlock must be in the same fork
             CBlockIndex* atTheblock = mapBlockIndex[hashBlock];
             if (!atTheblock) {
@@ -648,13 +648,13 @@ bool ReVerifyPoSBlock(CBlockIndex* pindex)
         nValueOut = coinstake.GetValueOut();
 
         size_t numUTXO = coinstake.vout.size();
-        CAmount posBlockReward = PoSBlockReward();
+        //CAmount posBlockReward = PoSBlockReward();
         if (mapBlockIndex.count(block.hashPrevBlock) < 1) {
             LogPrintf("ReVerifyPoSBlock() : Previous block not found, received block %s, previous %s, current tip %s", block.GetHash().GetHex(), block.hashPrevBlock.GetHex(), chainActive.Tip()->GetBlockHash().GetHex());
             return false;
         }
-        int thisBlockHeight = mapBlockIndex[block.hashPrevBlock]->nHeight + 1; //avoid potential block disorder during download
-        CAmount blockValue = GetBlockValue(mapBlockIndex[block.hashPrevBlock]);
+        //int thisBlockHeight = mapBlockIndex[block.hashPrevBlock]->nHeight + 1; //avoid potential block disorder during download
+        //CAmount blockValue = GetBlockValue(mapBlockIndex[block.hashPrevBlock]);
         /*if (blockValue > posBlockReward) {
             numUTXO - 1 is team rewards, numUTXO - 2 is masternode reward
             const CTxOut& mnOut = coinstake.vout[numUTXO - 2];
@@ -1595,7 +1595,7 @@ bool CheckHaveInputs(const CCoinsViewCache& view, const CTransaction& tx)
                 CBlockIndex* tip = chainActive.Tip();
                 if (!pindexPrev) tip = pindexPrev;
 
-                uint256 hashTip = tip->GetBlockHash();
+                //uint256 hashTip = tip->GetBlockHash();
                 //verify that tip and hashBlock must be in the same fork
                 CBlockIndex* atTheblock = mapBlockIndex[bh];
                 if (!atTheblock) {
@@ -1917,7 +1917,7 @@ bool AcceptableInputs(CTxMemPool& pool, CValidationState& state, const CTransact
                     hash.ToString(), nSigOps, nMaxSigOps),
                 REJECT_NONSTANDARD, "bad-txns-too-many-sigops");
 
-        CAmount nValueOut = tx.GetValueOut();
+        //CAmount nValueOut = tx.GetValueOut();
         CAmount nFees = tx.nTxFee;
         double dPriority = GetPriority(tx, chainHeight);
 
@@ -2508,7 +2508,7 @@ void UpdateCoins(const CTransaction& tx, CValidationState& state, CCoinsViewCach
         txundo.vprevout.reserve(tx.vin.size());
         for (const CTxIn& txin : tx.vin) {
             txundo.vprevout.push_back(CTxInUndo());
-            bool ret = inputs.ModifyCoins(txin.prevout.hash)->Spend(txin.prevout, txundo.vprevout.back());
+            //bool ret = inputs.ModifyCoins(txin.prevout.hash)->Spend(txin.prevout, txundo.vprevout.back());
             //assert(ret);
         }
     }
@@ -3039,12 +3039,12 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
     if (block.IsProofOfStake()) {
         const CTransaction coinstake = block.vtx[1];
         size_t numUTXO = coinstake.vout.size();
-        CAmount posBlockReward = PoSBlockReward();
+        //CAmount posBlockReward = PoSBlockReward();
         if (mapBlockIndex.count(block.hashPrevBlock) < 1) {
             return state.DoS(100, error("ConnectBlock() : Previous block not found, received block %s, previous %s, current tip %s", block.GetHash().GetHex(), block.hashPrevBlock.GetHex(), chainActive.Tip()->GetBlockHash().GetHex()));
         }
-        int thisBlockHeight = mapBlockIndex[block.hashPrevBlock]->nHeight + 1; //avoid potential block disorder during download
-        CAmount blockValue = GetBlockValue(mapBlockIndex[block.hashPrevBlock]);
+        //int thisBlockHeight = mapBlockIndex[block.hashPrevBlock]->nHeight + 1; //avoid potential block disorder during download
+        //CAmount blockValue = GetBlockValue(mapBlockIndex[block.hashPrevBlock]);
         /*if (blockValue > posBlockReward) {
             //numUTXO - 1 is PoS rewards commitment not correct", numUTXO - 2 is masternode reward
             const CTxOut& mnOut = coinstake.vout[numUTXO - 2];
