@@ -2266,7 +2266,7 @@ CAmount GetSeeSaw(const CAmount& blockValue, int nMasternodeCount, int nHeight)
         } else {
             ret = blockValue * .40;
         }
-	} else if (nHeight >= Params().SoftFork()) {
+	} else if (nHeight > Params().SoftFork()) {
 		if (mNodeCoins <= (nMoneySupply * .01) && mNodeCoins > 0) {
             ret = blockValue * .6;
         } else if (mNodeCoins <= (nMoneySupply * .02) && mNodeCoins > (nMoneySupply * .01)) {
