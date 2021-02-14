@@ -21,6 +21,7 @@
 #include "timedata.h"
 #include "util.h"
 #include "utilmoneystr.h"
+#include <QString>
 
 #include "secp256k1.h"
 #include <assert.h>
@@ -37,6 +38,7 @@
 #include <boost/thread.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include "masternodeconfig.h"
+
 
 
 using namespace std;
@@ -2772,7 +2774,7 @@ bool CWallet::CreateTransactionBulletProof(const CKey& txPrivDes, const CPubKey&
                                 strFailReason = "Insufficient reserved funds! Your wallet is staking with a reserve balance of " + ValueFromAmountToString(nReserveBalance) + " less than the sending amount " + ValueFromAmountToString(nTotalValue);
                         } else if (setCoins.size() > MAX_TX_INPUTS) {
                             //max inputs
-                            strFailReason = _("You have attempted to send more than " + MAX_TX_INPUTS + " UTXOs in a single transaction. To work around this limitation, please either lower the total amount of the transaction or send two separate transactions with 50% of your total desired amount.");
+                            strFailReason = _("You have attempted to send more than " + MAX_TX_INPUTS.toStdString() + " UTXOs in a single transaction. To work around this limitation, please either lower the total amount of the transaction or send two separate transactions with 50% of your total desired amount.");
                         } else {
                             //other
                             strFailReason = _("Error in CreateTransactionBulletProof. Please try again.");
@@ -3132,7 +3134,7 @@ bool CWallet::makeRingCT(CTransaction& wtxNew, int ringSize, std::string& strFai
     const size_t MAX_VOUT = 5;
 
     if (wtxNew.vin.size() > MAX_TX_INPUTS || wtxNew.vin.size() == 0) {
-        strFailReason = _("You have attempted to send a total value that is comprised of more than " + MAX_TX_INPUTS + " smaller deposits. This is a rare occurrence, and lowering the total value sent, or sending the same total value in two separate transactions will usually work around this limitation.");
+        strFailReason = _("You have attempted to send a total value that is comprised of more than " + MAX_TX_INPUTS.toStdString() + " smaller deposits. This is a rare occurrence, and lowering the total value sent, or sending the same total value in two separate transactions will usually work around this limitation.");
         return false;
     }
 
