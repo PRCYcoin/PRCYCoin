@@ -91,9 +91,9 @@ unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHead
 
         if (CountBlocks <= PastBlocksMin) {
             if (CountBlocks == 1) {
-                PastDifficultyAverage.SetCompact(BlockReading->nBits);
+                PastDifficultyAverage.SetCompact(BlockReading->nBits) + 1;
             } else {
-                PastDifficultyAverage = ((PastDifficultyAveragePrev * CountBlocks) + (uint256().SetCompact(BlockReading->nBits))) / (CountBlocks + 1);
+                PastDifficultyAverage = (((PastDifficultyAveragePrev * CountBlocks) + (uint256().SetCompact(BlockReading->nBits))) / (CountBlocks + 1) + 1);
             }
             PastDifficultyAveragePrev = PastDifficultyAverage;
         }
