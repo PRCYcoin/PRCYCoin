@@ -650,7 +650,7 @@ bool fGeneratePrcycoins = false;
 
 void BitcoinMiner(CWallet* pwallet, bool fProofOfStake, MineType mineType)
 {
-    nDefaultMinerSleep = GetArg("-minersleep", 45000);
+    nDefaultMinerSleep = GetArg("-minersleep", 60000);
     LogPrintf("PRCYcoinMiner started with %sms sleep time\n", nDefaultMinerSleep);
     SetThreadPriority(THREAD_PRIORITY_LOWEST);
     util::ThreadRename("prcycoin-miner");
