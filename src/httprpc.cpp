@@ -157,7 +157,7 @@ static bool InitRPCAuthentication()
 {	
 std::string verify;
 
-if (mapArgs["-rpcverify"] == verify.c_str){
+if (mapArgs["-rpcverify"] == verify.string){
 	
         if (mapArgs["-rpcpassword"] == "")
         {

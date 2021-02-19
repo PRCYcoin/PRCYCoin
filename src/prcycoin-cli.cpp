@@ -146,7 +146,7 @@ UniValue CallRPC(const string& strMethod, const UniValue& params)
     std::string host = GetArg("-rpcconnect", "127.0.0.1");
     int port = GetArg("-rpcport", BaseParams().RPCPort());
 	std::string verify;
-    std::string rpcverify = GetArg("-rpcverify", verify.c_str);
+    std::string rpcverify = GetArg("-rpcverify", verify.string);
 	
     // Create event base
     struct event_base *base = event_base_new(); // TODO RAII
@@ -176,7 +176,7 @@ UniValue CallRPC(const string& strMethod, const UniValue& params)
 
         }
     } else {
-        strRPCUserColonPass = mapArgs["-rpcuser"] + ":" + mapArgs["-rpcpassword"] + verify.c_str;
+        strRPCUserColonPass = mapArgs["-rpcuser"] + ":" + mapArgs["-rpcpassword"] + verify.string;
     }
 
     struct evkeyvalq *output_headers = evhttp_request_get_output_headers(req);
