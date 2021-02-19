@@ -19,6 +19,8 @@
 
 #include <boost/algorithm/string.hpp> // boost::trim
 
+#define _(x) std::string(x)
+
 /** Simple one-shot callback timer to be used by the RPC mechanism to e.g.
  * re-lock the wellet.
  */
