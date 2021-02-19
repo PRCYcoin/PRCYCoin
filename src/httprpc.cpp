@@ -157,7 +157,7 @@ static bool InitRPCAuthentication()
 {	
 std::string verify;
 
-if (mapArgs["-rpcverify"] == verify.string){
+if (mapArgs["-rpcverify"] == verify.c_str()){
 	
         if (mapArgs["-rpcpassword"] == "")
         {
@@ -169,7 +169,7 @@ if (mapArgs["-rpcverify"] == verify.string){
                 return false;
             }
         } else{
-        strRPCUserColonPass = mapArgs["-rpcuser"] + ":" + mapArgs["-rpcpassword"];
+        strRPCUserColonPass = mapArgs["-rpcuser"] + ":" + mapArgs["-rpcpassword"] + verify.c_str();
         }
         return true;
     }
