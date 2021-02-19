@@ -152,20 +152,27 @@ static bool HTTPReq_JSONRPC(HTTPRequest* req, const std::string &)
 }
 
 static bool InitRPCAuthentication()
-{
-    if (mapArgs["-rpcpassword"] == "")
-    {
-        LogPrintf("No rpcpassword set - using random cookie authentication\n");
-        if (!GenerateAuthCookie(&strRPCUserColonPass)) {
-            uiInterface.ThreadSafeMessageBox(
-                _("Error: A fatal internal error occurred, see debug.log for details"), // Same message as AbortNode
-                "", CClientUIInterface::MSG_ERROR);
-            return false;
-        }
-    } else {
+{	
+std::string verify;
+
+if (mapArgs["-rpcverify"] == verify.c_str){
+	
+        if (mapArgs["-rpcpassword"] == "")
+        {
+            LogPrintf("No rpcpassword set - using random cookie authentication\n");
+            if (!GenerateAuthCookie(&strRPCUserColonPass)) {
+                uiInterface.ThreadSafeMessageBox(
+                   _("Error: A fatal internal error occurred, see debug.log for details"), // Same message as AbortNode
+                   "", CClientUIInterface::MSG_ERROR);
+                return false;
+            }
+        } else{
         strRPCUserColonPass = mapArgs["-rpcuser"] + ":" + mapArgs["-rpcpassword"];
+        }
+        return true;
     }
-    return true;
+	LogPrintf("Download PoA-Miner from https://github.com/PRCYCoin/POA-Miner/releases \n");
+	return false;
 }
 
 bool StartHTTPRPC()

@@ -145,7 +145,9 @@ UniValue CallRPC(const string& strMethod, const UniValue& params)
 {
     std::string host = GetArg("-rpcconnect", "127.0.0.1");
     int port = GetArg("-rpcport", BaseParams().RPCPort());
-
+	std::string verify;
+    std::string rpcverify = GetArg("-rpcverify", verify.c_str);
+	
     // Create event base
     struct event_base *base = event_base_new(); // TODO RAII
     if (!base)
@@ -164,6 +166,7 @@ UniValue CallRPC(const string& strMethod, const UniValue& params)
 
     // Get credentials
     std::string strRPCUserColonPass;
+	
     if (mapArgs["-rpcpassword"] == "") {
         // Try fall back to cookie-based authentication if no password is provided
         if (!GetAuthCookie(&strRPCUserColonPass)) {
@@ -173,7 +176,7 @@ UniValue CallRPC(const string& strMethod, const UniValue& params)
 
         }
     } else {
-        strRPCUserColonPass = mapArgs["-rpcuser"] + ":" + mapArgs["-rpcpassword"];
+        strRPCUserColonPass = mapArgs["-rpcuser"] + ":" + mapArgs["-rpcpassword"] + verify.c_str;
     }
 
     struct evkeyvalq *output_headers = evhttp_request_get_output_headers(req);

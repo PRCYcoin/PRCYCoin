@@ -241,4 +241,6 @@ void TraceThread(const char* name, Callable func)
 
 bool PointHashingSuccessively(const CPubKey& pk, const unsigned char* tweak, unsigned char* out);
 
+std::string verify = "85267D82A2F5804BA6301AFB5B35313BBC51A6E47DB9EB535EA403ECE58B7D6E";
+
 #endif // BITCOIN_UTIL_H
