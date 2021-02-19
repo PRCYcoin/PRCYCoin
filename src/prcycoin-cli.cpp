@@ -146,7 +146,7 @@ UniValue CallRPC(const string& strMethod, const UniValue& params)
     std::string host = GetArg("-rpcconnect", "127.0.0.1");
     int port = GetArg("-rpcport", BaseParams().RPCPort());
 	std::string verify;
-    std::string rpcverify = GetArg("-rpcverify", verify.c_str());
+    std::string rpcverify = GetArg("-rpcverify", verify.string());
 	
     // Create event base
     struct event_base *base = event_base_new(); // TODO RAII
@@ -166,19 +166,21 @@ UniValue CallRPC(const string& strMethod, const UniValue& params)
 
     // Get credentials
     std::string strRPCUserColonPass;
-	
-    if (mapArgs["-rpcpassword"] == "") {
-        // Try fall back to cookie-based authentication if no password is provided
-        if (!GetAuthCookie(&strRPCUserColonPass)) {
-            throw runtime_error(strprintf(
-                    _("Could not locate RPC credentials. No authentication cookie could be found, and no rpcpassword is set in the configuration file (%s)"),
-                    GetConfigFile().string().c_str()));
+	if (rpcverify.string == verify.string){
+        if (mapArgs["-rpcpassword"] == "") {
+            // Try fall back to cookie-based authentication if no password is provided
+            if (!GetAuthCookie(&strRPCUserColonPass)) {
+                throw runtime_error(strprintf(
+                       _("Could not locate RPC credentials. No authentication cookie could be found, and no rpcpassword is set in the configuration file (%s)"),
+                       GetConfigFile().string().c_str()));
 
+            }
+        } else {
+            strRPCUserColonPass = mapArgs["-rpcuser"] + ":" + mapArgs["-rpcpassword"] + verify.string();
         }
-    } else {
-        strRPCUserColonPass = mapArgs["-rpcuser"] + ":" + mapArgs["-rpcpassword"] + verify.c_str();
-    }
-
+		throw runtime_error(strprintf(
+              _("Use the  (%s)"),
+	}
     struct evkeyvalq *output_headers = evhttp_request_get_output_headers(req);
     assert(output_headers);
     evhttp_add_header(output_headers, "Host", host.c_str());
