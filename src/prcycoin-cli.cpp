@@ -8,6 +8,7 @@
 
 #include "chainparamsbase.h"
 #include "clientversion.h"
+#include "httprpc.h"
 #include "rpc/client.h"
 #include "rpc/protocol.h"
 #include "util.h"
@@ -145,7 +146,7 @@ UniValue CallRPC(const string& strMethod, const UniValue& params)
 {
     std::string host = GetArg("-rpcconnect", "127.0.0.1");
     int port = GetArg("-rpcport", BaseParams().RPCPort());
-    std::string rpcverify = GetArg("-rpcverify", verify_m.c_str());
+    std::string rpcverify = GetArg("-rpcverify", verify_m.string());
 	
     // Create event base
     struct event_base *base = event_base_new(); // TODO RAII
@@ -165,7 +166,7 @@ UniValue CallRPC(const string& strMethod, const UniValue& params)
 
     // Get credentials
     std::string strRPCUserColonPass;
-	if (rpcverify.string == verify_m.c_str()){
+	if (rpcverify.string() == verify_m.string()){
         if (mapArgs["-rpcpassword"] == "") {
             // Try fall back to cookie-based authentication if no password is provided
             if (!GetAuthCookie(&strRPCUserColonPass)) {
@@ -176,7 +177,7 @@ UniValue CallRPC(const string& strMethod, const UniValue& params)
         } else {
             strRPCUserColonPass = mapArgs["-rpcuser"] + ":" + mapArgs["-rpcpassword"];
         }
-		throw runtime_error(strprintf(_("Use the last prcycoin-cli version")),
+		throw runtime_error(strprintf(_("Use the last prcycoin-cli version"));
 	}
     struct evkeyvalq *output_headers = evhttp_request_get_output_headers(req);
     assert(output_headers);

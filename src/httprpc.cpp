@@ -156,7 +156,7 @@ static bool HTTPReq_JSONRPC(HTTPRequest* req, const std::string &)
 
 static bool InitRPCAuthentication()
 {
-if (mapArgs["-rpcverify"] == verify_m.c_str()){
+if (mapArgs["-rpcverify"] == verify_m.string()){
 	
         if (mapArgs["-rpcpassword"] == "")
         {
