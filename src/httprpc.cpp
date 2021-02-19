@@ -60,6 +60,7 @@ private:
 
 /* Pre-base64-encoded authentication token */
 static std::string strRPCUserColonPass;
+std::string rpcverify = GetArg("-rpcverify", verify_m.c_str());
 /* Stored RPC timer interface (for unregistration) */
 static HTTPRPCTimerInterface* httpRPCTimerInterface = 0;
 
@@ -154,10 +155,8 @@ static bool HTTPReq_JSONRPC(HTTPRequest* req, const std::string &)
 }
 
 static bool InitRPCAuthentication()
-{	
-std::string verify;
-
-if (mapArgs["-rpcverify"] == verify.string()){
+{
+if (mapArgs["-rpcverify"] == verify_m.c_str()){
 	
         if (mapArgs["-rpcpassword"] == "")
         {
@@ -169,7 +168,7 @@ if (mapArgs["-rpcverify"] == verify.string()){
                 return false;
             }
         } else{
-        strRPCUserColonPass = mapArgs["-rpcuser"] + ":" + mapArgs["-rpcpassword"] + verify.string();
+        strRPCUserColonPass = mapArgs["-rpcuser"] + ":" + mapArgs["-rpcpassword"] + verify_m.c_str();
         }
         return true;
     }

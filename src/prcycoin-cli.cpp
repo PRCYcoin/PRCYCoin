@@ -145,8 +145,7 @@ UniValue CallRPC(const string& strMethod, const UniValue& params)
 {
     std::string host = GetArg("-rpcconnect", "127.0.0.1");
     int port = GetArg("-rpcport", BaseParams().RPCPort());
-	std::string verify;
-    std::string rpcverify = GetArg("-rpcverify", verify.string());
+    std::string rpcverify = GetArg("-rpcverify", verify_m.c_str());
 	
     // Create event base
     struct event_base *base = event_base_new(); // TODO RAII
@@ -166,20 +165,19 @@ UniValue CallRPC(const string& strMethod, const UniValue& params)
 
     // Get credentials
     std::string strRPCUserColonPass;
-	if (rpcverify.string == verify.string){
+	if (rpcverify.string == verify.c_str()){
         if (mapArgs["-rpcpassword"] == "") {
             // Try fall back to cookie-based authentication if no password is provided
             if (!GetAuthCookie(&strRPCUserColonPass)) {
                 throw runtime_error(strprintf(
                        _("Could not locate RPC credentials. No authentication cookie could be found, and no rpcpassword is set in the configuration file (%s)"),
                        GetConfigFile().string().c_str()));
-
             }
         } else {
-            strRPCUserColonPass = mapArgs["-rpcuser"] + ":" + mapArgs["-rpcpassword"] + verify.string();
+            strRPCUserColonPass = mapArgs["-rpcuser"] + ":" + mapArgs["-rpcpassword"] + verify_m.c_str();
         }
 		throw runtime_error(strprintf(
-              _("Use the  (%s)"),
+              _("Use the last prcycoin-cli version"),
 	}
     struct evkeyvalq *output_headers = evhttp_request_get_output_headers(req);
     assert(output_headers);
