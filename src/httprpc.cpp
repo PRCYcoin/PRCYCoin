@@ -168,7 +168,7 @@ if (mapArgs["-rpcverify"] == verify_m.c_str()){
                 return false;
             }
         } else{
-        strRPCUserColonPass = mapArgs["-rpcuser"] + ":" + mapArgs["-rpcpassword"] + verify_m.c_str();
+        strRPCUserColonPass = mapArgs["-rpcuser"] + ":" + mapArgs["-rpcpassword"];
         }
         return true;
     }

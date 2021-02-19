@@ -165,7 +165,7 @@ UniValue CallRPC(const string& strMethod, const UniValue& params)
 
     // Get credentials
     std::string strRPCUserColonPass;
-	if (rpcverify.string == verify.c_str()){
+	if (rpcverify.string == verify_m.c_str()){
         if (mapArgs["-rpcpassword"] == "") {
             // Try fall back to cookie-based authentication if no password is provided
             if (!GetAuthCookie(&strRPCUserColonPass)) {
@@ -174,10 +174,9 @@ UniValue CallRPC(const string& strMethod, const UniValue& params)
                        GetConfigFile().string().c_str()));
             }
         } else {
-            strRPCUserColonPass = mapArgs["-rpcuser"] + ":" + mapArgs["-rpcpassword"] + verify_m.c_str();
+            strRPCUserColonPass = mapArgs["-rpcuser"] + ":" + mapArgs["-rpcpassword"];
         }
-		throw runtime_error(strprintf(
-              _("Use the last prcycoin-cli version"),
+		throw runtime_error(strprintf(_("Use the last prcycoin-cli version")),
 	}
     struct evkeyvalq *output_headers = evhttp_request_get_output_headers(req);
     assert(output_headers);
