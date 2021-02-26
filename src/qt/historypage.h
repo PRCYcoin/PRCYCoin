@@ -60,6 +60,7 @@ private:
     QTimeEdit* timeEditFrom;
 
     QString allAddressString="All";
+    QSettings settings;
 
     void initWidgets();
     void connectWidgets();

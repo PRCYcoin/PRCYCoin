@@ -567,6 +567,29 @@
          </layout>
         </widget>
        </item>
+       <item>
+        <widget class="QGroupBox" name="privacygroupBox">
+         <property name="title">
+          <string>Privacy Settings</string>
+         </property>
+         <layout class="QHBoxLayout" name="horizontalLayout_7">
+          <item>
+           <widget class="QCheckBox" name="hideBalanceStaking">
+            <property name="text">
+             <string>Hide balance while wallet is unlocked for Staking</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="lockSendStaking">
+            <property name="text">
+             <string>Lock &quot;Send&quot; tab when unlocked for Staking</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
       </layout>
      </widget>
     </widget>

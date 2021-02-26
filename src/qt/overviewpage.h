@@ -12,6 +12,7 @@
 #include <QElapsedTimer>
 #include <QDialog>
 #include <QSizeGrip>
+#include <QSettings>
 
 class ClientModel;
 class TransactionFilterProxy;
@@ -84,6 +85,7 @@ private:
     QWidget* balanceSyncCircle;
     QWidget* balanceAnimSyncCircle;
     bool isSyncingBalance=true;
+    QSettings settings;
 
     void initSyncCircle(float percentOfParent);
     void moveSyncCircle(QWidget* anchor, QWidget* animated, int deltaRadius, float degreesPerSecond, float angleOffset=0);
