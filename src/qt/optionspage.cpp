@@ -1036,10 +1036,10 @@ void OptionsPage::hideBalanceStaking_clicked(int state) {
                 QMessageBox msgBox;
                 msgBox.setWindowTitle("Hide Balance in Staking");
                 msgBox.setIcon(QMessageBox::Information);
-                msgBox.setText("Attempt to view Disable Hide Balance in Staking failed or canceled. Wallet locked for security.");
+                msgBox.setText("Attempt to view Disable Hide Balance in Staking failed or canceled. Enabled for security.");
                 msgBox.setStyleSheet(GUIUtil::loadStyleSheet());
                 msgBox.exec();
-                LogPrintf("Attempt to view Disable Hide Balance in Staking failed or canceled. Wallet locked for security.\n");
+                LogPrintf("Attempt to view Disable Hide Balance in Staking failed or canceled. Enabled for security.\n");
                 return;
             } else {
                 SecureString pass;
@@ -1077,10 +1077,10 @@ void OptionsPage::lockSendStaking_clicked(int state) {
                 QMessageBox msgBox;
                 msgBox.setWindowTitle("Lock Send Tab in Staking");
                 msgBox.setIcon(QMessageBox::Information);
-                msgBox.setText("Attempt to view Disable Lock Send Tab in Staking failed or canceled. Wallet locked for security.");
+                msgBox.setText("Attempt to view Disable Lock Send Tab in Staking failed or canceled. Enabled for security.");
                 msgBox.setStyleSheet(GUIUtil::loadStyleSheet());
                 msgBox.exec();
-                LogPrintf("Attempt to view Disable Lock Send Tab in Staking failed or canceled. Wallet locked for security.\n");
+                LogPrintf("Attempt to view Disable Lock Send Tab in Staking failed or canceled. Enabled for security.\n");
                 return;
             } else {
                 SecureString pass;
