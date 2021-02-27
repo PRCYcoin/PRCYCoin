@@ -1030,7 +1030,6 @@ void OptionsPage::hideBalanceStaking_clicked(int state) {
         QMessageBox::StandardButton reply;
         reply = QMessageBox::question(this, "Are You Sure?", "Are you sure you would like to disable your Hide Balance in Staking?\nYou will be required to enter your passphrase. Failed or canceled attempts will be logged.", QMessageBox::Yes|QMessageBox::No);
         if (reply == QMessageBox::Yes) {
-            settings.setValue("fHideBalance", true);
             WalletModel::UnlockContext ctx(model->requestUnlock(AskPassphraseDialog::Context::Unlock_Full, true));
             if (!ctx.isValid()) {
                 QMessageBox msgBox;
@@ -1040,6 +1039,7 @@ void OptionsPage::hideBalanceStaking_clicked(int state) {
                 msgBox.setStyleSheet(GUIUtil::loadStyleSheet());
                 msgBox.exec();
                 LogPrintf("Attempt to view Disable Hide Balance in Staking failed or canceled. Enabled for security.\n");
+                settings.setValue("fHideBalance", true);
                 return;
             } else {
                 SecureString pass;
@@ -1048,6 +1048,7 @@ void OptionsPage::hideBalanceStaking_clicked(int state) {
             }
         } else {
             LogPrintf("Attempt to view Disable Hide Balance in Staking canceled.\n");
+            settings.setValue("fHideBalance", true);
             return;
         }
     }
@@ -1070,7 +1071,6 @@ void OptionsPage::lockSendStaking_clicked(int state) {
         QMessageBox::StandardButton reply;
         reply = QMessageBox::question(this, "Are You Sure?", "Are you sure you would like to disable your Lock Send Tab in Staking?\nYou will be required to enter your passphrase. Failed or canceled attempts will be logged.", QMessageBox::Yes|QMessageBox::No);
         if (reply == QMessageBox::Yes) {
-            settings.setValue("fLockSendStaking", true);
             WalletModel::UnlockContext ctx(model->requestUnlock(AskPassphraseDialog::Context::Unlock_Full, true));
             if (!ctx.isValid()) {
                 QMessageBox msgBox;
@@ -1080,6 +1080,7 @@ void OptionsPage::lockSendStaking_clicked(int state) {
                 msgBox.setStyleSheet(GUIUtil::loadStyleSheet());
                 msgBox.exec();
                 LogPrintf("Attempt to view Disable Lock Send Tab in Staking failed or canceled. Enabled for security.\n");
+                settings.setValue("fLockSendStaking", true);
                 return;
             } else {
                 SecureString pass;
@@ -1088,6 +1089,7 @@ void OptionsPage::lockSendStaking_clicked(int state) {
             }
         } else {
             LogPrintf("Attempt to view Disable Lock Send Tab in Staking canceled.\n");
+            settings.setValue("fLockSendStaking", true);
             return;
 		}
     }
