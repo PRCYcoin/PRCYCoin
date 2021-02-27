@@ -1030,7 +1030,7 @@ void OptionsPage::hideBalanceStaking_clicked(int state) {
         QMessageBox::StandardButton reply;
         reply = QMessageBox::question(this, "Are You Sure?", "Are you sure you would like to disable your Hide Balance in Staking?\nYou will be required to enter your passphrase. Failed or canceled attempts will be logged.", QMessageBox::Yes|QMessageBox::No);
         if (reply == QMessageBox::Yes) {
-            model->setWalletLocked(true);
+            settings.setValue("fHideBalance", true);
             WalletModel::UnlockContext ctx(model->requestUnlock(AskPassphraseDialog::Context::Unlock_Full, true));
             if (!ctx.isValid()) {
                 QMessageBox msgBox;
@@ -1043,7 +1043,6 @@ void OptionsPage::hideBalanceStaking_clicked(int state) {
                 return;
             } else {
                 SecureString pass;
-                model->setWalletLocked(false, pass);
                 settings.setValue("fHideBalance", false);
                 LogPrintf("Disabled Hide Balance in Staking successful.\n");
             }
@@ -1071,7 +1070,7 @@ void OptionsPage::lockSendStaking_clicked(int state) {
         QMessageBox::StandardButton reply;
         reply = QMessageBox::question(this, "Are You Sure?", "Are you sure you would like to disable your Lock Send Tab in Staking?\nYou will be required to enter your passphrase. Failed or canceled attempts will be logged.", QMessageBox::Yes|QMessageBox::No);
         if (reply == QMessageBox::Yes) {
-            model->setWalletLocked(true);
+            settings.setValue("fLockSendStaking", true);
             WalletModel::UnlockContext ctx(model->requestUnlock(AskPassphraseDialog::Context::Unlock_Full, true));
             if (!ctx.isValid()) {
                 QMessageBox msgBox;
@@ -1084,7 +1083,6 @@ void OptionsPage::lockSendStaking_clicked(int state) {
                 return;
             } else {
                 SecureString pass;
-                model->setWalletLocked(false, pass);
                 settings.setValue("fLockSendStaking", false);
                 LogPrintf("Disabled Lock Send Tab in Staking successful.\n");
             }
