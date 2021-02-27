@@ -1044,13 +1044,13 @@ void OptionsPage::hideBalanceStaking_clicked(int state) {
             } else {
                 SecureString pass;
                 model->setWalletLocked(false, pass);
+                settings.setValue("fHideBalance", false);
                 LogPrintf("Disabled Hide Balance in Staking successful.\n");
             }
         } else {
             LogPrintf("Attempt to view Disable Hide Balance in Staking canceled.\n");
             return;
         }
-        settings.setValue("fHideBalance", false);
     }
 }
 
@@ -1085,12 +1085,12 @@ void OptionsPage::lockSendStaking_clicked(int state) {
             } else {
                 SecureString pass;
                 model->setWalletLocked(false, pass);
+                settings.setValue("fLockSendStaking", false);
                 LogPrintf("Disabled Lock Send Tab in Staking successful.\n");
             }
         } else {
             LogPrintf("Attempt to view Disable Lock Send Tab in Staking canceled.\n");
             return;
 		}
-        settings.setValue("fLockSendStaking", false);
     }
 }
