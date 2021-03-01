@@ -141,7 +141,7 @@ public:
         nPoABlockTime = 60 * 60; //a PoA block every 60 minutes
         nMinNumPoSBlocks = 59;
         nMaxNumPoSBlocks = 120;
-        nSoftForkBlock = 120000; // Soft fork block for difficulty change
+        nSoftForkBlock = 130000; // Soft fork block for difficulty change
 
         /**
          * Build the genesis block. Note that the output of the genesis coinbase cannot
