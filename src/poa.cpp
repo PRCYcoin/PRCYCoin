@@ -16,8 +16,9 @@
 
 #include <math.h>
 
-unsigned int N_BITS = 0x1e127ff8;
-unsigned int N_BITS_SF = 0x1e0805ff;
+unsigned int N_BITS = 0x1e050000;
+unsigned int N_BITS_SF= 0x1e127ff8;
+unsigned int N_BITS_PD = 0x1e0805ff;  //PoANewDiff
 
 unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHeader* pblock)
 {
@@ -25,7 +26,10 @@ unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHead
         if (pindexLast->nHeight < Params().SoftFork()) {
             return N_BITS;
         }
-        return N_BITS_SF;
+		if (Params().SoftFork() > pindexLast->nHeight < Params().PoANewDiff()) {
+            return N_BITS_SF;
+        }
+        return N_BITS_PD;
     }
     /* current difficulty formula, prcycoin - DarkGravity v3, written by Evan Duffield - evan@dashpay.io */
     const CBlockIndex* BlockLastSolved = pindexLast;

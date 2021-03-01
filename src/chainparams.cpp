@@ -141,7 +141,8 @@ public:
         nPoABlockTime = 60 * 60; //a PoA block every 60 minutes
         nMinNumPoSBlocks = 59;
         nMaxNumPoSBlocks = 120;
-        nSoftForkBlock = 130000; // Soft fork block for difficulty change
+        nSoftForkBlock = 120000; // Soft fork block for difficulty change
+        nPoANewDiff=121200;
 
         /**
          * Build the genesis block. Note that the output of the genesis coinbase cannot
@@ -281,6 +282,7 @@ public:
         MAX_MONEY = 5000000000.0;
         nMaxMoneyOut = MAX_MONEY * COIN;
         nSoftForkBlock = 0; // Soft fork block for difficulty change - testnet started with it
+        nPoANewDiff = 0;
 
         //! Modify the testnet genesis block so the timestamp is valid for a later start.
         genesis.nTime = 1608422400;
