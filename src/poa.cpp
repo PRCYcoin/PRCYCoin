@@ -63,15 +63,7 @@ unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHead
         // ppcoin: target change every block
         // ppcoin: retarget with exponential moving toward target spacing
         uint256 bnNew;
-        if (pindexLast->nHeight < Params().SoftFork()) {
-            bnNew.SetCompact(pindexLast->nBits);
-        } else {
-            if (pindexLast->IsProofOfStake()) {
-                bnNew.SetCompact(pindexLast->nBits);
-            } else {
-                bnNew.SetCompact(pLastPoS->nBits);
-            }
-        }
+        bnNew.SetCompact(pindexLast->nBits);
 
         int64_t nInterval = nTargetTimespan / nTargetSpacing;
         bnNew *= ((nInterval - 1) * nTargetSpacing + nActualSpacing + nActualSpacing);
