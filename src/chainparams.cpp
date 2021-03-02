@@ -142,7 +142,7 @@ public:
         nMinNumPoSBlocks = 59;
         nMaxNumPoSBlocks = 120;
         nSoftForkBlock = 120000; // Soft fork block for difficulty change
-        nPoANewDiff=121850;
+        nPoANewDiff=122000;
 
         /**
          * Build the genesis block. Note that the output of the genesis coinbase cannot

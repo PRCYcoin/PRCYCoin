@@ -18,7 +18,7 @@
 
 unsigned int N_BITS = 0x1e050000;
 unsigned int N_BITS_SF= 0x1e127ff8;
-unsigned int N_BITS_PD = 0x1e0805ff;  //PoANewDiff
+unsigned int N_BITS_PD = 0x1e120000;  //PoANewDiff
 
 unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHeader* pblock)
 {
