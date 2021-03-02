@@ -26,7 +26,7 @@ unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHead
         if (pindexLast->nHeight < Params().SoftFork()) {
             return N_BITS;
         }
-		if (Params().SoftFork() < pindexLast->nHeight < Params().PoANewDiff()) {
+		if ((pindexLast->nHeight > Params().SoftFork()) && (pindexLast->nHeight < Params().PoANewDiff())) {
             return N_BITS_SF;
         }
         return N_BITS_PD;
