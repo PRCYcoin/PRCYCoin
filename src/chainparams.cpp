@@ -281,8 +281,8 @@ public:
         nModifierUpdateBlock = 51197; //approx Mon, 17 Apr 2017 04:00:00 GMT
         MAX_MONEY = 5000000000.0;
         nMaxMoneyOut = MAX_MONEY * COIN;
-        nSoftForkBlock = 0; // Soft fork block for difficulty change - testnet started with it
-        nPoANewDiff = 0;
+        nSoftForkBlock = 300; // Soft fork block for difficulty change - testnet started with it
+        nPoANewDiff = 500;
 
         //! Modify the testnet genesis block so the timestamp is valid for a later start.
         genesis.nTime = 1608422400;
