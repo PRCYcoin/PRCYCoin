@@ -5336,13 +5336,13 @@ bool CWallet::CreateSweepingTransaction(CAmount target, CAmount threshold, uint3
 
 void CWallet::AutoCombineDust()
 {
-    bool stkStatus = pwalletMain->ReadStakingStatus();
     // QT wallet is always locked at startup, return immediately
     if (IsLocked()) return;
     // Chain is not synced, return
     if (IsInitialBlockDownload() || !masternodeSync.IsBlockchainSynced()) return;
     // Tip()->nTime < (GetAdjustedTime() - 300) - (default .conf setting = 300)
     if (chainActive.Tip()->nTime < (GetAdjustedTime() - nDefaultConsolidateTime)) return;
+    bool stkStatus = pwalletMain->ReadStakingStatus();
     if (combineMode == CombineMode::ON && stkStatus) {
         //sweeping to create larger UTXO for staking
         LOCK2(cs_main, cs_wallet);
