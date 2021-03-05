@@ -423,16 +423,6 @@
               <item>
                <widget class="QLineEdit" name="lineEditWithhold"/>
               </item>
-              <item>
-               <widget class="QCheckBox" name="addNewFunds">
-                <property name="toolTip">
-                 <string>Enabling this will incur a minimum 1 PRCY fee each time you receive a new deposit that needs to be consolidated for staking.</string>
-                </property>
-                <property name="text">
-                 <string>Automatically add any new deposits received to your staked balance</string>
-                </property>
-               </widget>
-              </item>
              </layout>
             </item>
             <item>
