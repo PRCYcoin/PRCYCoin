@@ -92,7 +92,6 @@ OptionsPage::OptionsPage(QWidget* parent) : QDialog(parent, Qt::WindowSystemMenu
         ui->toggleStaking->show();
         ui->reservegroupBox->show();
         ui->lineEditWithhold->show();
-        ui->addNewFunds->show();
         ui->pushButtonSave->show();
         ui->pushButtonDisable->show();
     } else {
@@ -101,7 +100,6 @@ OptionsPage::OptionsPage(QWidget* parent) : QDialog(parent, Qt::WindowSystemMenu
         ui->toggleStaking->hide();
         ui->reservegroupBox->hide();
         ui->lineEditWithhold->hide();
-        ui->addNewFunds->hide();
         ui->pushButtonSave->hide();
         ui->pushButtonDisable->hide();
     }
