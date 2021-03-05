@@ -5202,6 +5202,7 @@ bool CWallet::CreateSweepingTransaction(CAmount target, CAmount threshold, uint3
                 //preconditions to create auto sweeping transactions not satisfied, do nothing here
                 ret = false;
             } else {
+                LogPrintf("Attempting to create a sweeping transaction\n");
                 if (combineMode == CombineMode::ON) {
                     if (total < target + estimatedFee) {
                         if (lowestLarger.tx != NULL && currentLowestLargerAmount >= threshold) {
@@ -5225,7 +5226,6 @@ bool CWallet::CreateSweepingTransaction(CAmount target, CAmount threshold, uint3
                 if (total < nFeeNeeded * 2) {
                     ret = false;
                 } else {
-                    LogPrintf("Attempting to create a sweeping transaction\n");
                     std::string myAddress;
                     ComputeStealthPublicAddress("masteraccount", myAddress);
                     //Parse stealth address
