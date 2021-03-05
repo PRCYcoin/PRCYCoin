@@ -5352,9 +5352,11 @@ void CWallet::AutoCombineDust()
         uint32_t nTime = ReadAutoConsolidateSettingTime();
         nTime = (nTime == 0)? GetAdjustedTime() : nTime;
         LogPrintf("Attempting to create a consolidation transaction for a larger UTXO for staking\n");
+        // MINIMUM_STAKE_AMOUNT already has * COIN, so not used here
         CreateSweepingTransaction(MINIMUM_STAKE_AMOUNT, max + MAX_FEE, nTime);
         return;
     }
+    // nAutoCombineTarget/ nAutoCombineThreshold are not * COIN, so that is used here
     CreateSweepingTransaction(nAutoCombineTarget * COIN, nAutoCombineThreshold * COIN, GetAdjustedTime());
 }
 
