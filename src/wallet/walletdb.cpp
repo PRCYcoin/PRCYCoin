@@ -363,21 +363,6 @@ bool CWalletDB::ReadAccount(const string& strAccount, CAccount& account)
     return Read(make_pair(string("acc"), strAccount), account);
 }
 
-bool CWalletDB::WriteAutoConsolidateSettingTime(uint32_t settingTime)
-{
-    return Write(std::string("autoconsolidatetime"), settingTime);
-}
-
-uint32_t CWalletDB::ReadAutoConsolidateSettingTime()
-{
-    uint32_t settingTime = 0;
-    if (!Read(std::string("autoconsolidatetime"), settingTime)) {
-        return 0;
-    }
-    return settingTime;
-}
-
-
 bool CWalletDB::WriteAccount(const string& strAccount, const CAccount& account)
 {
     return Write(make_pair(string("acc"), strAccount), account);

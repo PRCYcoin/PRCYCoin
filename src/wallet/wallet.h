@@ -56,7 +56,6 @@ extern bool bdisableSystemnotifications;
 extern bool fSendFreeTransactions;
 extern bool fPayAtLeastCustomFee;
 extern int64_t nReserveBalance;
-extern int64_t nDefaultConsolidateTime;
 
 //! -paytxfee default
 static const CAmount DEFAULT_TRANSACTION_FEE = 0.1 * COIN;//
@@ -272,9 +271,6 @@ public:
     bool estimateStakingConsolidationFees(CAmount& min, CAmount& max);
     static int MaxTxSizePerTx();
     std::string GetTransactionType(const CTransaction& tx);
-    bool WriteAutoConsolidateSettingTime(uint32_t settingTime);
-    uint32_t ReadAutoConsolidateSettingTime();
-    bool IsAutoConsolidateOn();
     string GetUniqueWalletBackupName() const;
     /*
      * Main wallet lock.

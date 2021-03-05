@@ -54,7 +54,6 @@ bool fSendFreeTransactions = false;
 bool fPayAtLeastCustomFee = true;
 int64_t nStartupTime = GetTime();
 int64_t nReserveBalance = 0;
-int64_t nDefaultConsolidateTime;
 
 #include "uint256.h"
 
@@ -2177,8 +2176,7 @@ StakingStatusError CWallet::StakingCoinStatus(CAmount& minFee, CAmount& maxFee)
     {
         LOCK2(cs_main, cs_wallet);
         {
-            uint32_t nTime = ReadAutoConsolidateSettingTime();
-            nTime = (nTime == 0)? GetAdjustedTime() : nTime;
+            uint32_t nTime = GetAdjustedTime();
 
             for (map<uint256, CWalletTx>::const_iterator it = mapWallet.begin(); it != mapWallet.end(); ++it) {
                 const uint256& wtxid = it->first;
@@ -2663,23 +2661,6 @@ bool CWallet::CreateTransactionBulletProof(const CKey& txPrivDes, const CPubKey&
     vector<pair<CScript, CAmount> > vecSend;
     vecSend.push_back(make_pair(scriptPubKey, nValue));
     return CreateTransactionBulletProof(txPrivDes, recipientViewKey, vecSend, wtxNew, reservekey, nFeeRet, strFailReason, coinControl, coin_type, useIX, nFeePay, ringSize, sendtoMyself);
-}
-
-//settingTime = 0 => auto consolidate on
-//settingTime > 0 => only consolidate transactions came before this settingTime
-bool CWallet::WriteAutoConsolidateSettingTime(uint32_t settingTime)
-{
-    return CWalletDB(strWalletFile).WriteAutoConsolidateSettingTime(settingTime);
-}
-
-uint32_t CWallet::ReadAutoConsolidateSettingTime()
-{
-    return CWalletDB(strWalletFile).ReadAutoConsolidateSettingTime();
-}
-
-bool CWallet::IsAutoConsolidateOn()
-{
-    return ReadAutoConsolidateSettingTime() > 0;
 }
 
 bool CWallet::CreateTransactionBulletProof(const CKey& txPrivDes, const CPubKey& recipientViewKey, const std::vector<std::pair<CScript, CAmount> >& vecSend, CWalletTx& wtxNew, CReserveKey& reservekey, CAmount& nFeeRet, std::string& strFailReason, const CCoinControl* coinControl, AvailableCoinsType coin_type, bool useIX, CAmount nFeePay, int ringSize, bool tomyself)
@@ -5340,8 +5321,8 @@ void CWallet::AutoCombineDust()
     if (IsLocked()) return;
     // Chain is not synced, return
     if (IsInitialBlockDownload() || !masternodeSync.IsBlockchainSynced()) return;
-    // Tip()->nTime < (GetAdjustedTime() - 300) - (default .conf setting = 300)
-    if (chainActive.Tip()->nTime < (GetAdjustedTime() - nDefaultConsolidateTime)) return;
+    // Tip()->nTime < (GetAdjustedTime() - 300)
+    if (chainActive.Tip()->nTime < (GetAdjustedTime() - 300)) return;
     bool stkStatus = pwalletMain->ReadStakingStatus();
     if (combineMode == CombineMode::ON && stkStatus) {
         //sweeping to create larger UTXO for staking
@@ -5350,8 +5331,7 @@ void CWallet::AutoCombineDust()
         if (max == 0) {
             max = GetBalance();
         }
-        uint32_t nTime = ReadAutoConsolidateSettingTime();
-        nTime = (nTime == 0)? GetAdjustedTime() : nTime;
+        uint32_t nTime = GetAdjustedTime();
         LogPrintf("Attempting to create a consolidation transaction for a larger UTXO for staking\n");
         // MINIMUM_STAKE_AMOUNT already has * COIN, so not used here
         CreateSweepingTransaction(MINIMUM_STAKE_AMOUNT, max + MAX_FEE, nTime);

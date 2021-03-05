@@ -137,24 +137,10 @@ OptionsPage::OptionsPage(QWidget* parent) : QDialog(parent, Qt::WindowSystemMenu
     ui->code_5->setVisible(false);
     ui->code_6->setVisible(false);
 
-    if (!pwalletMain->IsMasternodeController()) {
-        if (pwalletMain) {
-            bool isConsolidatedOn = pwalletMain->IsAutoConsolidateOn();
-            ui->addNewFunds->setChecked(isConsolidatedOn);
-        }
-    } else {
-        ui->addNewFunds->setChecked(false);
-        ui->addNewFunds->setEnabled(false);
-        QFont font = ui->addNewFunds->font();
-        font.setStrikeOut(true);
-        ui->addNewFunds->setFont(font);
-        ui->addNewFunds->setToolTip("Disabled by default due to controlling Masternode(s) from this wallet.\nEnabling this will incur a minimum 1 PRCY fee each time you receive a new deposit that needs to be consolidated for staking.");
-    }
     ui->mapPortUpnp->setChecked(settings.value("fUseUPnP", false).toBool());
     ui->minimizeToTray->setChecked(settings.value("fMinimizeToTray", false).toBool());
     ui->minimizeOnClose->setChecked(settings.value("fMinimizeOnClose", false).toBool());
     ui->alwaysRequest2FA->setChecked(settings.value("fAlwaysRequest2FA", false).toBool());
-    connect(ui->addNewFunds, SIGNAL(stateChanged(int)), this, SLOT(setAutoConsolidate(int)));
     connect(ui->mapPortUpnp, SIGNAL(stateChanged(int)), this, SLOT(mapPortUpnp_clicked(int)));
     connect(ui->minimizeToTray, SIGNAL(stateChanged(int)), this, SLOT(minimizeToTray_clicked(int)));
     connect(ui->minimizeOnClose, SIGNAL(stateChanged(int)), this, SLOT(minimizeOnClose_clicked(int)));
@@ -505,7 +491,6 @@ void OptionsPage::on_EnableStaking(ToggleButton* widget)
             model->generateCoins(true, 1);
             pwalletMain->fCombineDust = true;
             pwalletMain->combineMode = CombineMode::ON;
-            saveConsolidationSettingTime(ui->addNewFunds->isChecked());
             return;
         }
 
@@ -522,11 +507,9 @@ void OptionsPage::on_EnableStaking(ToggleButton* widget)
             model->generateCoins(true, 1);
             pwalletMain->fCombineDust = true;
             pwalletMain->combineMode = CombineMode::ON;
-            saveConsolidationSettingTime(ui->addNewFunds->isChecked());
             bool success = false;
             try {
-                uint32_t nTime = pwalletMain->ReadAutoConsolidateSettingTime();
-                nTime = (nTime == 0)? GetAdjustedTime() : nTime;
+                uint32_t nTime = GetAdjustedTime();
                 success = model->getCWallet()->CreateSweepingTransaction(
                                 CWallet::MINIMUM_STAKE_AMOUNT,
                                 CWallet::MINIMUM_STAKE_AMOUNT, nTime);
@@ -888,30 +871,6 @@ void OptionsPage::onShowMnemonic() {
     if (msgBox.clickedButton() == copyButton) {
     //Copy Mnemonic Recovery Phrase to clipboard
     GUIUtil::setClipboard(std::string(mnemonic.begin(), mnemonic.end()).c_str());
-    }
-}
-
-void OptionsPage::setAutoConsolidate(int state) {
-    int status = model->getEncryptionStatus();
-    if (status == WalletModel::Locked || status == WalletModel::UnlockedForAnonymizationOnly) {
-        QMessageBox msgBox;
-        msgBox.setWindowTitle("Staking Settings");
-        msgBox.setIcon(QMessageBox::Information);
-        msgBox.setText("Please unlock the keychain wallet with your passphrase before attempting to change this setting.");
-        msgBox.setStyleSheet(GUIUtil::loadStyleSheet());
-        msgBox.exec();
-        return;
-    }
-    LOCK(pwalletMain->cs_wallet);
-    saveConsolidationSettingTime(ui->addNewFunds->isChecked());
-}
-
-void OptionsPage::saveConsolidationSettingTime(bool autoConsolidate)
-{
-    if (!pwalletMain->IsMasternodeController() && autoConsolidate) {
-        pwalletMain->WriteAutoConsolidateSettingTime(0);
-    } else {
-        pwalletMain->WriteAutoConsolidateSettingTime(GetAdjustedTime());
     }
 }
 

@@ -95,7 +95,6 @@ private Q_SLOTS:
     void on_month();
     void onShowMnemonic();
     void setStakingToggle();
-    void setAutoConsolidate(int);
     void mapPortUpnp_clicked(int);
     void minimizeToTray_clicked(int);
     void minimizeOnClose_clicked(int);

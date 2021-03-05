@@ -161,9 +161,6 @@ public:
     bool ReadAccount(const std::string& strAccount, CAccount& account);
     bool WriteAccount(const std::string& strAccount, const CAccount& account);
 
-    bool WriteAutoConsolidateSettingTime(uint32_t settingTime);
-    uint32_t ReadAutoConsolidateSettingTime();
-
     bool ReadStealthAccount(const std::string& strAccount, CStealthAccount& account);
     bool WriteStealthAccount(const std::string& strAccount, const CStealthAccount& account);
 
