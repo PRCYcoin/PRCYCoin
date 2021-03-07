@@ -371,6 +371,4 @@ public:
     void RelayCompletedTransaction(const int sessionID, const bool error, const int errorID);
 };
 
-void ThreadCheckObfuScationPool();
-
 #endif
