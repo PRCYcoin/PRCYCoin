@@ -395,19 +395,15 @@ CNode *FindNode(const CService &addr) {
     return NULL;
 }
 
-CNode *ConnectNode(CAddress addrConnect, const char* pszDest, bool obfuScationMaster, bool fCountFailure)
+CNode* ConnectNode(CAddress addrConnect, const char* pszDest, bool fCountFailure)
 {
     if (pszDest == NULL) {
-        // we clean masternode connections in CMasternodeMan::ProcessMasternodeConnections()
-        // so should be safe to skip this and connect to local Hot MN on CActiveMasternode::ManageStatus()
-        if (IsLocal(addrConnect) && !obfuScationMaster)
+        if (IsLocal(addrConnect))
             return NULL;
 
         // Look for an existing connection
-        CNode *pnode = FindNode((CService) addrConnect);
+        CNode* pnode = FindNode((CService) addrConnect);
         if (pnode) {
-            pnode->fObfuScationMaster = obfuScationMaster;
-
             pnode->AddRef();
             return pnode;
         }
@@ -433,7 +429,7 @@ CNode *ConnectNode(CAddress addrConnect, const char* pszDest, bool obfuScationMa
         addrman.Attempt(addrConnect, fCountFailure);
 
         // Add node
-        CNode *pnode = new CNode(hSocket, addrConnect, pszDest ? pszDest : "", false);
+        CNode* pnode = new CNode(hSocket, addrConnect, pszDest ? pszDest : "", false);
         pnode->AddRef();
 
         {
@@ -443,7 +439,6 @@ CNode *ConnectNode(CAddress addrConnect, const char* pszDest, bool obfuScationMa
 
         pnode->nServicesExpected = ServiceFlags(addrConnect.nServices & nRelevantServices);
         pnode->nTimeConnected = GetTime();
-        if (obfuScationMaster) pnode->fObfuScationMaster = true;
 
         return pnode;
     } else if (!proxyConnectionFailed) {
@@ -1009,7 +1004,7 @@ void ThreadSocketHandler() {
                     LogPrintf("connection from %s dropped (banned)\n", addr.ToString());
                     CloseSocket(hSocket);
                 } else {
-                    CNode *pnode = new CNode(hSocket, addr, "", true);
+                    CNode* pnode = new CNode(hSocket, addr, "", true);
                     pnode->AddRef();
                     pnode->fWhitelisted = whitelisted;
 
@@ -1503,7 +1498,7 @@ bool OpenNetworkConnection(const CAddress &addrConnect, bool fCountFailure, CSem
     } else if (FindNode(pszDest))
         return false;
 
-    CNode *pnode = ConnectNode(addrConnect, pszDest, fCountFailure);
+    CNode* pnode = ConnectNode(addrConnect, pszDest, fCountFailure);
     boost::this_thread::interruption_point();
 
     if (!pnode)
@@ -2104,7 +2099,6 @@ CNode::CNode(SOCKET hSocketIn, CAddress addrIn, std::string addrNameIn, bool fIn
     nPingUsecStart = 0;
     nPingUsecTime = 0;
     fPingQueued = false;
-    fObfuScationMaster = false;
 
     {
         LOCK(cs_nLastNodeId);
