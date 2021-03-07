@@ -207,6 +207,11 @@ void CMasternode::Check(bool forceCheck)
     }
 
     if (!unitTest) {
+		
+    CValidationState state;
+    CMutableTransaction tx = CMutableTransaction();
+    tx.vin.push_back(vin);
+    tx.vout.push_back(vout);
         {
             TRY_LOCK(cs_main, lockMain);
             if (!lockMain) return;
@@ -578,12 +583,6 @@ bool CMasternodeBroadcast::CheckInputsAndAdd(int& nDoS)
             mnodeman.Remove(pmn->vin);
     }
 
-    CValidationState state;
-    CMutableTransaction tx = CMutableTransaction();
-    CTxOut vout = CTxOut(9999.99 * COIN, obfuScationPool.collateralPubKey);
-    tx.vin.push_back(vin);
-    tx.vout.push_back(vout);
-
     {
         TRY_LOCK(cs_main, lockMain);
         if (!lockMain) {
@@ -593,9 +592,11 @@ bool CMasternodeBroadcast::CheckInputsAndAdd(int& nDoS)
             return false;
         }
 
-        if (!AcceptableInputs(mempool, state, CTransaction(tx), false, NULL)) {
-            //set nDos
-            state.IsInvalid(nDoS);
+        CCoins coins;
+        if (!pcoinsTip->GetCoins(vin.prevout.hash, coins) ||
+           (unsigned int)vin.prevout.n>=coins.vout.size() ||
+           coins.vout[vin.prevout.n].IsNull()) {
+            LogPrint(BCLog::MASTERNODE, "CMasternodeBroadcast::CheckInputsAndAdd -- Failed to find Masternode UTXO, masternode=%s\n", vin.prevout.ToStringShort());
             return false;
         }
     }
