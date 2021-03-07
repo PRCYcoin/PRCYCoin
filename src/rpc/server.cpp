@@ -364,7 +364,6 @@ static const CRPCCommand vRPCCommands[] =
          {"prcycoin", "decodemasternodebroadcast", &decodemasternodebroadcast, true, true, false},
          {"prcycoin", "relaymasternodebroadcast", &relaymasternodebroadcast, true, true, false},
          {"prcycoin", "mnsync", &mnsync, true, true, false},
-         {"prcycoin", "getpoolinfo", &getpoolinfo, true, true, false},
 
 #ifdef ENABLE_WALLET
         /* Wallet */
