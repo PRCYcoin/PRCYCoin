@@ -66,7 +66,6 @@ static const char* ppszTypeName[] = {
     NetMsgType::BUDGETVOTE,
     NetMsgType::FINALBUDGET,
     NetMsgType::FINALBUDGETVOTE,
-    "dstx"
 };
 
 /** All known message types. Keep this in the same order as the list of
