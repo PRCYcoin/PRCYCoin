@@ -27,8 +27,6 @@ using namespace boost;
 
 // A helper object for signing messages from Masternodes
 CObfuScationSigner obfuScationSigner;
-// The current Obfuscations in progress on the network
-std::vector<CObfuscationQueue> vecObfuscationQueue;
 // Keep track of the used Masternodes
 std::vector<CTxIn> vecMasternodesUsed;
 // Keep track of the scanning errors I've seen
@@ -415,17 +413,7 @@ void CObfuscationPool::CheckTimeout()
         }
     }
 
-    // check Obfuscation queue objects for timeouts
     int c = 0;
-    vector<CObfuscationQueue>::iterator it = vecObfuscationQueue.begin();
-    while (it != vecObfuscationQueue.end()) {
-        if ((*it).IsExpired()) {
-            LogPrint("obfuscation", "CObfuscationPool::CheckTimeout() : Removing expired queue entry - %d\n", c);
-            it = vecObfuscationQueue.erase(it);
-        } else
-            ++it;
-        c++;
-    }
 
     int addLagTime = 0;
     if (!fMasterNode) addLagTime = 10000; //if we're the client, give the server a few extra seconds before resetting.
