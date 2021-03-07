@@ -39,11 +39,26 @@ std::string CDNSSeedData::getHost(uint64_t requiredServiceBits) const
  * + Contains no strange transactions
  */
 static Checkpoints::MapCheckpoints mapCheckpoints =
-    boost::assign::map_list_of(0, uint256("000006957e238ff4e6bcf00c8a7d1b3e7249c0a2109b0391d8740821a40c1d8c"))(500, uint256("00214da9b906c7c14558395b9bc88293301e6e5f87a714194079dd651293fadb")) // Final POW Block
-    (561, uint256("54872c72e81b34117bc5a6095d6f1b8d85746992d2513d7adc90a2aceed1651e"))                                                                                                           // First PoA Block
-    (562, uint256("0f00d3a6636c8a265724764da082fdef8106fce7057dfdda94ab6537f7211b4f"))                                                                                                           // First Block after PoA
-    (14905, uint256("6389ecdb851500d9467b41a54d02c58b1542bfc2d5c99339821c89d25135a4b0"))                                                                                                         // Chain split
-    (17128, uint256("98d76615ef96b3ced1d9902715ba432393335b791b2256936883c323f0bb91f4"))(17133, uint256("d9dcec83e8a675db0f7b6d28fde591f494a1b0766f7cb56ea8d8cb95348f835b"))(17150, uint256("bad4dccf8fd86f00d6c215802d39342e4de64e21155b76b38f0182ba7d96edd2"))(17153, uint256("4e63d92ac5209f0a342c2e74098778bbe36324de66734ff41132c7f3db3ad628"))(18375, uint256("c291cf0a7bcd73a91c6f68d28dc6ce9e1acee973fd134f4250c1ee80bf3d0c03"))(18813, uint256("ccf401e6fb24f34c105b2f693c2eb75c2ba7a2a4e3ffbbfe152e98ae9806d418"))(18814, uint256("f8092b5c474cc260edb7c378c4f7e2123b007a55018d32f97b9b729f729067ae"))(19317, uint256("0bd530827eff9bdc79893739c02c14c02bb35a39b943eaeeb72e04767e0597a5"))(19400, uint256("cdeebfe4fdeda461ab2025d08248e89b13a1e970c76b91ac2788837c147e6f33"))(77852, uint256("e6ec3ddccfb6bd378ca3cf5cc292c011ec235536a9edbb8c3fdbe17abd921d44"))(98715, uint256("04b3cfde139af89ddacf3cb790daf734e4953119c4a58da9b8f07be888271670"))(98768, uint256("43f42aaba4a1e8f7a4981b7d8620e5967974b0bbdee4ae22e42f14585be3a52f"))(105629, uint256("82ae47c00a0338f33a41b8505162cabaa4740f2187feb07f4ee4bc6138461acb"));
+    boost::assign::map_list_of
+    (0, uint256("000006957e238ff4e6bcf00c8a7d1b3e7249c0a2109b0391d8740821a40c1d8c"))
+    (500, uint256("00214da9b906c7c14558395b9bc88293301e6e5f87a714194079dd651293fadb")) // Final POW Block
+    (561, uint256("54872c72e81b34117bc5a6095d6f1b8d85746992d2513d7adc90a2aceed1651e")) // First PoA Block
+    (562, uint256("0f00d3a6636c8a265724764da082fdef8106fce7057dfdda94ab6537f7211b4f")) // First Block after PoA
+    (14905, uint256("6389ecdb851500d9467b41a54d02c58b1542bfc2d5c99339821c89d25135a4b0")) // Chain split
+    (17128, uint256("98d76615ef96b3ced1d9902715ba432393335b791b2256936883c323f0bb91f4"))
+    (17133, uint256("d9dcec83e8a675db0f7b6d28fde591f494a1b0766f7cb56ea8d8cb95348f835b"))
+    (17150, uint256("bad4dccf8fd86f00d6c215802d39342e4de64e21155b76b38f0182ba7d96edd2"))
+    (17153, uint256("4e63d92ac5209f0a342c2e74098778bbe36324de66734ff41132c7f3db3ad628"))
+    (18375, uint256("c291cf0a7bcd73a91c6f68d28dc6ce9e1acee973fd134f4250c1ee80bf3d0c03"))
+    (18813, uint256("ccf401e6fb24f34c105b2f693c2eb75c2ba7a2a4e3ffbbfe152e98ae9806d418"))
+    (18814, uint256("f8092b5c474cc260edb7c378c4f7e2123b007a55018d32f97b9b729f729067ae"))
+    (19317, uint256("0bd530827eff9bdc79893739c02c14c02bb35a39b943eaeeb72e04767e0597a5"))
+    (19400, uint256("cdeebfe4fdeda461ab2025d08248e89b13a1e970c76b91ac2788837c147e6f33"))
+    (77852, uint256("e6ec3ddccfb6bd378ca3cf5cc292c011ec235536a9edbb8c3fdbe17abd921d44"))
+    (98715, uint256("04b3cfde139af89ddacf3cb790daf734e4953119c4a58da9b8f07be888271670"))
+    (98768, uint256("43f42aaba4a1e8f7a4981b7d8620e5967974b0bbdee4ae22e42f14585be3a52f"))
+    (105629, uint256("82ae47c00a0338f33a41b8505162cabaa4740f2187feb07f4ee4bc6138461acb"))
+    ;
 static const Checkpoints::CCheckpointData data = {
     &mapCheckpoints,
     1614113250, // * UNIX timestamp of last checkpoint block
