@@ -144,12 +144,12 @@ uint256 CHDChain::GetSeedHash()
 void CHDChain::DeriveChildExtKey(uint32_t nAccountIndex, bool fInternal, uint32_t nChildIndex, CExtKey& extKeyRet)
 {
     // Use BIP44 keypath scheme i.e. m / purpose' / coin_type' / account' / change / address_index
-    CExtKey masterKey;              //hd master key
-    CExtKey purposeKey;             //key at m/purpose'
-    CExtKey cointypeKey;            //key at m/purpose'/coin_type'
-    CExtKey accountKey;             //key at m/purpose'/coin_type'/account'
-    CExtKey changeKey;              //key at m/purpose'/coin_type'/account'/change
-    CExtKey childKey;               //key at m/purpose'/coin_type'/account'/change/address_index
+    CExtKey masterKey;   //hd master key
+    CExtKey purposeKey;  //key at m/purpose'
+    CExtKey cointypeKey; //key at m/purpose'/coin_type'
+    CExtKey accountKey;  //key at m/purpose'/coin_type'/account'
+    CExtKey changeKey;   //key at m/purpose'/coin_type'/account'/change
+    CExtKey childKey;    //key at m/purpose'/coin_type'/account'/change/address_index
 
     masterKey.SetMaster(&vchSeed[0], vchSeed.size());
 

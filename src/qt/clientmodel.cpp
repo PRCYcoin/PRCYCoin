@@ -79,7 +79,7 @@ QString ClientModel::getMasternodeCountString() const
     int ipv4 = 0, ipv6 = 0, onion = 0;
     mnodeman.CountNetworks(ActiveProtocol(), ipv4, ipv6, onion);
     int nUnknown = mnodeman.size() - ipv4 - ipv6 - onion;
-    if(nUnknown < 0) nUnknown = 0;
+    if (nUnknown < 0) nUnknown = 0;
     return tr("Total: %1 (IPv4: %2 / IPv6: %3 / Tor: %4 / Unknown: %5)").arg(QString::number((int)mnodeman.size())).arg(QString::number((int)ipv4)).arg(QString::number((int)ipv6)).arg(QString::number((int)onion)).arg(QString::number((int)nUnknown));
 }
 
@@ -192,7 +192,7 @@ PeerTableModel* ClientModel::getPeerTableModel()
     return peerTableModel;
 }
 
-BanTableModel *ClientModel::getBanTableModel()
+BanTableModel* ClientModel::getBanTableModel()
 {
     return banTableModel;
 }
@@ -232,7 +232,7 @@ void ClientModel::updateBanlist()
     banTableModel->refresh();
 }
 
-static void BlockTipChanged(ClientModel *clientmodel, bool initialSync, const CBlockIndex *pIndex)
+static void BlockTipChanged(ClientModel* clientmodel, bool initialSync, const CBlockIndex* pIndex)
 {
     // lock free async UI updates in case we have a new block tip
     // during initial sync, only update the UI if the last update
@@ -275,7 +275,7 @@ static void NotifyAlertChanged(ClientModel* clientmodel)
     QMetaObject::invokeMethod(clientmodel, "updateAlert", Qt::QueuedConnection);
 }
 
-static void BannedListChanged(ClientModel *clientmodel)
+static void BannedListChanged(ClientModel* clientmodel)
 {
     qDebug() << QString("%1: Requesting update for peer banlist").arg(__func__);
     QMetaObject::invokeMethod(clientmodel, "updateBanlist", Qt::QueuedConnection);
@@ -304,14 +304,14 @@ void ClientModel::unsubscribeFromCoreSignals()
 bool ClientModel::getTorInfo(std::string& ip_port) const
 {
     proxyType onion;
-    if (GetProxy((Network) 3, onion) && IsReachable((Network) 3)) {
+    if (GetProxy((Network)3, onion) && IsReachable((Network)3)) {
         {
             LOCK(cs_mapLocalHost);
-            for (const std::pair<CNetAddr, LocalServiceInfo> &item : mapLocalHost) {
+            for (const std::pair<CNetAddr, LocalServiceInfo>& item : mapLocalHost) {
                 if (item.first.IsTor()) {
-                     CService addrOnion = CService(item.first.ToString(), item.second.nPort);
-                     ip_port = addrOnion.ToStringIPPort();
-                     return true;
+                    CService addrOnion = CService(item.first.ToString(), item.second.nPort);
+                    ip_port = addrOnion.ToStringIPPort();
+                    return true;
                 }
             }
         }

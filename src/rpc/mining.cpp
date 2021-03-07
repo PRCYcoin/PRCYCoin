@@ -39,7 +39,7 @@ static uint256 PoAMerkleRoot;
  */
 UniValue GetNetworkHashPS(int lookup, int height)
 {
-    CBlockIndex *pb = chainActive.Tip();
+    CBlockIndex* pb = chainActive.Tip();
 
     if (height >= 0 && height < chainActive.Height())
         pb = chainActive[height];
@@ -148,8 +148,8 @@ UniValue setgenerate(const UniValue& params, bool fHelp)
         if (nGenProcLimit == 0)
             fGenerate = false;
     }
-	pwalletMain->WriteStakingStatus(fGenerate);
-	
+    pwalletMain->WriteStakingStatus(fGenerate);
+
     // -regtest mode: don't return until nGenProcLimit blocks are generated
     if (fGenerate && Params().MineBlocksOnDemand()) {
         int nHeightStart = 0;
@@ -226,7 +226,7 @@ UniValue generatepoa(const UniValue& params, bool fHelp)
     // We need this here as CreateNewPoABlockWithKey requires unlocked wallet to GenerateAddress
     EnsureWalletIsUnlocked();
 
-    int period = 60;//default value
+    int period = 60; //default value
     if (params.size() > 1) {
         period = params[1].get_int();
     }
@@ -533,8 +533,7 @@ UniValue getblocktemplate(const UniValue& params, bool fHelp)
 
             WAIT_LOCK(g_best_block_mutex, lock);
             while (g_best_block == hashWatchedChain && IsRPCRunning()) {
-                if (g_best_block_cv.wait_until(lock, checktxtime) == std::cv_status::timeout)
-                {
+                if (g_best_block_cv.wait_until(lock, checktxtime) == std::cv_status::timeout) {
                     // Timeout: Check transactions for update
                     if (mempool.GetTransactionsUpdated() != nTransactionsUpdatedLastLP)
                         break;
@@ -587,7 +586,8 @@ UniValue getblocktemplate(const UniValue& params, bool fHelp)
     UpdateTime(pblock, pindexPrev);
     pblock->nNonce = 0;
 
-    UniValue aCaps(UniValue::VARR); aCaps.push_back("proposal");
+    UniValue aCaps(UniValue::VARR);
+    aCaps.push_back("proposal");
 
     UniValue transactions(UniValue::VARR);
     map<uint256, int64_t> setTxIndex;
@@ -672,40 +672,40 @@ UniValue getpoablocktemplate(const UniValue& params, bool fHelp)
 {
     if (fHelp || params.size() > 0)
         throw runtime_error(
-                "getpoablocktemplate\n"
-                "It returns data needed to construct a block to work on.\n"
+            "getpoablocktemplate\n"
+            "It returns data needed to construct a block to work on.\n"
 
-                "\nArguments:\n"
+            "\nArguments:\n"
 
-                "\nResult:\n"
-                "{\n"
-                "  \"version\" : n,                    (numeric) The block version\n"
-                "  \"previouspoablockhash\" : \"xxxx\",    (string) The hash of current highest block\n"
-                "  \"poamerkleroot\" : \"xxxx\",    (string) The PoA merkle root\n"
-                "  \"poahashintegrated\" : \"xxxx\",    (string) hash of previouspoablockhash and poamerkleroot\n"
-                "  \"coinbasevalue\" : n,               (numeric) maximum allowable input to coinbase transaction, including the generation award and transaction fees (in duffs)\n"
-                "  \"coinbasetxn\" : { ... },           (json object) information for coinbase transaction\n"
-                "  \"noncerange\" : \"00000000ffffffff\",   (string) A range of valid nonces\n"
-                "  \"sigoplimit\" : n,                 (numeric) limit of sigops in blocks\n"
-                "  \"sizelimit\" : n,                  (numeric) limit of block size\n"
-                "  \"curtime\" : ttt,                  (numeric) current timestamp in seconds since epoch (Jan 1 1970 GMT)\n"
-                "  \"bits\" : \"xxx\",                 (string) compressed target of next block\n"
-                "  \"payee\" : \"xxx\",                (string) required payee for the next block\n"
-                "  \"payee_amount\" : n,               (numeric) required amount to pay\n"
-                "  \"posblocksaudited\" : [                (array) summaries of PoS blocks that should be included in the next PoA block\n"
-                "      {\n"
-                "         \"hash\" : \"xxxx\",          (string) block hash\n"
-                "         \"height\" : xxxx,          (numeric) block height\n"
-                "         \"time\": xxxx,               (numeric) timestamp \n"
-                "      }\n"
-                "      ,...\n"
-                "  ],\n"
-                "  \"masternode_payments\" : true|false,         (boolean) true, if masternode payments are enabled\n"
-                "  \"enforce_masternode_payments\" : true|false  (boolean) true, if masternode payments are enforced\n"
-                "}\n"
+            "\nResult:\n"
+            "{\n"
+            "  \"version\" : n,                    (numeric) The block version\n"
+            "  \"previouspoablockhash\" : \"xxxx\",    (string) The hash of current highest block\n"
+            "  \"poamerkleroot\" : \"xxxx\",    (string) The PoA merkle root\n"
+            "  \"poahashintegrated\" : \"xxxx\",    (string) hash of previouspoablockhash and poamerkleroot\n"
+            "  \"coinbasevalue\" : n,               (numeric) maximum allowable input to coinbase transaction, including the generation award and transaction fees (in duffs)\n"
+            "  \"coinbasetxn\" : { ... },           (json object) information for coinbase transaction\n"
+            "  \"noncerange\" : \"00000000ffffffff\",   (string) A range of valid nonces\n"
+            "  \"sigoplimit\" : n,                 (numeric) limit of sigops in blocks\n"
+            "  \"sizelimit\" : n,                  (numeric) limit of block size\n"
+            "  \"curtime\" : ttt,                  (numeric) current timestamp in seconds since epoch (Jan 1 1970 GMT)\n"
+            "  \"bits\" : \"xxx\",                 (string) compressed target of next block\n"
+            "  \"payee\" : \"xxx\",                (string) required payee for the next block\n"
+            "  \"payee_amount\" : n,               (numeric) required amount to pay\n"
+            "  \"posblocksaudited\" : [                (array) summaries of PoS blocks that should be included in the next PoA block\n"
+            "      {\n"
+            "         \"hash\" : \"xxxx\",          (string) block hash\n"
+            "         \"height\" : xxxx,          (numeric) block height\n"
+            "         \"time\": xxxx,               (numeric) timestamp \n"
+            "      }\n"
+            "      ,...\n"
+            "  ],\n"
+            "  \"masternode_payments\" : true|false,         (boolean) true, if masternode payments are enabled\n"
+            "  \"enforce_masternode_payments\" : true|false  (boolean) true, if masternode payments are enforced\n"
+            "}\n"
 
-                "\nExamples:\n" +
-                HelpExampleCli("getpoablocktemplate", "") + HelpExampleRpc("getpoablocktemplate", ""));
+            "\nExamples:\n" +
+            HelpExampleCli("getpoablocktemplate", "") + HelpExampleRpc("getpoablocktemplate", ""));
 
     // We need this here as CreateNewPoABlockWithKey requires unlocked wallet to GenerateAddress
     EnsureWalletIsUnlocked();
@@ -757,7 +757,7 @@ UniValue getpoablocktemplate(const UniValue& params, bool fHelp)
         pblock->nNonce = 0;
 
         UniValue aCaps = NullUniValue;
-    //    static const Array aCaps = boost::assign::list_of("proposal");
+        //    static const Array aCaps = boost::assign::list_of("proposal");
 
         UniValue transactions(UniValue::VARR);
         map<uint256, int64_t> setTxIndex;
@@ -849,12 +849,13 @@ UniValue getpoablocktemplate(const UniValue& params, bool fHelp)
     }
 }
 
-UniValue setminingnbits(const UniValue& params, bool fHelp) {
+UniValue setminingnbits(const UniValue& params, bool fHelp)
+{
     if (fHelp || params.size() != 2)
         throw runtime_error(
-                "setminingnbits value 1/0\n");
-    unsigned int nbits = (unsigned int) params[0].get_int64();
-    int changed= params[1].get_int();
+            "setminingnbits value 1/0\n");
+    unsigned int nbits = (unsigned int)params[0].get_int64();
+    int changed = params[1].get_int();
     UniValue result(UniValue::VOBJ);
     result.push_back(Pair("previous_bits", strprintf("%08x", N_BITS)));
     if (changed) {
@@ -909,7 +910,6 @@ UniValue submitblock(const UniValue& params, bool fHelp)
 
     for (size_t i = 0; i < datastr.size(); i++) {
         if (('0' <= datastr[i] && datastr[i] <= '9') || ('a' <= datastr[i] && datastr[i] <= 'f') || ('A' <= datastr[i] && datastr[i] <= 'F')) {
-
         } else {
             datastr.erase(i, 1);
             break;

@@ -9,9 +9,8 @@
 #include <QDateTime>
 #include <QMessageBox>
 
-ImportOrCreate::ImportOrCreate(QWidget *parent) :
-    QDialog(parent, Qt::WindowSystemMenuHint | Qt::WindowTitleHint | Qt::WindowCloseButtonHint),
-    ui(new Ui::ImportOrCreate)
+ImportOrCreate::ImportOrCreate(QWidget* parent) : QDialog(parent, Qt::WindowSystemMenuHint | Qt::WindowTitleHint | Qt::WindowCloseButtonHint),
+                                                  ui(new Ui::ImportOrCreate)
 {
     ui->setupUi(this);
     connect(ui->btnNext, SIGNAL(clicked()), this, SLOT(on_next()));
@@ -37,8 +36,8 @@ void ImportOrCreate::on_next()
 
         QString mPhrase = std::string(mnemonic.begin(), mnemonic.end()).c_str();
         QMessageBox msgBox;
-        QPushButton *copyButton = msgBox.addButton(tr("Copy"), QMessageBox::ActionRole);
-        QPushButton *okButton = msgBox.addButton(tr("OK"), QMessageBox::ActionRole);
+        QPushButton* copyButton = msgBox.addButton(tr("Copy"), QMessageBox::ActionRole);
+        QPushButton* okButton = msgBox.addButton(tr("OK"), QMessageBox::ActionRole);
         copyButton->setStyleSheet("background:transparent;");
         copyButton->setIcon(QIcon(":/icons/editcopy"));
         msgBox.setWindowTitle("Mnemonic Recovery Phrase");
@@ -48,7 +47,7 @@ void ImportOrCreate::on_next()
         msgBox.exec();
 
         if (msgBox.clickedButton() == copyButton) {
-        //Copy Mnemonic Recovery Phrase to clipboard
+            //Copy Mnemonic Recovery Phrase to clipboard
             GUIUtil::setClipboard(std::string(mnemonic.begin(), mnemonic.end()).c_str());
         }
 

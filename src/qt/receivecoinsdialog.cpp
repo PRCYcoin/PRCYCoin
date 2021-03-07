@@ -57,11 +57,11 @@ ReceiveCoinsDialog::ReceiveCoinsDialog(QWidget* parent) : QDialog(parent, Qt::Wi
         CPubKey temp;
         pwalletMain->GetKeyFromPool(temp);
         pwalletMain->CreatePrivacyAccount();
-     }
+    }
 
     QLocale lo(QLocale::C);
     lo.setNumberOptions(QLocale::RejectGroupSeparator);
-    QDoubleValidator *dblVal = new QDoubleValidator(0, Params().MAX_MONEY, 8, ui->reqAmount);
+    QDoubleValidator* dblVal = new QDoubleValidator(0, Params().MAX_MONEY, 8, ui->reqAmount);
     dblVal->setNotation(QDoubleValidator::StandardNotation);
     dblVal->setLocale(lo);
     ui->reqAmount->setValidator(dblVal);
@@ -72,7 +72,8 @@ static inline int64_t roundint64(double d)
     return (int64_t)(d > 0 ? d + 0.5 : d - 0.5);
 }
 
-CAmount ReceiveCoinsDialog::getValidatedAmount() {
+CAmount ReceiveCoinsDialog::getValidatedAmount()
+{
     double dAmount = ui->reqAmount->text().toDouble();
     CAmount nAmount = roundint64(dAmount * COIN);
     return nAmount;
@@ -90,7 +91,8 @@ void ReceiveCoinsDialog::setModel(WalletModel* model)
     }
 }
 
-void ReceiveCoinsDialog::loadAccount() {
+void ReceiveCoinsDialog::loadAccount()
+{
     QRect rec = QApplication::desktop()->availableGeometry();
     int screenWidth = rec.width();
     QString addr;
@@ -100,15 +102,15 @@ void ReceiveCoinsDialog::loadAccount() {
     CWallet* wl = model->getCWallet();
     QList<QString> stringsList;
     wl->AllMyPublicAddresses(addrList, accountList);
-    for(size_t i = 0; i < addrList.size(); i++) {
+    for (size_t i = 0; i < addrList.size(); i++) {
         if (accountList[i] == "masteraccount") continue;
         bool isDuplicate = false;
-            if (screenWidth <= 1280) {
-                //(truncated for screen with less availableGeometry than 1280px)
-                addr = QString(accountList[i].c_str()) + " - " + QString(addrList[i].substr(0, 30).c_str()) + "..." + QString(addrList[i].substr(addrList[i].length() - 30, 30).c_str());
-            } else {
-                addr = QString(accountList[i].c_str()) + " - " + QString(addrList[i].c_str());
-            }
+        if (screenWidth <= 1280) {
+            //(truncated for screen with less availableGeometry than 1280px)
+            addr = QString(accountList[i].c_str()) + " - " + QString(addrList[i].substr(0, 30).c_str()) + "..." + QString(addrList[i].substr(addrList[i].length() - 30, 30).c_str());
+        } else {
+            addr = QString(accountList[i].c_str()) + " - " + QString(addrList[i].c_str());
+        }
         for (size_t i = 0; i < (size_t)ui->reqAddress->count(); i++) {
             if (stringsList.contains(QString(addrList[i].substr(0, 30).c_str()) + "..." + QString(addrList[i].substr(addrList[i].length() - 30, 30).c_str()))) {
                 isDuplicate = true;
@@ -172,7 +174,7 @@ void ReceiveCoinsDialog::on_receiveButton_clicked()
     CWallet* wl = model->getCWallet();
     wl->AllMyPublicAddresses(addrList, accountList);
     int selectedIdx = ui->reqAddress->currentIndex();
-    if ((int)addrList.size() > selectedIdx){
+    if ((int)addrList.size() > selectedIdx) {
         QString address(addrList[selectedIdx].c_str());
         QString label(accountList[selectedIdx].c_str());
         QString reqMes = ui->reqID->text();
@@ -198,7 +200,6 @@ void ReceiveCoinsDialog::on_receiveButton_clicked()
         clear();
         model->getRecentRequestsTableModel()->addNewRequest(info);
     }
-
 }
 
 // We override the virtual resizeEvent of the QWidget to adjust tables column
@@ -222,9 +223,10 @@ void ReceiveCoinsDialog::keyPressEvent(QKeyEvent* event)
     this->QDialog::keyPressEvent(event);
 }
 
-void ReceiveCoinsDialog::copyAddress(){
+void ReceiveCoinsDialog::copyAddress()
+{
     std::vector<std::string> addrList, accountList;
-    QClipboard *clipboard = QApplication::clipboard();
+    QClipboard* clipboard = QApplication::clipboard();
     CWallet* wl = model->getCWallet();
     wl->AllMyPublicAddresses(addrList, accountList);
     clipboard->setText(QString(addrList[0].c_str()));

@@ -76,7 +76,11 @@ void BIP32Hash(const unsigned char chainCode[32], unsigned int nChild, unsigned 
     num[1] = (nChild >> 16) & 0xFF;
     num[2] = (nChild >> 8) & 0xFF;
     num[3] = (nChild >> 0) & 0xFF;
-    CHMAC_SHA512(chainCode, 32).Write(&header, 1).Write(data, 32).Write(num, 4).Finalize(output);
+    CHMAC_SHA512(chainCode, 32)
+        .Write(&header, 1)
+        .Write(data, 32)
+        .Write(num, 4)
+        .Finalize(output);
 }
 
 void scrypt_hash(const char* pass, unsigned int pLen, const char* salt, unsigned int sLen, char* output, unsigned int N, unsigned int r, unsigned int p, unsigned int dkLen)

@@ -125,16 +125,16 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(const CWallet* 
             sub.address = "";
 
             for (unsigned int nOut = 0; nOut < wtx.vout.size(); nOut++) {
-                    const CTxOut& txout = wtx.vout[nOut];
-                    sub.idx = parts.size();
+                const CTxOut& txout = wtx.vout[nOut];
+                sub.idx = parts.size();
 
-                    if (wallet->IsCollateralAmount(wallet->getCTxOutValue(wtx, txout))) sub.type = TransactionRecord::ObfuscationMakeCollaterals;
-                    if (nDebit - wtx.GetValueOut() == OBFUSCATION_COLLATERAL) sub.type = TransactionRecord::ObfuscationCollateralPayment;
-                }
-                CTxDestination address;
-                if (ExtractDestination(wtx.vout[0].scriptPubKey, address)) {
-                    // Sent to PRCY Address
-                    sub.address = CBitcoinAddress(address).ToString();
+                if (wallet->IsCollateralAmount(wallet->getCTxOutValue(wtx, txout))) sub.type = TransactionRecord::ObfuscationMakeCollaterals;
+                if (nDebit - wtx.GetValueOut() == OBFUSCATION_COLLATERAL) sub.type = TransactionRecord::ObfuscationCollateralPayment;
+            }
+            CTxDestination address;
+            if (ExtractDestination(wtx.vout[0].scriptPubKey, address)) {
+                // Sent to PRCY Address
+                sub.address = CBitcoinAddress(address).ToString();
             }
 
             //a sendtoself transaction has second output as change
@@ -149,7 +149,7 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(const CWallet* 
             //
             // Debit
             //
-            CAmount nTxFee = 0;//nDebit - wtx.GetValueOut();
+            CAmount nTxFee = 0; //nDebit - wtx.GetValueOut();
 
             for (unsigned int nOut = 0; nOut < wtx.vout.size(); nOut++) {
                 const CTxOut& txout = wtx.vout[nOut];

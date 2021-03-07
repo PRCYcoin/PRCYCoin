@@ -173,8 +173,7 @@ protected:
         return rv;
     }
 
-Q_SIGNALS:
-    void valueChanged();
+    Q_SIGNALS : void valueChanged();
 };
 
 #include "bitcoinamountfield.moc"

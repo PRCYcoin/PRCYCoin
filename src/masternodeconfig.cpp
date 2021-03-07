@@ -62,8 +62,8 @@ bool CMasternodeConfig::read(std::string& strErr)
         int port = 0;
         std::string hostname = "";
         SplitHostPort(ip, port, hostname);
-        if(port == 0 || hostname == "") {
-            strErr = _("Failed to parse host:port string") + "\n"+
+        if (port == 0 || hostname == "") {
+            strErr = _("Failed to parse host:port string") + "\n" +
                      strprintf(_("Line: %d"), linenumber) + "\n\"" + line + "\"";
             streamConfig.close();
             return false;
@@ -93,7 +93,7 @@ bool CMasternodeConfig::read(std::string& strErr)
     return true;
 }
 
-bool CMasternodeConfig::CMasternodeEntry::castOutputIndex(int &n)
+bool CMasternodeConfig::CMasternodeEntry::castOutputIndex(int& n)
 {
     try {
         n = std::stoi(outputIndex);

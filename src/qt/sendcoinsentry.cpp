@@ -46,7 +46,7 @@ SendCoinsEntry::SendCoinsEntry(QWidget* parent) : QStackedWidget(parent),
 
     QLocale lo(QLocale::C);
     lo.setNumberOptions(QLocale::RejectGroupSeparator);
-    QDoubleValidator *dblVal = new QDoubleValidator(0, Params().MAX_MONEY, 8, ui->payAmount);
+    QDoubleValidator* dblVal = new QDoubleValidator(0, Params().MAX_MONEY, 8, ui->payAmount);
     dblVal->setNotation(QDoubleValidator::StandardNotation);
     dblVal->setLocale(lo);
     ui->payAmount->setValidator(dblVal);
@@ -128,7 +128,8 @@ static inline int64_t roundint64(double d)
     return (int64_t)(d > 0 ? d + 0.5 : d - 0.5);
 }
 
-CAmount SendCoinsEntry::getValidatedAmount() {
+CAmount SendCoinsEntry::getValidatedAmount()
+{
     double dAmount = ui->payAmount->text().toDouble();
     if (dAmount < 0.0 || dAmount > Params().MAX_MONEY) {
         QMessageBox msgBox;
@@ -235,14 +236,18 @@ bool SendCoinsEntry::updateLabel(const QString& address)
     return false;
 }
 
-void SendCoinsEntry::errorAddress(bool valid){
+void SendCoinsEntry::errorAddress(bool valid)
+{
     if (valid)
         ui->payTo->setStyleSheet(GUIUtil::loadStyleSheet());
-    else ui->payTo->setStyleSheet("border-color: red;");
+    else
+        ui->payTo->setStyleSheet("border-color: red;");
 }
 
-void SendCoinsEntry::errorAmount(bool valid){
+void SendCoinsEntry::errorAmount(bool valid)
+{
     if (valid)
         ui->payAmount->setStyleSheet(GUIUtil::loadStyleSheet());
-    else ui->payAmount->setStyleSheet("border-color: red;");
+    else
+        ui->payAmount->setStyleSheet("border-color: red;");
 }

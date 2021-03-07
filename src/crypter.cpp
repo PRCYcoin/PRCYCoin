@@ -253,7 +253,7 @@ bool CCryptoKeyStore::Unlock(const CKeyingMaterial& vMasterKeyIn)
             return false;
         vMasterKey = vMasterKeyIn;
 
-        if(!cryptedHDChain.IsNull()) {
+        if (!cryptedHDChain.IsNull()) {
             bool chainPass = false;
             // try to decrypt seed and make sure it matches
             CHDChain hdChainTmp;
@@ -266,7 +266,7 @@ bool CCryptoKeyStore::Unlock(const CKeyingMaterial& vMasterKeyIn)
                 return false;
             }
         }
-        
+
         fDecryptionThoroughlyChecked = true;
     }
     NotifyStatusChanged(this);
@@ -495,7 +495,7 @@ bool CCryptoKeyStore::SetCryptedHDChain(const CHDChain& chain)
 
 bool CCryptoKeyStore::GetHDChain(CHDChain& hdChainRet) const
 {
-    if(IsCrypted()) {
+    if (IsCrypted()) {
         hdChainRet = cryptedHDChain;
         return !cryptedHDChain.IsNull();
     }

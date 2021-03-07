@@ -193,7 +193,9 @@ void CExtKey::SetMaster(const unsigned char* seed, unsigned int nSeedLen)
     static const unsigned char hashkey[] = {'p', 'r', 'c', 'y', 'c', 'o', 'i', 'n', ' ', 's', 'e', 'e', 'd'};
     unsigned char out[64];
     LockObject(out);
-    CHMAC_SHA512(hashkey, sizeof(hashkey)).Write(seed, nSeedLen).Finalize(out);
+    CHMAC_SHA512(hashkey, sizeof(hashkey))
+        .Write(seed, nSeedLen)
+        .Finalize(out);
     key.Set(&out[0], &out[32], true);
     memcpy(vchChainCode, &out[32], 32);
     UnlockObject(out);

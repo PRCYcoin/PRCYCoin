@@ -161,13 +161,14 @@ bool CCoinsViewDB::GetStats(CCoinsStats& stats) const
     return true;
 }
 
-bool CBlockTreeDB::WriteBatchSync(const std::vector<std::pair<int, const CBlockFileInfo*> >& fileInfo, int nLastFile, const std::vector<const CBlockIndex*>& blockinfo) {
+bool CBlockTreeDB::WriteBatchSync(const std::vector<std::pair<int, const CBlockFileInfo*> >& fileInfo, int nLastFile, const std::vector<const CBlockIndex*>& blockinfo)
+{
     CLevelDBBatch batch;
-    for (std::vector<std::pair<int, const CBlockFileInfo*> >::const_iterator it=fileInfo.begin(); it != fileInfo.end(); it++) {
+    for (std::vector<std::pair<int, const CBlockFileInfo*> >::const_iterator it = fileInfo.begin(); it != fileInfo.end(); it++) {
         batch.Write(make_pair('f', it->first), *it->second);
     }
     batch.Write('l', nLastFile);
-    for (std::vector<const CBlockIndex*>::const_iterator it=blockinfo.begin(); it != blockinfo.end(); it++) {
+    for (std::vector<const CBlockIndex*>::const_iterator it = blockinfo.begin(); it != blockinfo.end(); it++) {
         batch.Write(make_pair('b', (*it)->GetBlockHash()), CDiskBlockIndex(*it));
     }
     return WriteBatch(batch, true);
@@ -199,7 +200,7 @@ bool CBlockTreeDB::ReadKeyImages(const string& keyImage, std::vector<uint256>& b
     if (!Read(std::make_pair('k', keyImage), bh)) return false;
     bhs.push_back(bh);
     int i = 1;
-    while(ReadKeyImage(keyImage + std::to_string(i), bh)) {
+    while (ReadKeyImage(keyImage + std::to_string(i), bh)) {
         bhs.push_back(bh);
         i++;
     }
@@ -302,7 +303,7 @@ bool CBlockTreeDB::LoadBlockIndexGuts()
                 }
 
                 //populate accumulator checksum map in memory
-                if(pindexNew->nAccumulatorCheckpoint != 0 && pindexNew->nAccumulatorCheckpoint != nPreviousCheckpoint) {
+                if (pindexNew->nAccumulatorCheckpoint != 0 && pindexNew->nAccumulatorCheckpoint != nPreviousCheckpoint) {
                     nPreviousCheckpoint = pindexNew->nAccumulatorCheckpoint;
                 }
 

@@ -35,7 +35,7 @@ struct AddressTableEntry {
     QString pubcoin;
 
     AddressTableEntry() {}
-    AddressTableEntry(Type type, const QString &pubcoin):    type(type), pubcoin(pubcoin) {}
+    AddressTableEntry(Type type, const QString& pubcoin) : type(type), pubcoin(pubcoin) {}
     AddressTableEntry(Type type, const QString& label, const QString& address) : type(type), label(label), address(address) {}
 };
 
@@ -77,7 +77,6 @@ public:
     AddressTableModel* parent;
 
     AddressTablePriv(CWallet* wallet, AddressTableModel* parent) : wallet(wallet), parent(parent) {}
-
     void refreshAddressTable()
     {
         cachedAddressTable.clear();
@@ -142,8 +141,8 @@ public:
             break;
         }
     }
-    
-    void updateEntry(const QString &pubCoin, const QString &isUsed, int status)
+
+    void updateEntry(const QString& pubCoin, const QString& isUsed, int status)
     {
         //Do nothing right now, might be changed in the future to have stealth address book
     }
@@ -322,12 +321,11 @@ void AddressTableModel::updateEntry(const QString& address,
 }
 
 
-void AddressTableModel::updateEntry(const QString &pubCoin, const QString &isUsed, int status)
+void AddressTableModel::updateEntry(const QString& pubCoin, const QString& isUsed, int status)
 {
     // Update stealth address book model from Bitcoin core
     priv->updateEntry(pubCoin, isUsed, status);
 }
-
 
 
 QString AddressTableModel::addRow(const QString& type, const QString& label, const QString& address)

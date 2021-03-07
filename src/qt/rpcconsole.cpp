@@ -73,20 +73,18 @@ class RPCExecutor : public QObject
 public Q_SLOTS:
     void request(const QString& command);
 
-Q_SIGNALS:
-    void reply(int category, const QString& command);
+    Q_SIGNALS : void reply(int category, const QString& command);
 };
 
 
 /** Class for handling RPC timers
  * (used for e.g. re-locking the wallet after a timeout)
  */
-class QtRPCTimerBase: public QObject, public RPCTimerBase
+class QtRPCTimerBase : public QObject, public RPCTimerBase
 {
     Q_OBJECT
 public:
-    QtRPCTimerBase(boost::function<void(void)>& func, int64_t millis):
-            func(func)
+    QtRPCTimerBase(boost::function<void(void)>& func, int64_t millis) : func(func)
     {
         timer.setSingleShot(true);
         connect(&timer, SIGNAL(timeout()), this, SLOT(timeout()));
@@ -94,17 +92,17 @@ public:
     }
     ~QtRPCTimerBase() {}
 private Q_SLOTS:
-            void timeout() { func(); }
+    void timeout() { func(); }
 private:
     QTimer timer;
     boost::function<void(void)> func;
 };
 
-class QtRPCTimerInterface: public RPCTimerInterface
+class QtRPCTimerInterface : public RPCTimerInterface
 {
 public:
     ~QtRPCTimerInterface() {}
-    const char *Name() { return "Qt"; }
+    const char* Name() { return "Qt"; }
     RPCTimerBase* NewTimer(boost::function<void(void)>& func, int64_t millis)
     {
         return new QtRPCTimerBase(func, millis);
@@ -138,7 +136,7 @@ bool parseCommandLine(std::vector<std::string>& args, const std::string& strComm
         STATE_ESCAPE_DOUBLEQUOTED
     } state = STATE_EATING_SPACES;
     std::string curarg;
-   Q_FOREACH (char ch, strCommand) {
+    Q_FOREACH (char ch, strCommand) {
         switch (state) {
         case STATE_ARGUMENT:      // In or after argument
         case STATE_EATING_SPACES: // Handle runs of whitespace
@@ -244,7 +242,7 @@ void RPCExecutor::request(const QString& command)
             std::string message = find_value(objError, "message").get_str();
             Q_EMIT reply(RPCConsole::CMD_ERROR, QString::fromStdString(message) + " (code " + QString::number(code) + ")");
         } catch (const std::runtime_error&) // raised when converting to invalid type, i.e. missing code or message
-        {                             // Show raw JSON object
+        {                                   // Show raw JSON object
             Q_EMIT reply(RPCConsole::CMD_ERROR, QString::fromStdString(objError.write()));
         }
     } catch (const std::exception& e) {
@@ -347,7 +345,7 @@ bool RPCConsole::eventFilter(QObject* obj, QEvent* event)
         case Qt::Key_Return:
         case Qt::Key_Enter:
             // forward these events to lineEdit
-            if(obj == autoCompleter->popup()) {
+            if (obj == autoCompleter->popup()) {
                 QApplication::postEvent(ui->lineEdit, new QKeyEvent(*keyevt));
                 return true;
             }
@@ -399,10 +397,10 @@ void RPCConsole::setClientModel(ClientModel* model)
 
         // create peer table context menu actions
         QAction* disconnectAction = new QAction(tr("&Disconnect Node"), this);
-        QAction* banAction1h      = new QAction(tr("Ban Node for") + " " + tr("1 &hour"), this);
-        QAction* banAction24h     = new QAction(tr("Ban Node for") + " " + tr("1 &day"), this);
-        QAction* banAction7d      = new QAction(tr("Ban Node for") + " " + tr("1 &week"), this);
-        QAction* banAction365d    = new QAction(tr("Ban Node for") + " " + tr("1 &year"), this);
+        QAction* banAction1h = new QAction(tr("Ban Node for") + " " + tr("1 &hour"), this);
+        QAction* banAction24h = new QAction(tr("Ban Node for") + " " + tr("1 &day"), this);
+        QAction* banAction7d = new QAction(tr("Ban Node for") + " " + tr("1 &week"), this);
+        QAction* banAction365d = new QAction(tr("Ban Node for") + " " + tr("1 &year"), this);
 
         // create peer table context menu
         peersTableContextMenu = new QMenu();
@@ -416,10 +414,10 @@ void RPCConsole::setClientModel(ClientModel* model)
         // We need to use int (instead of int64_t), because signal mapper only supports
         // int or objects, which is okay because max bantime (1 year) is < int_max.
         QSignalMapper* signalMapper = new QSignalMapper(this);
-        signalMapper->setMapping(banAction1h, 60*60);
-        signalMapper->setMapping(banAction24h, 60*60*24);
-        signalMapper->setMapping(banAction7d, 60*60*24*7);
-        signalMapper->setMapping(banAction365d, 60*60*24*365);
+        signalMapper->setMapping(banAction1h, 60 * 60);
+        signalMapper->setMapping(banAction24h, 60 * 60 * 24);
+        signalMapper->setMapping(banAction7d, 60 * 60 * 24 * 7);
+        signalMapper->setMapping(banAction365d, 60 * 60 * 24 * 365);
 
         connect(banAction1h, SIGNAL(triggered()), signalMapper, SLOT(map()));
         connect(banAction24h, SIGNAL(triggered()), signalMapper, SLOT(map()));
@@ -433,7 +431,7 @@ void RPCConsole::setClientModel(ClientModel* model)
 
         // peer table signal handling - update peer details when selecting new node
         connect(ui->peerWidget->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),
-        this, SLOT(peerSelected(const QItemSelection &, const QItemSelection &)));
+            this, SLOT(peerSelected(const QItemSelection&, const QItemSelection&)));
         // peer table signal handling - update peer details when new nodes are added to the model
         connect(model->getPeerTableModel(), SIGNAL(layoutChanged()), this, SLOT(peerLayoutChanged()));
 
@@ -477,8 +475,7 @@ void RPCConsole::setClientModel(ClientModel* model)
         //Setup autocomplete and attach it
         QStringList wordList;
         std::vector<std::string> commandList = tableRPC.listCommands();
-        for (size_t i = 0; i < commandList.size(); ++i)
-        {
+        for (size_t i = 0; i < commandList.size(); ++i) {
             wordList << commandList[i].c_str();
         }
 
@@ -547,9 +544,9 @@ void RPCConsole::walletReindex()
 void RPCConsole::walletResync()
 {
     QString resyncWarning = tr("This will delete your local blockchain folders and the wallet will synchronize the complete Blockchain from scratch.<br /><br />");
-        resyncWarning +=   tr("This needs quite some time and downloads a lot of data.<br /><br />");
-        resyncWarning +=   tr("Your transactions and funds will be visible again after the download has completed.<br /><br />");
-        resyncWarning +=   tr("Do you want to continue?.<br />");
+    resyncWarning += tr("This needs quite some time and downloads a lot of data.<br /><br />");
+    resyncWarning += tr("Your transactions and funds will be visible again after the download has completed.<br /><br />");
+    resyncWarning += tr("Do you want to continue?.<br />");
     QMessageBox::StandardButton retval = QMessageBox::question(this, tr("Confirm resync Blockchain"),
         resyncWarning,
         QMessageBox::Yes | QMessageBox::Cancel,
@@ -620,12 +617,12 @@ void RPCConsole::clear()
 #endif
 
     message(CMD_REPLY, (tr("Welcome to the PRCY RPC console.") + "<br>" +
-                        tr("Use up and down arrows to navigate history, and %1 to clear screen.").arg("<b>"+clsKey+"</b>") + "<br>" +
-                        tr("Type <b>help</b> for an overview of available commands.") +
-                        "<br><span class=\"secwarning\"><br>" +
-                        tr("WARNING: Scammers have been active, telling users to type commands here, stealing their wallet contents. Do not use this console without fully understanding the ramifications of a command.") +
-                        "</span>"),
-                        true);
+                           tr("Use up and down arrows to navigate history, and %1 to clear screen.").arg("<b>" + clsKey + "</b>") + "<br>" +
+                           tr("Type <b>help</b> for an overview of available commands.") +
+                           "<br><span class=\"secwarning\"><br>" +
+                           tr("WARNING: Scammers have been active, telling users to type commands here, stealing their wallet contents. Do not use this console without fully understanding the ramifications of a command.") +
+                           "</span>"),
+        true);
 }
 
 void RPCConsole::reject()
@@ -981,17 +978,17 @@ void RPCConsole::disconnectSelectedNode()
     if (!clientModel)
         return;
 
-    if(cachedNodeid == -1)
+    if (cachedNodeid == -1)
         return;
 
     // Get currently selected peer address
     int detailNodeRow = clientModel->getPeerTableModel()->getRowByNodeId(cachedNodeid);
-    if(detailNodeRow < 0)
+    if (detailNodeRow < 0)
         return;
 
-    const CNodeCombinedStats *stats = clientModel->getPeerTableModel()->getNodeStats(detailNodeRow);
+    const CNodeCombinedStats* stats = clientModel->getPeerTableModel()->getNodeStats(detailNodeRow);
     // Find the node, disconnect it and clear the selected node
-    if (CNode *bannedNode = FindNode(stats->nodeStats.addr.ToString())) {
+    if (CNode* bannedNode = FindNode(stats->nodeStats.addr.ToString())) {
         bannedNode->CloseSocketDisconnect();
         clearSelectedNode();
     }
@@ -1002,17 +999,17 @@ void RPCConsole::banSelectedNode(int bantime)
     if (!clientModel)
         return;
 
-    if(cachedNodeid == -1)
+    if (cachedNodeid == -1)
         return;
 
     // Get currently selected peer address
     int detailNodeRow = clientModel->getPeerTableModel()->getRowByNodeId(cachedNodeid);
-    if(detailNodeRow < 0)
+    if (detailNodeRow < 0)
         return;
 
     // Find possible nodes, ban it and clear the selected node
-    const CNodeCombinedStats *stats = clientModel->getPeerTableModel()->getNodeStats(detailNodeRow);
-    if(stats) {
+    const CNodeCombinedStats* stats = clientModel->getPeerTableModel()->getNodeStats(detailNodeRow);
+    if (stats) {
         CNode::Ban(stats->nodeStats.addr, BanReasonManuallyAdded, bantime);
         clearSelectedNode();
         clientModel->getBanTableModel()->refresh();
@@ -1026,8 +1023,7 @@ void RPCConsole::unbanSelectedNode()
     // Get currently selected ban address
     QString strNode = GUIUtil::getEntryData(ui->banlistWidget, 0, BanTableModel::Address).toString();
     CSubNet possibleSubnet(strNode.toStdString());
-    if (possibleSubnet.IsValid())
-    {
+    if (possibleSubnet.IsValid()) {
         CNode::Unban(possibleSubnet);
         clientModel->getBanTableModel()->refresh();
     }

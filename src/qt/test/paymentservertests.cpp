@@ -17,12 +17,12 @@
 #include <QFileOpenEvent>
 #include <QTemporaryFile>
 
-X509 *parse_b64der_cert(const char* cert_data)
+X509* parse_b64der_cert(const char* cert_data)
 {
     std::vector<unsigned char> data = DecodeBase64(cert_data);
     assert(data.size() > 0);
     const unsigned char* dptr = &data[0];
-    X509 *cert = d2i_X509(NULL, &dptr, data.size());
+    X509* cert = d2i_X509(NULL, &dptr, data.size());
     assert(cert);
     return cert;
 }
@@ -109,9 +109,9 @@ void PaymentServerTests::paymentServerTests()
     r.paymentRequest.getMerchant(caStore, merchant);
     QCOMPARE(merchant, QString(""));
 
-    unsigned long lDoSProtectionTrigger = (unsigned long) BIP70_MAX_PAYMENTREQUEST_SIZE + 1;
+    unsigned long lDoSProtectionTrigger = (unsigned long)BIP70_MAX_PAYMENTREQUEST_SIZE + 1;
     std::string randData(lDoSProtectionTrigger, '\0');
-    unsigned char* buff = reinterpret_cast<unsigned char *>(&randData[0]);
+    unsigned char* buff = reinterpret_cast<unsigned char*>(&randData[0]);
 
     // Just get some random data big enough to trigger BIP70 DoS protection
     // unsigned char randData[BIP70_MAX_PAYMENTREQUEST_SIZE + 1];

@@ -88,7 +88,7 @@ namespace GUIUtil
 {
 QString dateTimeStr(const QDateTime& date)
 {
-     QString format = "MM/dd/yy HH:mm:ss";
+    QString format = "MM/dd/yy HH:mm:ss";
     return date.toString(format);
 }
 
@@ -110,7 +110,6 @@ void setupAddressWidget(QValidatedLineEdit* widget, QWidget* parent)
 
     // We don't want translators to use own addresses in translations
     // and this is the only place, where this address is supplied.
-
 }
 
 void setupAmountWidget(QLineEdit* widget, QWidget* parent)
@@ -139,8 +138,7 @@ bool parseBitcoinURI(const QUrl& uri, SendCoinsRecipient* out)
     QUrlQuery uriQuery(uri);
     QList<QPair<QString, QString> > items = uriQuery.queryItems();
 
-    for (QList<QPair<QString, QString> >::iterator i = items.begin(); i != items.end(); i++)
-    {
+    for (QList<QPair<QString, QString> >::iterator i = items.begin(); i != items.end(); i++) {
         bool fShouldReturnFalse = false;
         if (i->first.startsWith("req-")) {
             i->first.remove(0, 4);
@@ -245,12 +243,12 @@ void copyEntryData(QAbstractItemView* view, int column, int role)
     }
 }
 
-QVariant getEntryData(QAbstractItemView *view, int column, int role)
+QVariant getEntryData(QAbstractItemView* view, int column, int role)
 {
-    if(!view || !view->selectionModel())
+    if (!view || !view->selectionModel())
         return QVariant();
     QModelIndexList selection = view->selectionModel()->selectedRows(column);
-    if(!selection.isEmpty()) {
+    if (!selection.isEmpty()) {
         // Return first item
         return (selection.at(0).data(role));
     }
@@ -302,9 +300,7 @@ QString getOpenFileName(QWidget* parent, const QString& caption, const QString& 
     if (dir.isEmpty()) // Default to user documents location
     {
         myDir = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
-    }
-    else
-    {
+    } else {
         myDir = dir;
     }
     /* Directly convert path to native OS path separators */
@@ -730,17 +726,17 @@ LSSharedFileListItemRef findStartupItemInList(LSSharedFileListRef list, CFURLRef
         CFURLRef currentItemURL = NULL;
 
 #if defined(MAC_OS_X_VERSION_MAX_ALLOWED) && MAC_OS_X_VERSION_MAX_ALLOWED >= 10100
-    if(&LSSharedFileListItemCopyResolvedURL)
-        currentItemURL = LSSharedFileListItemCopyResolvedURL(item, resolutionFlags, NULL);
+        if (&LSSharedFileListItemCopyResolvedURL)
+            currentItemURL = LSSharedFileListItemCopyResolvedURL(item, resolutionFlags, NULL);
 #if defined(MAC_OS_X_VERSION_MIN_REQUIRED) && MAC_OS_X_VERSION_MIN_REQUIRED < 10100
-    else
-        LSSharedFileListItemResolve(item, resolutionFlags, &currentItemURL, NULL);
+        else
+            LSSharedFileListItemResolve(item, resolutionFlags, &currentItemURL, NULL);
 #endif
 #else
-    LSSharedFileListItemResolve(item, resolutionFlags, &currentItemURL, NULL);
+        LSSharedFileListItemResolve(item, resolutionFlags, &currentItemURL, NULL);
 #endif
 
-        if(currentItemURL && CFEqual(currentItemURL, findUrl)) {
+        if (currentItemURL && CFEqual(currentItemURL, findUrl)) {
             // found
             CFRelease(currentItemURL);
             return item;
@@ -793,9 +789,10 @@ void saveWindowGeometry(const QString& strSetting, QWidget* parent)
     settings.setValue(strSetting + "Size", parent->size());
 }
 
-void HideDisabledWidgets( QVector<QWidget*> widgets ){
-    auto hide = []( QWidget* widget) { widget->setVisible(false); };
-    for_each (widgets.begin(), widgets.end(), hide);
+void HideDisabledWidgets(QVector<QWidget*> widgets)
+{
+    auto hide = [](QWidget* widget) { widget->setVisible(false); };
+    for_each(widgets.begin(), widgets.end(), hide);
 }
 
 
@@ -823,40 +820,44 @@ QString loadStyleSheet()
     QVariant theme = settings.value("theme");
     QString cssName = QString(":/css/" + theme.toString());
     //LogPrintf("loadStyleSheet: Loading stylesheet %s\n", cssName.toStdString());
-        // Build-in CSS
+    // Build-in CSS
     settings.setValue("fCSSexternal", false);
 
     QFile qFile(cssName);
-    if (!qFile.exists()){
+    if (!qFile.exists()) {
         QTextStream qout(stdout);
-        qout << "Error: " << cssName << " not found. Please check qrc." <<endl;
+        qout << "Error: " << cssName << " not found. Please check qrc." << endl;
     } else if (qFile.open(QFile::ReadOnly)) {
         styleSheet = QLatin1String(qFile.readAll());
         return styleSheet;
-    } 
+    }
     return 0;
 }
 
-void refreshStyleSheet(){
+void refreshStyleSheet()
+{
     qApp->setStyleSheet(GUIUtil::loadStyleSheet());
-   Q_FOREACH (QWidget *widget, QApplication::topLevelWidgets()){
+    Q_FOREACH (QWidget* widget, QApplication::topLevelWidgets()) {
         widget->setStyleSheet(GUIUtil::loadStyleSheet());
         widget->update();
     }
 }
 
-void setWindowless(QWidget* widget){
+void setWindowless(QWidget* widget)
+{
     widget->setWindowFlags(Qt::Popup | Qt::FramelessWindowHint | Qt::NoDropShadowWindowHint);
     widget->setAttribute(Qt::WA_NoSystemBackground, true);
-    widget->setAttribute(Qt::WA_TranslucentBackground, true);  
+    widget->setAttribute(Qt::WA_TranslucentBackground, true);
     widget->setAttribute(Qt::WA_OpaquePaintEvent, false);
     widget->setStyleSheet(GUIUtil::loadStyleSheet());
 }
 
-void disableTooltips(QWidget* widget){
+void disableTooltips(QWidget* widget)
+{
 }
 
-void prompt(QString message){
+void prompt(QString message)
+{
     QMessageBox* errorPrompt = new QMessageBox();
     GUIUtil::setWindowless(errorPrompt);
     errorPrompt->setStyleSheet(GUIUtil::loadStyleSheet());
@@ -873,7 +874,7 @@ void colorCalendarWidgetWeekends(QCalendarWidget* widget, QColor color)
     format = widget->weekdayTextFormat(Qt::Sunday);
     format.setForeground(QBrush(color, Qt::SolidPattern));
     widget->setWeekdayTextFormat(Qt::Sunday, format);
-    widget->parentWidget()->resize(300,300);
+    widget->parentWidget()->resize(300, 300);
     widget->findChild<QWidget*>("qt_calendar_navigationbar")->setMinimumHeight(65);
     widget->findChild<QWidget*>("qt_calendar_calendarview")->setStyleSheet("padding:5px; margin:0;");
     widget->findChild<QAbstractButton*>("qt_calendar_prevmonth")->setIcon(QIcon(":/images/leftArrow_small"));
@@ -969,11 +970,11 @@ QString formatTimeOffset(int64_t nTimeOffset)
 
 QString formatBytes(uint64_t bytes)
 {
-    if(bytes < 1024)
+    if (bytes < 1024)
         return QString(QObject::tr("%1 B")).arg(bytes);
-    if(bytes < 1024 * 1024)
+    if (bytes < 1024 * 1024)
         return QString(QObject::tr("%1 KB")).arg(bytes / 1024);
-    if(bytes < 1024 * 1024 * 1024)
+    if (bytes < 1024 * 1024 * 1024)
         return QString(QObject::tr("%1 MB")).arg(bytes / 1024 / 1024);
 
     return QString(QObject::tr("%1 GB")).arg(bytes / 1024 / 1024 / 1024);

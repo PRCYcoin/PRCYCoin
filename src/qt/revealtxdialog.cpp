@@ -4,9 +4,8 @@
 
 #include <QClipboard>
 
-RevealTxDialog::RevealTxDialog(QWidget *parent) :
-    QDialog(parent, Qt::WindowSystemMenuHint | Qt::WindowTitleHint | Qt::WindowCloseButtonHint),
-    ui(new Ui::RevealTxDialog)
+RevealTxDialog::RevealTxDialog(QWidget* parent) : QDialog(parent, Qt::WindowSystemMenuHint | Qt::WindowTitleHint | Qt::WindowCloseButtonHint),
+                                                  ui(new Ui::RevealTxDialog)
 {
     ui->setupUi(this);
 
@@ -32,17 +31,17 @@ RevealTxDialog::~RevealTxDialog()
     delete ui;
 }
 
-void RevealTxDialog::setTxID(QString strId) 
+void RevealTxDialog::setTxID(QString strId)
 {
     ui->lblTxID->setText(strId);
 }
 
-void RevealTxDialog::setTxAddress(QString strAddr) 
+void RevealTxDialog::setTxAddress(QString strAddr)
 {
     ui->lblAddress->setText(strAddr);
 }
 
-void RevealTxDialog::setTxPrivKey(QString strPrivKey) 
+void RevealTxDialog::setTxPrivKey(QString strPrivKey)
 {
     ui->lblPrivateKey->setText(strPrivKey);
 }
@@ -55,25 +54,28 @@ void RevealTxDialog::setTxFee(CAmount fee)
 
 void RevealTxDialog::on_buttonBox_accepted()
 {
-
 }
 
-void RevealTxDialog::copyID(){
-    QClipboard *clipboard = QApplication::clipboard();
+void RevealTxDialog::copyID()
+{
+    QClipboard* clipboard = QApplication::clipboard();
     clipboard->setText(ui->lblTxID->text());
 }
 
-void RevealTxDialog::copyAddress(){
-    QClipboard *clipboard = QApplication::clipboard();
+void RevealTxDialog::copyAddress()
+{
+    QClipboard* clipboard = QApplication::clipboard();
     clipboard->setText(ui->lblAddress->text());
 }
 
-void RevealTxDialog::copyPrivateKey(){
-    QClipboard *clipboard = QApplication::clipboard();
+void RevealTxDialog::copyPrivateKey()
+{
+    QClipboard* clipboard = QApplication::clipboard();
     clipboard->setText(ui->lblPrivateKey->text());
 }
 
-void RevealTxDialog::copyTxFee(){
-    QClipboard *clipboard = QApplication::clipboard();
+void RevealTxDialog::copyTxFee()
+{
+    QClipboard* clipboard = QApplication::clipboard();
     clipboard->setText(ui->lblTxFee->text());
 }

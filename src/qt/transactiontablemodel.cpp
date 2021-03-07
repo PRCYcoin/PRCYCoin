@@ -82,76 +82,74 @@ public:
     /* Query entire wallet anew from core.
      */
     void refreshWallet()
-        {
-            if (wallet->IsLocked()) return;
-            cachedWallet.clear();
-            //Use defined values
-            int customThreadLimit = SINGLE_THREAD_MAX_TXES_SIZE;
-            int maxTXUIlLimit = MAX_AMOUNT_LOADED_RECORDS;
-            //Change to user values if set
-            customThreadLimit = GetArg("-txthreadinglimit", 4000);
-            maxTXUIlLimit = GetArg("-maxtxuilimit", 20000);
+    {
+        if (wallet->IsLocked()) return;
+        cachedWallet.clear();
+        //Use defined values
+        int customThreadLimit = SINGLE_THREAD_MAX_TXES_SIZE;
+        int maxTXUIlLimit = MAX_AMOUNT_LOADED_RECORDS;
+        //Change to user values if set
+        customThreadLimit = GetArg("-txthreadinglimit", 4000);
+        maxTXUIlLimit = GetArg("-maxtxuilimit", 20000);
 
-            std::vector<CWalletTx> walletTxes = wallet->getWalletTxs();
+        std::vector<CWalletTx> walletTxes = wallet->getWalletTxs();
 
-            // Divide the work between multiple threads to speedup the process if the vector is larger than 4k txes
-            std::size_t txesSize = walletTxes.size();
-            if (txesSize > customThreadLimit && GetBoolArg("-txthreading", true)) {
-                // First check if the amount of txs exceeds the UI limit
-                if (txesSize > maxTXUIlLimit) {
-                    // Sort the txs by date just to be really really sure that them are ordered.
-                    // (this extra calculation should be removed in the future if can ensure that
-                    // txs are stored in order in the db, which is what should be happening)
-                    sort(walletTxes.begin(), walletTxes.end(),
-                            [](const CWalletTx & a, const CWalletTx & b) -> bool {
-                             return a.GetComputedTxTime() > b.GetComputedTxTime();
-                         });
+        // Divide the work between multiple threads to speedup the process if the vector is larger than 4k txes
+        std::size_t txesSize = walletTxes.size();
+        if (txesSize > customThreadLimit && GetBoolArg("-txthreading", true)) {
+            // First check if the amount of txs exceeds the UI limit
+            if (txesSize > maxTXUIlLimit) {
+                // Sort the txs by date just to be really really sure that them are ordered.
+                // (this extra calculation should be removed in the future if can ensure that
+                // txs are stored in order in the db, which is what should be happening)
+                sort(walletTxes.begin(), walletTxes.end(),
+                    [](const CWalletTx& a, const CWalletTx& b) -> bool {
+                        return a.GetComputedTxTime() > b.GetComputedTxTime();
+                    });
 
-                    // Only latest ones.
-                    walletTxes = std::vector<CWalletTx>(walletTxes.begin(), walletTxes.begin() + MAX_AMOUNT_LOADED_RECORDS);
-                    txesSize = walletTxes.size();
-                };
+                // Only latest ones.
+                walletTxes = std::vector<CWalletTx>(walletTxes.begin(), walletTxes.begin() + MAX_AMOUNT_LOADED_RECORDS);
+                txesSize = walletTxes.size();
+            };
 
-                // Simple way to get the processors count
-                std::size_t threadsCount = (QThreadPool::globalInstance()->maxThreadCount() / 2 ) + 1;
+            // Simple way to get the processors count
+            std::size_t threadsCount = (QThreadPool::globalInstance()->maxThreadCount() / 2) + 1;
 
-                // Size of the tx subsets
-                std::size_t const subsetSize = txesSize / (threadsCount + 1);
-                std::size_t totalSumSize = 0;
-                QList<QFuture<QList<TransactionRecord>>> tasks;
+            // Size of the tx subsets
+            std::size_t const subsetSize = txesSize / (threadsCount + 1);
+            std::size_t totalSumSize = 0;
+            QList<QFuture<QList<TransactionRecord> > > tasks;
 
-                // Subsets + run task
-                for (std::size_t i = 0; i < threadsCount; ++i) {
-                    tasks.append(
-                            QtConcurrent::run(
-                                    convertTxToRecords,
-                                    this,
-                                    wallet,
-                                    std::vector<CWalletTx>(walletTxes.begin() + totalSumSize, walletTxes.begin() + totalSumSize + subsetSize)
-                            )
-                     );
-                    totalSumSize += subsetSize;
-                }
-
-                // Now take the remaining ones and do the work here
-                std::size_t const remainingSize = txesSize - totalSumSize;
-                cachedWallet.append(convertTxToRecords(this, wallet,
-                                                       std::vector<CWalletTx>(walletTxes.end() - remainingSize, walletTxes.end())
-                                                       ));
-
-                for (QFuture<QList<TransactionRecord>> &future : tasks) {
-                    future.waitForFinished();
-                    cachedWallet.append(future.result());
-                }
-            } else {
-                // Single thread flow
-                cachedWallet.append(convertTxToRecords(this, wallet, walletTxes));
+            // Subsets + run task
+            for (std::size_t i = 0; i < threadsCount; ++i) {
+                tasks.append(
+                    QtConcurrent::run(
+                        convertTxToRecords,
+                        this,
+                        wallet,
+                        std::vector<CWalletTx>(walletTxes.begin() + totalSumSize, walletTxes.begin() + totalSumSize + subsetSize)));
+                totalSumSize += subsetSize;
             }
-        }
 
-    static QList<TransactionRecord> convertTxToRecords(TransactionTablePriv* tablePriv, const CWallet* wallet, const std::vector<CWalletTx>& walletTxes) {
+            // Now take the remaining ones and do the work here
+            std::size_t const remainingSize = txesSize - totalSumSize;
+            cachedWallet.append(convertTxToRecords(this, wallet,
+                std::vector<CWalletTx>(walletTxes.end() - remainingSize, walletTxes.end())));
+
+            for (QFuture<QList<TransactionRecord> >& future : tasks) {
+                future.waitForFinished();
+                cachedWallet.append(future.result());
+            }
+        } else {
+            // Single thread flow
+            cachedWallet.append(convertTxToRecords(this, wallet, walletTxes));
+        }
+    }
+
+    static QList<TransactionRecord> convertTxToRecords(TransactionTablePriv* tablePriv, const CWallet* wallet, const std::vector<CWalletTx>& walletTxes)
+    {
         QList<TransactionRecord> cachedWallet;
-        for (const auto &tx : walletTxes) {
+        for (const auto& tx : walletTxes) {
             QList<TransactionRecord> records = TransactionRecord::decomposeTransaction(wallet, tx);
             cachedWallet.append(records);
         }
@@ -210,7 +208,7 @@ public:
                 {
                     parent->beginInsertRows(QModelIndex(), lowerIndex, lowerIndex + toInsert.size() - 1);
                     int insert_idx = lowerIndex;
-                   Q_FOREACH (const TransactionRecord& rec, toInsert) {
+                    Q_FOREACH (const TransactionRecord& rec, toInsert) {
                         cachedWallet.insert(insert_idx, rec);
                         insert_idx += 1;
                     }
@@ -727,7 +725,6 @@ struct TransactionNotification {
 public:
     TransactionNotification() {}
     TransactionNotification(uint256 hash, ChangeType status) : hash(hash), status(status) {}
-
     void invoke(QObject* ttm)
     {
         QString strHash = QString::fromStdString(hash.GetHex());
@@ -748,11 +745,9 @@ static std::vector<TransactionNotification> vQueueNotifications;
 
 static void NotifyTransactionChanged(TransactionTableModel* ttm, CWallet* wallet, const uint256& hash, ChangeType status)
 {
-
     TransactionNotification notification(hash, status);
 
-    if (fQueueNotifications)
-    {
+    if (fQueueNotifications) {
         vQueueNotifications.push_back(notification);
         return;
     }

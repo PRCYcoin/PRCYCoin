@@ -27,7 +27,8 @@ void HandleError(const leveldb::Status& status)
     throw leveldb_error("Unknown database error");
 }
 
-static void SetMaxOpenFiles(leveldb::Options *options) {
+static void SetMaxOpenFiles(leveldb::Options* options)
+{
     // On most platforms the default setting of max_open_files (which is 1000)
     // is optimal. On Windows using a large file count is OK because the handles
     // do not interfere with select() loops. On 64-bit Unix hosts this value is
@@ -49,7 +50,7 @@ static void SetMaxOpenFiles(leveldb::Options *options) {
     }
 #endif
     LogPrintf("LevelDB using max_open_files=%d (default=%d)\n",
-             options->max_open_files, default_open_files);
+        options->max_open_files, default_open_files);
 }
 
 static leveldb::Options GetOptions(size_t nCacheSize)

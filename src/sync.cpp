@@ -48,7 +48,6 @@ struct CLockLocation {
           sourceFile(pszFile),
           m_thread_name(thread_name),
           sourceLine(nLine) {}
-
     std::string ToString() const
     {
         return strprintf(
@@ -76,12 +75,12 @@ struct LockData {
     bool available;
     LockData() : available(true) {}
     ~LockData() { available = false; }
-
     LockOrders lockorders;
     InvLockOrders invlockorders;
     std::mutex dd_mutex;
 };
-LockData& GetLockData() {
+LockData& GetLockData()
+{
     static LockData lockdata;
     return lockdata;
 }
@@ -92,7 +91,7 @@ static void potential_deadlock_detected(const std::pair<void*, void*>& mismatch,
 {
     LogPrintf("POTENTIAL DEADLOCK DETECTED\n");
     LogPrintf("Previous lock order was:\n");
-    for (const std::pair<void*, CLockLocation> & i : s2) {
+    for (const std::pair<void*, CLockLocation>& i : s2) {
         if (i.first == mismatch.first) {
             LogPrintf(" (1)"); /* Continued */
         }
@@ -102,7 +101,7 @@ static void potential_deadlock_detected(const std::pair<void*, void*>& mismatch,
         LogPrintf(" %s\n", i.second.ToString());
     }
     LogPrintf("Current lock order is:\n");
-    for (const std::pair<void*, CLockLocation> & i : s1) {
+    for (const std::pair<void*, CLockLocation>& i : s1) {
         if (i.first == mismatch.first) {
             LogPrintf(" (1)"); /* Continued */
         }

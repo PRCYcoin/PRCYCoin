@@ -129,7 +129,6 @@ void WalletView::setClientModel(ClientModel* clientModel)
     overviewPage->setClientModel(clientModel);
     sendCoinsPage->setClientModel(clientModel);
     masternodeListPage->setClientModel(clientModel);
-
 }
 
 void WalletView::setWalletModel(WalletModel* walletModel)
@@ -248,7 +247,7 @@ void WalletView::encryptWallet(bool status)
     if (!walletModel)
         return;
     AskPassphraseDialog dlg(status ? AskPassphraseDialog::Mode::Encrypt : AskPassphraseDialog::Mode::Decrypt, this,
-                            walletModel, AskPassphraseDialog::Context::Encrypt);
+        walletModel, AskPassphraseDialog::Context::Encrypt);
     dlg.exec();
 
     updateEncryptionStatus();
@@ -306,7 +305,7 @@ void WalletView::toggleLockWallet()
     }
 
     else if (encStatus == walletModel->Unlocked || encStatus == walletModel->UnlockedForAnonymizationOnly) {
-            walletModel->setWalletLocked(true);
+        walletModel->setWalletLocked(true);
     }
 }
 

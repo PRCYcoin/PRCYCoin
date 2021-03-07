@@ -15,7 +15,7 @@
 #include <QStyleOption>
 
 ToggleButton::ToggleButton(QWidget* parent) : QWidget(parent),
-                                                  ui(new Ui::ToggleButton)
+                                              ui(new Ui::ToggleButton)
 {
     ui->setupUi(this);
     ui->pushButton0->setCheckable(true);
@@ -33,54 +33,67 @@ ToggleButton::~ToggleButton()
 }
 
 void ToggleButton::setOptionA(QString label)
-{    ui->pushButton1->setText(label);   }
+{
+    ui->pushButton1->setText(label);
+}
 
 void ToggleButton::setOptionB(QString label)
-{    ui->pushButton0->setText(label);   }
+{
+    ui->pushButton0->setText(label);
+}
 
 void ToggleButton::setLayoutDirection(Qt::LayoutDirection Dir)
- {   direction=Dir; QWidget::setLayoutDirection(Dir); }
+{
+    direction = Dir;
+    QWidget::setLayoutDirection(Dir);
+}
 
 bool ToggleButton::getState()
-{   return state;   }
+{
+    return state;
+}
 
 void ToggleButton::setState(bool value)
-{   state = value; update();  }
+{
+    state = value;
+    update();
+}
 
- void ToggleButton::paintEvent(QPaintEvent *e)
- {
+void ToggleButton::paintEvent(QPaintEvent* e)
+{
     QStyleOption opt;
     opt.init(this);
     QPainter p(this);
-    if (direction!=Qt::RightToLeft)
-        ui->pushButton1->move(this->width()-ui->pushButton1->width() -ui->pushButton0->x(),ui->pushButton1->y());
+    if (direction != Qt::RightToLeft)
+        ui->pushButton1->move(this->width() - ui->pushButton1->width() - ui->pushButton0->x(), ui->pushButton1->y());
     else if (state)
-        ui->pushButton0->move(this->width()-ui->pushButton0->width()- ui->pushButton1->x(),ui->pushButton0->y());
+        ui->pushButton0->move(this->width() - ui->pushButton0->width() - ui->pushButton1->x(), ui->pushButton0->y());
     style()->drawPrimitive(QStyle::PE_Widget, &opt, &p, this);
- }
+}
 
- void ToggleButton::resizeEvent(QResizeEvent * event)
- {     resize();    }
+void ToggleButton::resizeEvent(QResizeEvent* event)
+{
+    resize();
+}
 
- void ToggleButton::resize()
- {
+void ToggleButton::resize()
+{
     this->setFixedWidth(this->width());
-    double large = this->width()*.55;
-    double small = this->width()*.4;
-    if (state)
-    {
+    double large = this->width() * .55;
+    double small = this->width() * .4;
+    if (state) {
         ui->pushButton0->setFixedWidth(large);
         ui->pushButton1->setFixedWidth(small);
     } else {
         ui->pushButton0->setFixedWidth(small);
         ui->pushButton1->setFixedWidth(large);
     }
- }
+}
 
- void ToggleButton::update()
- {
-     ui->pushButton0->setChecked(!state);
-     ui->pushButton1->setChecked(state);
+void ToggleButton::update()
+{
+    ui->pushButton0->setChecked(!state);
+    ui->pushButton1->setChecked(state);
 
     if (state)
         ui->pushButton0->stackUnder(ui->pushButton1);
@@ -88,12 +101,11 @@ void ToggleButton::setState(bool value)
         ui->pushButton1->stackUnder(ui->pushButton0);
     resize();
     this->repaint();
- }
+}
 
 void ToggleButton::toggle()
 {
-    state=!state;
+    state = !state;
     Q_EMIT stateChanged(this);
     update();
 }
-

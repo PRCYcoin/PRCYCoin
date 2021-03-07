@@ -13,7 +13,9 @@ CHMAC_SHA256::CHMAC_SHA256(const unsigned char* key, size_t keylen)
         memcpy(rkey, key, keylen);
         memset(rkey + keylen, 0, 64 - keylen);
     } else {
-        CSHA256().Write(key, keylen).Finalize(rkey);
+        CSHA256()
+            .Write(key, keylen)
+            .Finalize(rkey);
         memset(rkey + 32, 0, 32);
     }
 

@@ -44,32 +44,37 @@ static RecursiveMutex cs_rpcWarmup;
 static RPCTimerInterface* timerInterface = NULL;
 /* Map of name to timer.
  * @note Can be changed to std::unique_ptr when C++11 */
-static std::map <std::string, boost::shared_ptr<RPCTimerBase>> deadlineTimers;
+static std::map<std::string, boost::shared_ptr<RPCTimerBase> > deadlineTimers;
 
 static struct CRPCSignals {
     boost::signals2::signal<void()> Started;
     boost::signals2::signal<void()> Stopped;
-    boost::signals2::signal<void(const CRPCCommand &)> PreCommand;
-    boost::signals2::signal<void(const CRPCCommand &)> PostCommand;
+    boost::signals2::signal<void(const CRPCCommand&)> PreCommand;
+    boost::signals2::signal<void(const CRPCCommand&)> PostCommand;
 } g_rpcSignals;
 
-void RPCServer::OnStarted(boost::function<void()> slot) {
+void RPCServer::OnStarted(boost::function<void()> slot)
+{
     g_rpcSignals.Started.connect(slot);
 }
 
-void RPCServer::OnStopped(boost::function<void()> slot) {
+void RPCServer::OnStopped(boost::function<void()> slot)
+{
     g_rpcSignals.Stopped.connect(slot);
 }
 
-void RPCServer::OnPreCommand(boost::function<void(const CRPCCommand &)> slot) {
+void RPCServer::OnPreCommand(boost::function<void(const CRPCCommand&)> slot)
+{
     g_rpcSignals.PreCommand.connect(boost::bind(slot, _1));
 }
 
-void RPCServer::OnPostCommand(boost::function<void(const CRPCCommand &)> slot) {
+void RPCServer::OnPostCommand(boost::function<void(const CRPCCommand&)> slot)
+{
     g_rpcSignals.PostCommand.connect(boost::bind(slot, _1));
 }
 
-void RPCTypeCheck(const UniValue &params, const list <UniValue::VType> &typesExpected, bool fAllowNull) {
+void RPCTypeCheck(const UniValue& params, const list<UniValue::VType>& typesExpected, bool fAllowNull)
+{
     unsigned int i = 0;
     for (UniValue::VType t : typesExpected) {
         if (params.size() <= i)
@@ -78,7 +83,7 @@ void RPCTypeCheck(const UniValue &params, const list <UniValue::VType> &typesExp
         const UniValue& v = params[i];
         if (!((v.type() == t) || (fAllowNull && (v.isNull())))) {
             string err = strprintf("Expected type %s, got %s",
-                                   uvTypeName(t), uvTypeName(v.type()));
+                uvTypeName(t), uvTypeName(v.type()));
             throw JSONRPCError(RPC_TYPE_ERROR, err);
         }
         i++;
@@ -86,27 +91,29 @@ void RPCTypeCheck(const UniValue &params, const list <UniValue::VType> &typesExp
 }
 
 void RPCTypeCheckObj(const UniValue& o,
-                     const map<string, UniValue::VType>& typesExpected,
-                     bool fAllowNull)
+    const map<string, UniValue::VType>& typesExpected,
+    bool fAllowNull)
 {
-    for (const PAIRTYPE(string, UniValue::VType)& t : typesExpected) {
+    for (const PAIRTYPE(string, UniValue::VType) & t : typesExpected) {
         const UniValue& v = find_value(o, t.first);
         if (!fAllowNull && v.isNull())
             throw JSONRPCError(RPC_TYPE_ERROR, strprintf("Missing %s", t.first));
 
         if (!((v.type() == t.second) || (fAllowNull && (v.isNull())))) {
             string err = strprintf("Expected type %s for %s, got %s",
-                                   uvTypeName(t.second), t.first, uvTypeName(v.type()));
+                uvTypeName(t.second), t.first, uvTypeName(v.type()));
             throw JSONRPCError(RPC_TYPE_ERROR, err);
         }
     }
 }
 
-static inline int64_t roundint64(double d) {
+static inline int64_t roundint64(double d)
+{
     return (int64_t)(d > 0 ? d + 0.5 : d - 0.5);
 }
 
-CAmount AmountFromValue(const UniValue& value) {
+CAmount AmountFromValue(const UniValue& value)
+{
     if (!value.isNum())
         throw JSONRPCError(RPC_TYPE_ERROR, "Amount is not a number");
 
@@ -117,16 +124,18 @@ CAmount AmountFromValue(const UniValue& value) {
     return nAmount;
 }
 
-UniValue ValueFromAmount(const CAmount &amount) {
+UniValue ValueFromAmount(const CAmount& amount)
+{
     bool sign = amount < 0;
     int64_t n_abs = (sign ? -amount : amount);
     int64_t quotient = n_abs / COIN;
     int64_t remainder = n_abs % COIN;
     return UniValue(UniValue::VNUM,
-                    strprintf("%s%d.%08d", sign ? "-" : "", quotient, remainder));
+        strprintf("%s%d.%08d", sign ? "-" : "", quotient, remainder));
 }
 
-uint256 ParseHashV(const UniValue &v, string strName) {
+uint256 ParseHashV(const UniValue& v, string strName)
+{
     string strHex;
     if (v.isStr())
         strHex = v.get_str();
@@ -137,11 +146,13 @@ uint256 ParseHashV(const UniValue &v, string strName) {
     return result;
 }
 
-uint256 ParseHashO(const UniValue &o, string strKey) {
+uint256 ParseHashO(const UniValue& o, string strKey)
+{
     return ParseHashV(find_value(o, strKey), strKey);
 }
 
-vector<unsigned char> ParseHexV(const UniValue& v, string strName) {
+vector<unsigned char> ParseHexV(const UniValue& v, string strName)
+{
     string strHex;
     if (v.isStr())
         strHex = v.get_str();
@@ -150,19 +161,22 @@ vector<unsigned char> ParseHexV(const UniValue& v, string strName) {
     return ParseHex(strHex);
 }
 
-vector<unsigned char> ParseHexO(const UniValue &o, string strKey) {
+vector<unsigned char> ParseHexO(const UniValue& o, string strKey)
+{
     return ParseHexV(find_value(o, strKey), strKey);
 }
 
-int ParseInt(const UniValue &o, string strKey) {
-    const UniValue &v = find_value(o, strKey);
+int ParseInt(const UniValue& o, string strKey)
+{
+    const UniValue& v = find_value(o, strKey);
     if (!v.isNum())
         throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid parameter, " + strKey + "is not an int");
 
     return v.get_int();
 }
 
-bool ParseBool(const UniValue& o, string strKey) {
+bool ParseBool(const UniValue& o, string strKey)
+{
     const UniValue& v = find_value(o, strKey);
     if (!v.isBool())
         throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid parameter, " + strKey + "is not a bool");
@@ -175,18 +189,19 @@ bool ParseBool(const UniValue& o, string strKey) {
  * Note: This interface may still be subject to change.
  */
 
-string CRPCTable::help(string strCommand) const {
+string CRPCTable::help(string strCommand) const
+{
     string strRet;
     string category;
-    set <rpcfn_type> setDone;
-    vector <pair<string, const CRPCCommand *>> vCommands;
+    set<rpcfn_type> setDone;
+    vector<pair<string, const CRPCCommand*> > vCommands;
 
-    for (map<string, const CRPCCommand *>::const_iterator mi = mapCommands.begin(); mi != mapCommands.end(); ++mi)
+    for (map<string, const CRPCCommand*>::const_iterator mi = mapCommands.begin(); mi != mapCommands.end(); ++mi)
         vCommands.push_back(make_pair(mi->second->category + mi->first, mi->second));
     sort(vCommands.begin(), vCommands.end());
 
-    for (const PAIRTYPE(string, const CRPCCommand*) &command : vCommands) {
-        const CRPCCommand *pcmd = command.second;
+    for (const PAIRTYPE(string, const CRPCCommand*)&command : vCommands) {
+        const CRPCCommand* pcmd = command.second;
         string strMethod = pcmd->name;
         // We already filter duplicates, but these deprecated screw up the sort order
         if (strMethod.find("label") != string::npos)
@@ -228,15 +243,16 @@ string CRPCTable::help(string strCommand) const {
     return strRet;
 }
 
-UniValue help(const UniValue& params, bool fHelp) {
+UniValue help(const UniValue& params, bool fHelp)
+{
     if (fHelp || params.size() > 1)
         throw runtime_error(
-                "help ( \"command\" )\n"
-                "\nList all commands, or get help for a specified command.\n"
-                "\nArguments:\n"
-                "1. \"command\"     (string, optional) The command to get help on\n"
-                "\nResult:\n"
-                "\"text\"     (string) The help text\n");
+            "help ( \"command\" )\n"
+            "\nList all commands, or get help for a specified command.\n"
+            "\nArguments:\n"
+            "1. \"command\"     (string, optional) The command to get help on\n"
+            "\nResult:\n"
+            "\"text\"     (string) The help text\n");
 
     string strCommand;
     if (params.size() > 0)
@@ -246,12 +262,13 @@ UniValue help(const UniValue& params, bool fHelp) {
 }
 
 
-UniValue stop(const UniValue& params, bool fHelp) {
+UniValue stop(const UniValue& params, bool fHelp)
+{
     // Accept the deprecated and ignored 'detach' boolean argument
     if (fHelp || params.size() > 1)
         throw runtime_error(
-                "stop\n"
-                "\nStop PRCY server.");
+            "stop\n"
+            "\nStop PRCY server.");
     // Event loop will exit after current HTTP requests have been handled, so
     // this reply will get back to the client.
     StartShutdown();
@@ -342,29 +359,29 @@ static const CRPCCommand vRPCCommands[] =
         // {"hidden", "invalidateblock", &invalidateblock, true, true, false},
         // {"hidden", "reconsiderblock", &reconsiderblock, true, true, false},
         // {"hidden", "setmocktime", &setmocktime, true, false, false},
-        { "hidden", "waitfornewblock", &waitfornewblock, true, true, false},
-        { "hidden", "waitforblock", &waitforblock, true, true, false},
-        { "hidden", "waitforblockheight", &waitforblockheight, true, true, false},
+        {"hidden", "waitfornewblock", &waitfornewblock, true, true, false},
+        {"hidden", "waitforblock", &waitforblock, true, true, false},
+        {"hidden", "waitforblockheight", &waitforblockheight, true, true, false},
 
         /* Prcycoin features */
-         {"prcycoin", "masternode", &masternode, true, true, false},
-         {"prcycoin", "listmasternodes", &listmasternodes, true, true, false},
-         {"prcycoin", "getmasternodecount", &getmasternodecount, true, true, false},
-         {"prcycoin", "getcurrentseesawreward", &getcurrentseesawreward, true, true, false},
-         {"prcycoin", "getseesawrewardratio", &getseesawrewardratio, true, true, false},
-         {"prcycoin", "getseesawrewardwithheight", &getseesawrewardwithheight, true, true, false},
-         {"prcycoin", "masternodeconnect", &masternodeconnect, true, true, false},
-         {"prcycoin", "masternodecurrent", &masternodecurrent, true, true, false},
-         {"prcycoin", "masternodedebug", &masternodedebug, true, true, false},
-         {"prcycoin", "startmasternode", &startmasternode, true, true, false},
-         {"prcycoin", "listmasternodeconf", &listmasternodeconf, true, true, false},
-         {"prcycoin", "getmasternodewinners", &getmasternodewinners, true, true, false},
-         {"prcycoin", "getmasternodescores", &getmasternodescores, true, true, false},
-         {"prcycoin", "createmasternodebroadcast", &createmasternodebroadcast, true, true, false},
-         {"prcycoin", "decodemasternodebroadcast", &decodemasternodebroadcast, true, true, false},
-         {"prcycoin", "relaymasternodebroadcast", &relaymasternodebroadcast, true, true, false},
-         {"prcycoin", "mnsync", &mnsync, true, true, false},
-         {"prcycoin", "getpoolinfo", &getpoolinfo, true, true, false},
+        {"prcycoin", "masternode", &masternode, true, true, false},
+        {"prcycoin", "listmasternodes", &listmasternodes, true, true, false},
+        {"prcycoin", "getmasternodecount", &getmasternodecount, true, true, false},
+        {"prcycoin", "getcurrentseesawreward", &getcurrentseesawreward, true, true, false},
+        {"prcycoin", "getseesawrewardratio", &getseesawrewardratio, true, true, false},
+        {"prcycoin", "getseesawrewardwithheight", &getseesawrewardwithheight, true, true, false},
+        {"prcycoin", "masternodeconnect", &masternodeconnect, true, true, false},
+        {"prcycoin", "masternodecurrent", &masternodecurrent, true, true, false},
+        {"prcycoin", "masternodedebug", &masternodedebug, true, true, false},
+        {"prcycoin", "startmasternode", &startmasternode, true, true, false},
+        {"prcycoin", "listmasternodeconf", &listmasternodeconf, true, true, false},
+        {"prcycoin", "getmasternodewinners", &getmasternodewinners, true, true, false},
+        {"prcycoin", "getmasternodescores", &getmasternodescores, true, true, false},
+        {"prcycoin", "createmasternodebroadcast", &createmasternodebroadcast, true, true, false},
+        {"prcycoin", "decodemasternodebroadcast", &decodemasternodebroadcast, true, true, false},
+        {"prcycoin", "relaymasternodebroadcast", &relaymasternodebroadcast, true, true, false},
+        {"prcycoin", "mnsync", &mnsync, true, true, false},
+        {"prcycoin", "getpoolinfo", &getpoolinfo, true, true, false},
 
 #ifdef ENABLE_WALLET
         /* Wallet */
@@ -434,60 +451,69 @@ static const CRPCCommand vRPCCommands[] =
         {"wallet", "revealmnemonicphrase", &revealmnemonicphrase, true, false, true}
 
 #endif // ENABLE_WALLET
-        };
+};
 
-CRPCTable::CRPCTable() {
+CRPCTable::CRPCTable()
+{
     unsigned int vcidx;
     for (vcidx = 0; vcidx < (sizeof(vRPCCommands) / sizeof(vRPCCommands[0])); vcidx++) {
-        const CRPCCommand *pcmd;
+        const CRPCCommand* pcmd;
 
         pcmd = &vRPCCommands[vcidx];
         mapCommands[pcmd->name] = pcmd;
     }
 }
 
-const CRPCCommand *CRPCTable::operator[](const std::string &name) const {
-    map<string, const CRPCCommand *>::const_iterator it = mapCommands.find(name);
+const CRPCCommand* CRPCTable::operator[](const std::string& name) const
+{
+    map<string, const CRPCCommand*>::const_iterator it = mapCommands.find(name);
     if (it == mapCommands.end())
         return NULL;
     return (*it).second;
 }
 
 
-bool StartRPC() {
+bool StartRPC()
+{
     LogPrint("rpc", "Starting RPC\n");
     fRPCRunning = true;
     g_rpcSignals.Started();
     return true;
 }
 
-void InterruptRPC() {
+void InterruptRPC()
+{
     LogPrint("rpc", "Interrupting RPC\n");
     // Interrupt e.g. running longpolls
     // Interrupt e.g. running longpolls
 }
 
-void StopRPC() {
+void StopRPC()
+{
     LogPrint("rpc", "Stopping RPC\n");
     deadlineTimers.clear();
 }
 
-bool IsRPCRunning() {
+bool IsRPCRunning()
+{
     return fRPCRunning;
 }
 
-void SetRPCWarmupStatus(const std::string &newStatus) {
+void SetRPCWarmupStatus(const std::string& newStatus)
+{
     LOCK(cs_rpcWarmup);
     rpcWarmupStatus = newStatus;
 }
 
-void SetRPCWarmupFinished() {
+void SetRPCWarmupFinished()
+{
     LOCK(cs_rpcWarmup);
     assert(fRPCInWarmup);
     fRPCInWarmup = false;
 }
 
-bool RPCIsInWarmup(std::string *outStatus) {
+bool RPCIsInWarmup(std::string* outStatus)
+{
     LOCK(cs_rpcWarmup);
     if (outStatus)
         *outStatus = rpcWarmupStatus;
@@ -525,7 +551,6 @@ void JSONRequest::parse(const UniValue& valRequest)
 }
 
 
-
 static UniValue JSONRPCExecOne(const UniValue& req)
 {
     UniValue rpc_result(UniValue::VOBJ);
@@ -540,13 +565,14 @@ static UniValue JSONRPCExecOne(const UniValue& req)
         rpc_result = JSONRPCReplyObj(NullUniValue, objError, jreq.id);
     } catch (const std::exception& e) {
         rpc_result = JSONRPCReplyObj(NullUniValue,
-                                     JSONRPCError(RPC_PARSE_ERROR, e.what()), jreq.id);
+            JSONRPCError(RPC_PARSE_ERROR, e.what()), jreq.id);
     }
 
     return rpc_result;
 }
 
-std::string JSONRPCExecBatch(const UniValue &vReq) {
+std::string JSONRPCExecBatch(const UniValue& vReq)
+{
     UniValue ret(UniValue::VARR);
     for (unsigned int reqIdx = 0; reqIdx < vReq.size(); reqIdx++)
         ret.push_back(JSONRPCExecOne(vReq[reqIdx]));
@@ -554,7 +580,8 @@ std::string JSONRPCExecBatch(const UniValue &vReq) {
     return ret.write() + "\n";
 }
 
-UniValue CRPCTable::execute(const std::string &strMethod, const UniValue &params) const {
+UniValue CRPCTable::execute(const std::string& strMethod, const UniValue& params) const
+{
     // Return immediately if in warmup
     std::string strWarmupStatus;
     if (RPCIsInWarmup(&strWarmupStatus)) {
@@ -562,7 +589,7 @@ UniValue CRPCTable::execute(const std::string &strMethod, const UniValue &params
     }
 
     // Find method
-    const CRPCCommand *pcmd = tableRPC[strMethod];
+    const CRPCCommand* pcmd = tableRPC[strMethod];
     if (!pcmd)
         throw JSONRPCError(RPC_METHOD_NOT_FOUND, "Method not found");
 
@@ -578,47 +605,54 @@ UniValue CRPCTable::execute(const std::string &strMethod, const UniValue &params
     g_rpcSignals.PostCommand(*pcmd);
 }
 
-std::vector <std::string> CRPCTable::listCommands() const {
-    std::vector <std::string> commandList;
-    typedef std::map<std::string, const CRPCCommand *> commandMap;
+std::vector<std::string> CRPCTable::listCommands() const
+{
+    std::vector<std::string> commandList;
+    typedef std::map<std::string, const CRPCCommand*> commandMap;
 
     std::transform(mapCommands.begin(), mapCommands.end(),
-                   std::back_inserter(commandList),
-                   boost::bind(&commandMap::value_type::first, _1));
+        std::back_inserter(commandList),
+        boost::bind(&commandMap::value_type::first, _1));
     return commandList;
 }
 
-std::string HelpExampleCli(string methodname, string args) {
+std::string HelpExampleCli(string methodname, string args)
+{
     return "> prcycoin-cli " + methodname + " " + args + "\n";
 }
 
-std::string HelpExampleRpc(string methodname, string args) {
+std::string HelpExampleRpc(string methodname, string args)
+{
     return "> curl --user myusername --data-binary '{\"jsonrpc\": \"1.0\", \"id\":\"curltest\", "
            "\"method\": \"" +
            methodname + "\", \"params\": [" + args + "] }' -H 'content-type: text/plain;' http://127.0.0.1:59683/\n";
 }
 
-void RPCSetTimerInterfaceIfUnset(RPCTimerInterface *iface) {
+void RPCSetTimerInterfaceIfUnset(RPCTimerInterface* iface)
+{
     if (!timerInterface)
         timerInterface = iface;
 }
 
-void RPCSetTimerInterface(RPCTimerInterface *iface) {
+void RPCSetTimerInterface(RPCTimerInterface* iface)
+{
     timerInterface = iface;
 }
 
-void RPCUnsetTimerInterface(RPCTimerInterface *iface) {
+void RPCUnsetTimerInterface(RPCTimerInterface* iface)
+{
     if (timerInterface == iface)
         timerInterface = NULL;
 }
 
-void RPCRunLater(const std::string &name, boost::function<void(void)> func, int64_t nSeconds) {
+void RPCRunLater(const std::string& name, boost::function<void(void)> func, int64_t nSeconds)
+{
     if (!timerInterface)
         throw JSONRPCError(RPC_INTERNAL_ERROR, "No timer handler registered for RPC");
     deadlineTimers.erase(name);
     LogPrint("rpc", "queue run of timer %s in %i seconds (using %s)\n", name, nSeconds, timerInterface->Name());
     deadlineTimers.insert(
-            std::make_pair(name, boost::shared_ptr<RPCTimerBase>(timerInterface->NewTimer(func, nSeconds * 1000))));
+        std::make_pair(name, boost::shared_ptr<RPCTimerBase>(timerInterface->NewTimer(func, nSeconds * 1000))));
 }
 
 const CRPCTable tableRPC;

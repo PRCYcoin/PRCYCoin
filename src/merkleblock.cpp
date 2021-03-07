@@ -123,7 +123,6 @@ CPartialMerkleTree::CPartialMerkleTree(const std::vector<uint256>& vTxid, const 
 }
 
 CPartialMerkleTree::CPartialMerkleTree() : nTransactions(0), fBad(true) {}
-
 uint256 CPartialMerkleTree::ExtractMatches(std::vector<uint256>& vMatch)
 {
     vMatch.clear();

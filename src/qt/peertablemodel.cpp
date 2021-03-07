@@ -131,7 +131,8 @@ PeerTableModel::PeerTableModel(ClientModel* parent) : QAbstractTableModel(parent
     refresh();
 }
 
-PeerTableModel::~PeerTableModel() {
+PeerTableModel::~PeerTableModel()
+{
     delete priv;
 }
 
@@ -183,12 +184,12 @@ QVariant PeerTableModel::data(const QModelIndex& index, int role) const
         }
     } else if (role == Qt::TextAlignmentRole) {
         switch (index.column()) {
-            case Ping:
-            case Sent:
-            case Received:
-                return QVariant(Qt::AlignRight | Qt::AlignVCenter);
-            default:
-                return QVariant();
+        case Ping:
+        case Sent:
+        case Received:
+            return QVariant(Qt::AlignRight | Qt::AlignVCenter);
+        default:
+            return QVariant();
         }
     }
 

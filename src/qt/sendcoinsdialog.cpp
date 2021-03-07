@@ -118,8 +118,7 @@ void SendCoinsDialog::setModel(WalletModel* model)
     }
 }
 
-void SendCoinsDialog::setBalance(const CAmount& balance, const CAmount& unconfirmedBalance, const CAmount& immatureBalance, 
-                              const CAmount& watchOnlyBalance, const CAmount& watchUnconfBalance, const CAmount& watchImmatureBalance)
+void SendCoinsDialog::setBalance(const CAmount& balance, const CAmount& unconfirmedBalance, const CAmount& immatureBalance, const CAmount& watchOnlyBalance, const CAmount& watchUnconfBalance, const CAmount& watchImmatureBalance)
 {
     int status = model->getEncryptionStatus();
     if (status == WalletModel::Locked || status == WalletModel::UnlockedForAnonymizationOnly) {
@@ -129,11 +128,13 @@ void SendCoinsDialog::setBalance(const CAmount& balance, const CAmount& unconfir
     }
 }
 
-SendCoinsDialog::~SendCoinsDialog(){
+SendCoinsDialog::~SendCoinsDialog()
+{
     delete ui;
 }
 
-void SendCoinsDialog::on_sendButton_clicked(){
+void SendCoinsDialog::on_sendButton_clicked()
+{
     if (!masternodeSync.IsBlockchainSynced()) {
         QMessageBox msgBox;
         msgBox.setWindowTitle("Send Disabled - Syncing");
@@ -151,9 +152,9 @@ void SendCoinsDialog::on_sendButton_clicked(){
     QString address = recipient.address;
     send_address = recipient.address;
     send_amount = recipient.amount;
-    bool isValidAddresss = (regex_match(address.toStdString(), regex("[a-zA-z0-9]+")))&&(address.length()==99||address.length()==110);
-    bool isValidAmount = ((recipient.amount>0) && (recipient.amount<=model->getBalance()));
-    bool isMinimumAmount = (recipient.amount >= 5  * COIN);
+    bool isValidAddresss = (regex_match(address.toStdString(), regex("[a-zA-z0-9]+"))) && (address.length() == 99 || address.length() == 110);
+    bool isValidAmount = ((recipient.amount > 0) && (recipient.amount <= model->getBalance()));
+    bool isMinimumAmount = (recipient.amount >= 5 * COIN);
     bool fAlwaysRequest2FA = settings.value("fAlwaysRequest2FA").toBool();
 
     form->errorAddress(isValidAddresss);
@@ -206,21 +207,21 @@ void SendCoinsDialog::on_sendButton_clicked(){
     // Format confirmation message
     QStringList formatted;
     formatted.append("<center>");
-    QString amount = "<b>" + BitcoinUnits::formatHtmlWithUnit(model->getOptionsModel()->getDisplayUnit(), recipient.amount)+"</b>";
+    QString amount = "<b>" + BitcoinUnits::formatHtmlWithUnit(model->getOptionsModel()->getDisplayUnit(), recipient.amount) + "</b>";
 
     QString recipientElement;
-    recipientElement.append("<span class='h1 b'>"+amount+"</span><br/>");
+    recipientElement.append("<span class='h1 b'>" + amount + "</span><br/>");
     recipientElement.append("<br/>to<br/>");
     //if (rcp.label.length() > 0)
-            //recipientElement.append("<br/><span class='h3'>"+tr("Description")+": <br/><b>"+GUIUtil::HtmlEscape(rcp.label)+"</b></span>");
-    recipientElement.append("<br/><span class='h3'>"+tr("Destination")+": <br/><b>"+recipient.address+"</b></span><br/>");
+    //recipientElement.append("<br/><span class='h3'>"+tr("Description")+": <br/><b>"+GUIUtil::HtmlEscape(rcp.label)+"</b></span>");
+    recipientElement.append("<br/><span class='h3'>" + tr("Destination") + ": <br/><b>" + recipient.address + "</b></span><br/>");
 
     formatted.append(recipientElement);
     QString strFee = BitcoinUnits::formatHtmlWithUnit(model->getOptionsModel()->getDisplayUnit(), (pwalletMain->ComputeFee(1, 1, MAX_RING_SIZE)));
-    QString questionString = "<br/><span class='h2'><center><b>"+tr("Are you sure you want to send?")+"</b></center></span>";
+    QString questionString = "<br/><span class='h2'><center><b>" + tr("Are you sure you want to send?") + "</b></center></span>";
     questionString.append("%1");
-    questionString.append("<br/><span class='h3'>"+tr("Estimated Transaction fee")+": <br/><b>");
-    questionString.append(strFee+"</b></span>");
+    questionString.append("<br/><span class='h3'>" + tr("Estimated Transaction fee") + ": <br/><b>");
+    questionString.append(strFee + "</b></span>");
     questionString.append("<br/><br/>");
 
     CAmount txFee = pwalletMain->ComputeFee(1, 1, MAX_RING_SIZE);
@@ -283,12 +284,13 @@ void SendCoinsDialog::on_sendButton_clicked(){
         TwoFAConfirmDialog codedlg;
         codedlg.setWindowTitle("2FA Code Verification");
         codedlg.setStyleSheet(GUIUtil::loadStyleSheet());
-        connect(&codedlg, SIGNAL(finished (int)), this, SLOT(dialogIsFinished(int)));
+        connect(&codedlg, SIGNAL(finished(int)), this, SLOT(dialogIsFinished(int)));
         codedlg.exec();
     }
 }
 
-void SendCoinsDialog::sendTx() {
+void SendCoinsDialog::sendTx()
+{
     CWalletTx resultTx;
     bool success = false;
     try {
@@ -296,21 +298,20 @@ void SendCoinsDialog::sendTx() {
             send_address.toStdString(),
             send_amount,
             resultTx,
-            false
-        );
+            false);
     } catch (const std::exception& err) {
         std::string errMes(err.what());
         if (errMes.find("You have attempted to send more than 50 UTXOs in a single transaction") != std::string::npos) {
             QMessageBox::StandardButton reply;
-            reply = QMessageBox::question(this, "Transaction Size Too Large", QString(err.what()) + QString("\n\nDo you want to combine small UTXOs into a larger one?"), QMessageBox::Yes|QMessageBox::No);
+            reply = QMessageBox::question(this, "Transaction Size Too Large", QString(err.what()) + QString("\n\nDo you want to combine small UTXOs into a larger one?"), QMessageBox::Yes | QMessageBox::No);
             if (reply == QMessageBox::Yes) {
                 CAmount backupReserve = nReserveBalance;
                 try {
                     uint32_t nTime = GetAdjustedTime();
                     nReserveBalance = 0;
                     success = model->getCWallet()->CreateSweepingTransaction(
-                                    send_amount,
-                                    send_amount, nTime);
+                        send_amount,
+                        send_amount, nTime);
                     nReserveBalance = backupReserve;
                     if (success) {
                         QString msg = "Consolidation transaction created!";
@@ -357,12 +358,12 @@ void SendCoinsDialog::sendTx() {
         return;
     }
 
-    if (success){
+    if (success) {
         WalletUtil::getTx(pwalletMain, resultTx.GetHash());
         QString txhash = resultTx.GetHash().GetHex().c_str();
         QMessageBox msgBox;
-        QPushButton *copyButton = msgBox.addButton(tr("Copy"), QMessageBox::ActionRole);
-        QPushButton *okButton = msgBox.addButton(tr("OK"), QMessageBox::ActionRole);
+        QPushButton* copyButton = msgBox.addButton(tr("Copy"), QMessageBox::ActionRole);
+        QPushButton* okButton = msgBox.addButton(tr("OK"), QMessageBox::ActionRole);
         copyButton->setStyleSheet("background:transparent;");
         copyButton->setIcon(QIcon(":/icons/editcopy"));
         msgBox.setWindowTitle("Transaction Initialized");
@@ -372,16 +373,17 @@ void SendCoinsDialog::sendTx() {
         msgBox.exec();
 
         if (msgBox.clickedButton() == copyButton) {
-        //Copy txhash to clipboard
-        GUIUtil::setClipboard(txhash);
+            //Copy txhash to clipboard
+            GUIUtil::setClipboard(txhash);
         }
     }
 }
 
-void SendCoinsDialog::dialogIsFinished(int result) {
-   if(result == QDialog::Accepted){
+void SendCoinsDialog::dialogIsFinished(int result)
+{
+    if (result == QDialog::Accepted) {
         sendTx();
-   }
+    }
 }
 
 SendCoinsEntry* SendCoinsDialog::addEntry()

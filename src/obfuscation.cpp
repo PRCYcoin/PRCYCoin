@@ -39,7 +39,6 @@ map<uint256, CObfuscationBroadcastTx> mapObfuscationBroadcastTxes;
 CActiveMasternode activeMasternode;
 
 int randomizeList(int i) { return secp256k1_rand32() % i; }
-
 void CObfuscationPool::Reset()
 {
     cachedLastSuccess = 0;
@@ -93,7 +92,7 @@ void CObfuscationPool::UnlockCoins()
 {
     if (!pwalletMain)
         return;
-    
+
     while (true) {
         TRY_LOCK(pwalletMain->cs_wallet, lockWallet);
         if (!lockWallet) {
@@ -284,8 +283,8 @@ void CObfuscationPool::ChargeFees()
 
     if (state == POOL_STATUS_SIGNING) {
         // who didn't sign?
-        for (const CObfuScationEntry &v : entries) {
-            for (const CTxDSIn &s : v.sev) {
+        for (const CObfuScationEntry& v : entries) {
+            for (const CTxDSIn& s : v.sev) {
                 if (!s.fHasSig) {
                     LogPrintf("CObfuscationPool::ChargeFees -- found uncooperative node (didn't sign). Found offence\n");
                     offences++;

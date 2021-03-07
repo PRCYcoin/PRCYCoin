@@ -72,7 +72,6 @@ class TxPriorityCompare
 
 public:
     TxPriorityCompare(bool _byFee) : byFee(_byFee) {}
-
     bool operator()(const TxPriority& a, const TxPriority& b)
     {
         if (byFee) {
@@ -168,7 +167,7 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, const CPubKey& txP
     // -blockversion=N to test forking scenarios
     if (Params().MineBlocksOnDemand())
         pblock->nVersion = GetArg("-blockversion", pblock->nVersion);
-    pblock->nVersion = 5;   // Supports CLTV activation
+    pblock->nVersion = 5; // Supports CLTV activation
 
     // Create coinbase tx
     CMutableTransaction txNew;

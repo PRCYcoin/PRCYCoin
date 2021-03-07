@@ -44,7 +44,8 @@ using namespace std;
  *
  * Or alternatively, create a specific query method for the information.
  **/
-UniValue getinfo(const UniValue &params, bool fHelp) {
+UniValue getinfo(const UniValue& params, bool fHelp)
+{
     if (fHelp || params.size() != 0)
         throw runtime_error(
             "getinfo\n"
@@ -86,13 +87,13 @@ UniValue getinfo(const UniValue &params, bool fHelp) {
         obj.push_back(Pair("balance", ValueFromAmount(pwalletMain->GetBalance())));
     }
 #endif
-    obj.push_back(Pair("blocks", (int) chainActive.Height()));
+    obj.push_back(Pair("blocks", (int)chainActive.Height()));
     obj.push_back(Pair("timeoffset", GetTimeOffset()));
-    obj.push_back(Pair("connections", (int) vNodes.size()));
+    obj.push_back(Pair("connections", (int)vNodes.size()));
     obj.push_back(Pair("proxy", (proxy.IsValid() ? proxy.proxy.ToStringIPPort() : string())));
-    obj.push_back(Pair("difficulty", (double) GetDifficulty()));
+    obj.push_back(Pair("difficulty", (double)GetDifficulty()));
     obj.push_back(Pair("testnet", Params().TestnetToBeDeprecatedFieldRPC()));
-    obj.push_back(Pair("moneysupply",ValueFromAmount(chainActive.Tip()->nMoneySupply)));
+    obj.push_back(Pair("moneysupply", ValueFromAmount(chainActive.Tip()->nMoneySupply)));
 
 #ifdef ENABLE_WALLET
     if (pwalletMain) {
@@ -129,43 +130,44 @@ UniValue getinfo(const UniValue &params, bool fHelp) {
     return obj;
 }
 
-UniValue mnsync(const UniValue &params, bool fHelp) {
+UniValue mnsync(const UniValue& params, bool fHelp)
+{
     std::string strMode;
     if (params.size() == 1)
         strMode = params[0].get_str();
 
     if (fHelp || params.size() != 1 || (strMode != "status" && strMode != "reset")) {
         throw runtime_error(
-                "mnsync \"status|reset\"\n"
-                "\nReturns the sync status or resets sync.\n"
+            "mnsync \"status|reset\"\n"
+            "\nReturns the sync status or resets sync.\n"
 
-                "\nArguments:\n"
-                "1. \"mode\"    (string, required) either 'status' or 'reset'\n"
+            "\nArguments:\n"
+            "1. \"mode\"    (string, required) either 'status' or 'reset'\n"
 
-                "\nResult ('status' mode):\n"
-                "{\n"
-                "  \"IsBlockchainSynced\": true|false,    (boolean) 'true' if blockchain is synced\n"
-                "  \"lastMasternodeList\": xxxx,        (numeric) Timestamp of last MN list message\n"
-                "  \"lastMasternodeWinner\": xxxx,      (numeric) Timestamp of last MN winner message\n"
-                "  \"lastBudgetItem\": xxxx,            (numeric) Timestamp of last MN budget message\n"
-                "  \"lastFailure\": xxxx,           (numeric) Timestamp of last failed sync\n"
-                "  \"nCountFailures\": n,           (numeric) Number of failed syncs (total)\n"
-                "  \"sumMasternodeList\": n,        (numeric) Number of MN list messages (total)\n"
-                "  \"sumMasternodeWinner\": n,      (numeric) Number of MN winner messages (total)\n"
-                "  \"sumBudgetItemProp\": n,        (numeric) Number of MN budget messages (total)\n"
-                "  \"sumBudgetItemFin\": n,         (numeric) Number of MN budget finalization messages (total)\n"
-                "  \"countMasternodeList\": n,      (numeric) Number of MN list messages (local)\n"
-                "  \"countMasternodeWinner\": n,    (numeric) Number of MN winner messages (local)\n"
-                "  \"countBudgetItemProp\": n,      (numeric) Number of MN budget messages (local)\n"
-                "  \"countBudgetItemFin\": n,       (numeric) Number of MN budget finalization messages (local)\n"
-                "  \"RequestedMasternodeAssets\": n, (numeric) Status code of last sync phase\n"
-                "  \"RequestedMasternodeAttempt\": n, (numeric) Status code of last sync attempt\n"
-                "}\n"
+            "\nResult ('status' mode):\n"
+            "{\n"
+            "  \"IsBlockchainSynced\": true|false,    (boolean) 'true' if blockchain is synced\n"
+            "  \"lastMasternodeList\": xxxx,        (numeric) Timestamp of last MN list message\n"
+            "  \"lastMasternodeWinner\": xxxx,      (numeric) Timestamp of last MN winner message\n"
+            "  \"lastBudgetItem\": xxxx,            (numeric) Timestamp of last MN budget message\n"
+            "  \"lastFailure\": xxxx,           (numeric) Timestamp of last failed sync\n"
+            "  \"nCountFailures\": n,           (numeric) Number of failed syncs (total)\n"
+            "  \"sumMasternodeList\": n,        (numeric) Number of MN list messages (total)\n"
+            "  \"sumMasternodeWinner\": n,      (numeric) Number of MN winner messages (total)\n"
+            "  \"sumBudgetItemProp\": n,        (numeric) Number of MN budget messages (total)\n"
+            "  \"sumBudgetItemFin\": n,         (numeric) Number of MN budget finalization messages (total)\n"
+            "  \"countMasternodeList\": n,      (numeric) Number of MN list messages (local)\n"
+            "  \"countMasternodeWinner\": n,    (numeric) Number of MN winner messages (local)\n"
+            "  \"countBudgetItemProp\": n,      (numeric) Number of MN budget messages (local)\n"
+            "  \"countBudgetItemFin\": n,       (numeric) Number of MN budget finalization messages (local)\n"
+            "  \"RequestedMasternodeAssets\": n, (numeric) Status code of last sync phase\n"
+            "  \"RequestedMasternodeAttempt\": n, (numeric) Status code of last sync attempt\n"
+            "}\n"
 
-                "\nResult ('reset' mode):\n"
-                "\"status\"     (string) 'success'\n"
-                "\nExamples:\n" +
-                HelpExampleCli("mnsync", "\"status\"") + HelpExampleRpc("mnsync", "\"status\""));
+            "\nResult ('reset' mode):\n"
+            "\"status\"     (string) 'success'\n"
+            "\nExamples:\n" +
+            HelpExampleCli("mnsync", "\"status\"") + HelpExampleRpc("mnsync", "\"status\""));
     }
 
     if (strMode == "status") {
@@ -206,10 +208,8 @@ private:
 
 public:
     DescribeAddressVisitor(isminetype mineIn) : mine(mineIn) {}
-
-    UniValue operator()(const CNoDestination &dest) const { return UniValue(UniValue::VOBJ); }
-
-    UniValue operator()(const CKeyID &keyID) const
+    UniValue operator()(const CNoDestination& dest) const { return UniValue(UniValue::VOBJ); }
+    UniValue operator()(const CKeyID& keyID) const
     {
         UniValue obj(UniValue::VOBJ);
         CPubKey vchPubKey;
@@ -222,7 +222,7 @@ public:
         return obj;
     }
 
-    UniValue operator()(const CScriptID &scriptID) const
+    UniValue operator()(const CScriptID& scriptID) const
     {
         UniValue obj(UniValue::VOBJ);
         obj.push_back(Pair("isscript", true));
@@ -249,29 +249,29 @@ UniValue validateaddress(const UniValue& params, bool fHelp)
 {
     if (fHelp || params.size() != 1)
         throw runtime_error(
-                "validateaddress \"prcycoinaddress\"\n"
-                "\nReturn information about the given prcycoin address.\n"
-                "\nArguments:\n"
-                "1. \"prcycoinaddress\"     (string, required) The prcycoin address to validate\n"
-                "\nResult:\n"
-                "{\n"
-                "  \"isvalid\" : true|false,         (boolean) If the address is valid or not. If not, this is the only property returned.\n"
-                "  \"address\" : \"prcycoinaddress\", (string) The prcycoin address validated\n"
-                "  \"scriptPubKey\" : \"hex\",       (string) The hex encoded scriptPubKey generated by the address\n"
-                "  \"ismine\" : true|false,          (boolean) If the address is yours or not\n"
-                "  \"iswatchonly\" : true|false,     (boolean) If the address is watchonly\n"
-                "  \"isscript\" : true|false,        (boolean) If the key is a script\n"
-                "  \"hex\" : \"hex\",                (string, optional) The redeemscript for the P2SH address\n"
-                "  \"pubkey\" : \"publickeyhex\",    (string) The hex value of the raw public key\n"
-                "  \"iscompressed\" : true|false,    (boolean) If the address is compressed\n"
-                "  \"account\" : \"account\"         (string) The account associated with the address, \"\" is the default account\n"
-                "}\n"
-                "\nExamples:\n" +
-                HelpExampleCli("validateaddress", "\"1PSSGeFHDnKNxiEyFrD1wcEaHr9hrQDDWc\"") +
-                HelpExampleRpc("validateaddress", "\"1PSSGeFHDnKNxiEyFrD1wcEaHr9hrQDDWc\""));
+            "validateaddress \"prcycoinaddress\"\n"
+            "\nReturn information about the given prcycoin address.\n"
+            "\nArguments:\n"
+            "1. \"prcycoinaddress\"     (string, required) The prcycoin address to validate\n"
+            "\nResult:\n"
+            "{\n"
+            "  \"isvalid\" : true|false,         (boolean) If the address is valid or not. If not, this is the only property returned.\n"
+            "  \"address\" : \"prcycoinaddress\", (string) The prcycoin address validated\n"
+            "  \"scriptPubKey\" : \"hex\",       (string) The hex encoded scriptPubKey generated by the address\n"
+            "  \"ismine\" : true|false,          (boolean) If the address is yours or not\n"
+            "  \"iswatchonly\" : true|false,     (boolean) If the address is watchonly\n"
+            "  \"isscript\" : true|false,        (boolean) If the key is a script\n"
+            "  \"hex\" : \"hex\",                (string, optional) The redeemscript for the P2SH address\n"
+            "  \"pubkey\" : \"publickeyhex\",    (string) The hex value of the raw public key\n"
+            "  \"iscompressed\" : true|false,    (boolean) If the address is compressed\n"
+            "  \"account\" : \"account\"         (string) The account associated with the address, \"\" is the default account\n"
+            "}\n"
+            "\nExamples:\n" +
+            HelpExampleCli("validateaddress", "\"1PSSGeFHDnKNxiEyFrD1wcEaHr9hrQDDWc\"") +
+            HelpExampleRpc("validateaddress", "\"1PSSGeFHDnKNxiEyFrD1wcEaHr9hrQDDWc\""));
 
 #ifdef ENABLE_WALLET
-        LOCK2(cs_main, pwalletMain ? &pwalletMain->cs_wallet : NULL);
+    LOCK2(cs_main, pwalletMain ? &pwalletMain->cs_wallet : NULL);
 #else
     LOCK(cs_main);
 #endif
@@ -304,25 +304,26 @@ UniValue validateaddress(const UniValue& params, bool fHelp)
 /**
  * Used by addmultisigaddress / createmultisig:
  */
-CScript _createmultisig_redeemScript(const UniValue& params) {
+CScript _createmultisig_redeemScript(const UniValue& params)
+{
     int nRequired = params[0].get_int();
     const UniValue& keys = params[1].get_array();
 
     // Gather public keys
     if (nRequired < 1)
         throw runtime_error("a multisignature address must require at least one key to redeem");
-    if ((int) keys.size() < nRequired)
+    if ((int)keys.size() < nRequired)
         throw runtime_error(
-                strprintf("not enough keys supplied "
-                          "(got %u keys, but need at least %d to redeem)",
-                          keys.size(), nRequired));
+            strprintf("not enough keys supplied "
+                      "(got %u keys, but need at least %d to redeem)",
+                keys.size(), nRequired));
     if (keys.size() > 16)
         throw runtime_error(
-                "Number of addresses involved in the multisignature address creation > 16\nReduce the number");
-    std::vector <CPubKey> pubkeys;
+            "Number of addresses involved in the multisignature address creation > 16\nReduce the number");
+    std::vector<CPubKey> pubkeys;
     pubkeys.resize(keys.size());
     for (unsigned int i = 0; i < keys.size(); i++) {
-        const std::string &ks = keys[i].get_str();
+        const std::string& ks = keys[i].get_str();
 #ifdef ENABLE_WALLET
         // Case 1: PRCY address and we have full public key:
         CBitcoinAddress address(ks);
@@ -343,7 +344,7 @@ CScript _createmultisig_redeemScript(const UniValue& params) {
         // Case 2: hex public key
         else
 #endif
-        if (IsHex(ks)) {
+            if (IsHex(ks)) {
             CPubKey vchPubKey(ParseHex(ks));
             if (!vchPubKey.IsFullyValid())
                 throw runtime_error(" Invalid public key: " + ks);
@@ -356,12 +357,13 @@ CScript _createmultisig_redeemScript(const UniValue& params) {
 
     if (result.size() > MAX_SCRIPT_ELEMENT_SIZE)
         throw runtime_error(
-                strprintf("redeemScript exceeds size limit: %d > %d", result.size(), MAX_SCRIPT_ELEMENT_SIZE));
+            strprintf("redeemScript exceeds size limit: %d > %d", result.size(), MAX_SCRIPT_ELEMENT_SIZE));
 
     return result;
 }
 
-UniValue createmultisig(const UniValue& params, bool fHelp) {
+UniValue createmultisig(const UniValue& params, bool fHelp)
+{
     if (fHelp || params.size() < 2 || params.size() > 2) {
         string msg = "createmultisig nrequired [\"key\",...]\n"
                      "\nCreates a multi-signature address with n signature of m keys required.\n"
@@ -384,9 +386,9 @@ UniValue createmultisig(const UniValue& params, bool fHelp) {
                      "\nExamples:\n"
                      "\nCreate a multisig address from 2 addresses\n" +
                      HelpExampleCli("createmultisig",
-                                    "2 \"[\\\"16sSauSf5pF2UkUwvKGq4qjNRzBZYqgEL5\\\",\\\"171sgjn4YtPu27adkKGrdDwzRTxnRkBfKV\\\"]\"") +
+                         "2 \"[\\\"16sSauSf5pF2UkUwvKGq4qjNRzBZYqgEL5\\\",\\\"171sgjn4YtPu27adkKGrdDwzRTxnRkBfKV\\\"]\"") +
                      "\nAs a json rpc call\n" + HelpExampleRpc("createmultisig",
-                                                               "2, \"[\\\"16sSauSf5pF2UkUwvKGq4qjNRzBZYqgEL5\\\",\\\"171sgjn4YtPu27adkKGrdDwzRTxnRkBfKV\\\"]\"");
+                                                    "2, \"[\\\"16sSauSf5pF2UkUwvKGq4qjNRzBZYqgEL5\\\",\\\"171sgjn4YtPu27adkKGrdDwzRTxnRkBfKV\\\"]\"");
         throw runtime_error(msg);
     }
 
@@ -402,7 +404,8 @@ UniValue createmultisig(const UniValue& params, bool fHelp) {
     return result;
 }
 
-UniValue verifymessage(const UniValue& params, bool fHelp) {
+UniValue verifymessage(const UniValue& params, bool fHelp)
+{
     if (fHelp || params.size() != 3)
         throw runtime_error(
             "verifymessage \"prcycoinaddress\" \"signature\" \"message\"\n"
@@ -449,14 +452,15 @@ UniValue verifymessage(const UniValue& params, bool fHelp) {
     return (pubkey.GetID() == keyID);
 }
 
-UniValue setmocktime(const UniValue& params, bool fHelp) {
+UniValue setmocktime(const UniValue& params, bool fHelp)
+{
     if (fHelp || params.size() != 1)
         throw runtime_error(
-                "setmocktime timestamp\n"
-                "\nSet the local time to given timestamp (-regtest only)\n"
-                "\nArguments:\n"
-                "1. timestamp  (integer, required) Unix seconds-since-epoch timestamp\n"
-                "   Pass 0 to go back to using the system time.");
+            "setmocktime timestamp\n"
+            "\nSet the local time to given timestamp (-regtest only)\n"
+            "\nArguments:\n"
+            "1. timestamp  (integer, required) Unix seconds-since-epoch timestamp\n"
+            "   Pass 0 to go back to using the system time.");
 
     if (!Params().MineBlocksOnDemand())
         throw runtime_error("setmocktime for regression testing (-regtest mode) only");

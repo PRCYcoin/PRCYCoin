@@ -106,7 +106,7 @@ BitcoinGUI::BitcoinGUI(const NetworkStyle* networkStyle, QWidget* parent) : QMai
                                                                             explorerWindow(0),
                                                                             prevBlocks(0),
                                                                             spinnerFrame(0),
-                                                                            m_previousPos(0,0),
+                                                                            m_previousPos(0, 0),
                                                                             m_fMousePress(0)
 {
     /* Open CSS when configured */
@@ -116,12 +116,11 @@ BitcoinGUI::BitcoinGUI(const NetworkStyle* networkStyle, QWidget* parent) : QMai
 
     // Adapt screen size
     QRect rec = QApplication::desktop()->screenGeometry();
-    int adaptedHeight = (rec.height() < BASE_WINDOW_HEIGHT) ?  BASE_WINDOW_MIN_HEIGHT : BASE_WINDOW_HEIGHT;
+    int adaptedHeight = (rec.height() < BASE_WINDOW_HEIGHT) ? BASE_WINDOW_MIN_HEIGHT : BASE_WINDOW_HEIGHT;
     GUIUtil::restoreWindowGeometry(
-            "nWindow",
-            QSize(BASE_WINDOW_WIDTH, adaptedHeight),
-            this
-    );
+        "nWindow",
+        QSize(BASE_WINDOW_WIDTH, adaptedHeight),
+        this);
 
     QString windowTitle = tr("PRCY Coin") + " ";
     fLiteMode = GetBoolArg("-litemode", false);
@@ -244,7 +243,6 @@ BitcoinGUI::BitcoinGUI(const NetworkStyle* networkStyle, QWidget* parent) : QMai
     this->installEventFilter(this);
 
 
-
     // Initially wallet actions should be disabled
     setWalletActionsEnabled(false);
 
@@ -326,21 +324,21 @@ void BitcoinGUI::createActions(const NetworkStyle* networkStyle)
     tabGroup->addAction(historyAction);
 
 #ifdef ENABLE_WALLET
-        masternodeAction = new QAction(QIcon(":/icons/masternodes"), tr("&Masternodes"), this);
-        masternodeAction->setIconText("    &Masternodes");
-        masternodeAction->setStatusTip(tr("Masternodes"));
-        masternodeAction->setToolTip(masternodeAction->statusTip());
-        masternodeAction->setCheckable(true);
+    masternodeAction = new QAction(QIcon(":/icons/masternodes"), tr("&Masternodes"), this);
+    masternodeAction->setIconText("    &Masternodes");
+    masternodeAction->setStatusTip(tr("Masternodes"));
+    masternodeAction->setToolTip(masternodeAction->statusTip());
+    masternodeAction->setCheckable(true);
 #ifdef Q_OS_MAC
-        masternodeAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_5));
+    masternodeAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_5));
 #else
-        masternodeAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_5));
+    masternodeAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_5));
 #endif
-        if (!fLiteMode) {
-            tabGroup->addAction(masternodeAction);
-        }
-        connect(masternodeAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
-        connect(masternodeAction, SIGNAL(triggered()), this, SLOT(gotoMasternodePage()));
+    if (!fLiteMode) {
+        tabGroup->addAction(masternodeAction);
+    }
+    connect(masternodeAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
+    connect(masternodeAction, SIGNAL(triggered()), this, SLOT(gotoMasternodePage()));
 
     // These showNormalIfMinimized are needed because Send Coins and Receive Coins
     // can be triggered from the tray menu, and need to show the GUI to be useful.
@@ -544,12 +542,12 @@ void BitcoinGUI::createMenuBar()
 
     //QMenu* settings = appMenuBar->addMenu(tr("&Settings"));
     //if (walletFrame) {
-        //settings->addAction(encryptWalletAction);
-        //settings->addAction(changePassphraseAction);
-        //settings->addAction(unlockWalletAction);
-        //settings->addAction(lockWalletAction);
-        //settings->addAction(multiSendAction);
-        //settings->addSeparator();
+    //settings->addAction(encryptWalletAction);
+    //settings->addAction(changePassphraseAction);
+    //settings->addAction(unlockWalletAction);
+    //settings->addAction(lockWalletAction);
+    //settings->addAction(multiSendAction);
+    //settings->addSeparator();
     //}
 
     if (walletFrame) {
@@ -702,7 +700,7 @@ void BitcoinGUI::setClientModel(ClientModel* clientModel)
     }
 }
 
-void BitcoinGUI::showProgress(const QString &title, int nProgress)
+void BitcoinGUI::showProgress(const QString& title, int nProgress)
 {
     if (nProgress == 0) {
         progressDialog = new QProgressDialog(title, QString(), 0, 100);
@@ -932,7 +930,7 @@ void BitcoinGUI::openDiscordSupportClicked()
 void BitcoinGUI::checkForUpdatesClicked()
 {
     QUrl serviceUrl = QUrl("https://raw.githubusercontent.com/PRCYCoin/PRCYCoin/master/version.txt");
-    QNetworkAccessManager *manager = new QNetworkAccessManager(this);
+    QNetworkAccessManager* manager = new QNetworkAccessManager(this);
     connect(manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(serviceRequestFinished(QNetworkReply*)));
     QNetworkRequest request;
     request.setUrl(serviceUrl);
@@ -941,13 +939,13 @@ void BitcoinGUI::checkForUpdatesClicked()
 
 void BitcoinGUI::serviceRequestFinished(QNetworkReply* reply)
 {
-    QString currentVersion = QString::number(CLIENT_VERSION_MAJOR) + "." + QString::number(CLIENT_VERSION_MINOR)+ "." + QString::number(CLIENT_VERSION_REVISION)+ "." + QString::number(CLIENT_VERSION_BUILD);
+    QString currentVersion = QString::number(CLIENT_VERSION_MAJOR) + "." + QString::number(CLIENT_VERSION_MINOR) + "." + QString::number(CLIENT_VERSION_REVISION) + "." + QString::number(CLIENT_VERSION_BUILD);
     reply->deleteLater();
-    if(reply->error() == QNetworkReply::NoError) {
+    if (reply->error() == QNetworkReply::NoError) {
         QByteArray data = reply->readAll();
         if (data.trimmed() != currentVersion) {
             QMessageBox::StandardButton msgReply;
-            msgReply = QMessageBox::question(this, "Wallet Update Available!", "Wallet update available.\n\nWould you like to go to the GitHub Releases page to download v" + data.trimmed() + "?", QMessageBox::Yes|QMessageBox::No);
+            msgReply = QMessageBox::question(this, "Wallet Update Available!", "Wallet update available.\n\nWould you like to go to the GitHub Releases page to download v" + data.trimmed() + "?", QMessageBox::Yes | QMessageBox::No);
             if (msgReply == QMessageBox::Yes) {
                 QDesktopServices::openUrl(QUrl("https://github.com/PRCYCoin/PRCYCoin/releases/latest"));
             } else {
@@ -997,7 +995,6 @@ void BitcoinGUI::gotoMasternodePage()
 {
     masternodeAction->setChecked(true);
     if (walletFrame) walletFrame->gotoMasternodePage();
-
 }
 
 void BitcoinGUI::gotoReceiveCoinsPage()
@@ -1238,7 +1235,7 @@ void BitcoinGUI::closeEvent(QCloseEvent* event)
 }
 
 #ifdef ENABLE_WALLET
-void BitcoinGUI::incomingTransaction(const QString& date, int unit, const CAmount& amount, const QString& type, const QString& address, const QString &confirmations)
+void BitcoinGUI::incomingTransaction(const QString& date, int unit, const CAmount& amount, const QString& type, const QString& address, const QString& confirmations)
 {
     // Only send notifications when not disabled
     if (!bdisableSystemnotifications) {
@@ -1268,7 +1265,7 @@ void BitcoinGUI::dragEnterEvent(QDragEnterEvent* event)
         event->acceptProposedAction();
 }
 
-bool BitcoinGUI::eventFilter(QObject *obj, QEvent *event)
+bool BitcoinGUI::eventFilter(QObject* obj, QEvent* event)
 {
     return false;
 }
@@ -1276,7 +1273,7 @@ bool BitcoinGUI::eventFilter(QObject *obj, QEvent *event)
 void BitcoinGUI::dropEvent(QDropEvent* event)
 {
     if (event->mimeData()->hasUrls()) {
-       Q_FOREACH (const QUrl& uri, event->mimeData()->urls()) {
+        Q_FOREACH (const QUrl& uri, event->mimeData()->urls()) {
             Q_EMIT receivedURI(uri.toString());
         }
     }
@@ -1291,28 +1288,28 @@ void BitcoinGUI::setStakingStatus()
         stkStatus = pwalletMain->ReadStakingStatus();
     }
     if (!stkStatus || pwalletMain->stakingMode == StakingMode::STOPPED || pwalletMain->IsLocked()) {
-        LogPrint("staking","Checking Staking Status: Disabled.\n");
+        LogPrint("staking", "Checking Staking Status: Disabled.\n");
         stakingState->setText(tr("Staking Disabled"));
         stakingState->setToolTip("Staking Disabled");
         stakingAction->setIcon(QIcon(":/icons/staking_inactive"));
         return;
     }
     if (vNodes.empty()) {
-        LogPrint("staking","Checking Staking Status: No Active Peers...\n");
+        LogPrint("staking", "Checking Staking Status: No Active Peers...\n");
         stakingState->setText(tr("No Active Peers"));
         stakingState->setToolTip("No Active Peers");
         stakingAction->setIcon(QIcon(":/icons/staking_inactive"));
         return;
     }
     if (clientModel->inInitialBlockDownload()) {
-        LogPrint("staking","Checking Staking Status: Syncing...\n");
+        LogPrint("staking", "Checking Staking Status: Syncing...\n");
         stakingState->setText(tr("Syncing Blocks..."));
         stakingState->setToolTip("Syncing Blocks");
         stakingAction->setIcon(QIcon(":/icons/staking_waiting"));
         return;
     }
     if (!masternodeSync.IsSynced()) {
-        LogPrint("staking","Checking Staking Status: Syncing MN List...\n");
+        LogPrint("staking", "Checking Staking Status: Syncing MN List...\n");
         stakingState->setText(tr("Syncing MN List..."));
         stakingState->setToolTip("Syncing Masternode List");
         stakingAction->setIcon(QIcon(":/icons/staking_waiting"));
@@ -1322,17 +1319,17 @@ void BitcoinGUI::setStakingStatus()
         if (!nLastCoinStakeSearchInterval) return;
     }
     if (nLastCoinStakeSearchInterval) {
-        LogPrint("staking","Checking Staking Status: Enabled.\n");
+        LogPrint("staking", "Checking Staking Status: Enabled.\n");
         stakingState->setText(tr("Staking Enabled"));
         stakingState->setToolTip("Staking Enabled");
         stakingAction->setIcon(QIcon(":/icons/staking_active"));
-    /*} else if (nConsolidationTime > 0) {
+        /*} else if (nConsolidationTime > 0) {
         nConsolidationTime --;
         stakingState->setText(tr("Consolidating Transactions…"));
         stakingState->setToolTip("Consolidating Transactions… Please wait few minutes for it to be consolidated.");
         stakingAction->setIcon(QIcon(":/icons/staking_active"));*/
     } else {
-        LogPrint("staking","Checking Staking Status: Enabling...\n");
+        LogPrint("staking", "Checking Staking Status: Enabling...\n");
         stakingState->setText(tr("Enabling Staking..."));
         stakingState->setToolTip("Enabling Staking... Please wait up to 1.5 hours for it to be properly enabled after consolidation.");
         stakingAction->setIcon(QIcon(":/icons/staking_active"));
@@ -1465,7 +1462,8 @@ static bool ThreadSafeMessageBox(BitcoinGUI* gui, const std::string& message, co
     return ret;
 }
 
-void BitcoinGUI::exitApp(){
+void BitcoinGUI::exitApp()
+{
     QApplication::quit();
 }
 
@@ -1506,7 +1504,7 @@ void UnitDisplayStatusBarControl::createContextMenu()
 {
     menu = new QMenu(this);
     menu->setAttribute(Qt::WA_DeleteOnClose);
-   Q_FOREACH (BitcoinUnits::Unit u, BitcoinUnits::availableUnits()) {
+    Q_FOREACH (BitcoinUnits::Unit u, BitcoinUnits::availableUnits()) {
         QAction* menuAction = new QAction(QString(BitcoinUnits::name(u)), this);
         menuAction->setData(QVariant(u));
         menu->addAction(menuAction);

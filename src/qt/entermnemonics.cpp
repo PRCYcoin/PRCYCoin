@@ -29,9 +29,9 @@ void EnterMnemonics::on_next()
         QMessageBox::information(this, "Recovery Phrase Import Successful", "Your mnemonics have been successfully imported into the wallet. Rescanning will be scheduled to recover all your funds.", QMessageBox::Ok);
         CBlockLocator loc = chainActive.GetLocator(chainActive[0]);
         pwalletMain->SetBestChain(loc);
-        CWalletDB(pwalletMain->strWalletFile).WriteScannedBlockHeight(0); //reschedule to rescan entire chain to recover all funds and history        
+        CWalletDB(pwalletMain->strWalletFile).WriteScannedBlockHeight(0); //reschedule to rescan entire chain to recover all funds and history
         accept();
     } catch (const std::exception& ex) {
-       QMessageBox::warning(this, "Recovery Phrase Invalid", "Recovery phrase is invalid. Please try again and double check all words.", QMessageBox::Ok);
+        QMessageBox::warning(this, "Recovery Phrase Invalid", "Recovery phrase is invalid. Please try again and double check all words.", QMessageBox::Ok);
     }
 }

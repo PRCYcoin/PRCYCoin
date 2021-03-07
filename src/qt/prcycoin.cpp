@@ -182,8 +182,7 @@ public Q_SLOTS:
     void shutdown();
     void restart(QStringList args);
 
-Q_SIGNALS:
-    void initializeResult(int retval);
+    Q_SIGNALS : void initializeResult(int retval);
     void shutdownResult(int retval);
     void runawayException(const QString& message);
 
@@ -223,7 +222,6 @@ public:
 
     /// Get process return value
     int getReturnValue() { return returnValue; }
-
     /// Get window identifier of QMainWindow (BitcoinGUI)
     WId getMainWinId() const;
 
@@ -233,8 +231,7 @@ public Q_SLOTS:
     /// Handle runaway exceptions. Shows a message box with the problem and quits the program.
     void handleRunawayException(const QString& message);
 
-Q_SIGNALS:
-    void requestedInitialize();
+    Q_SIGNALS : void requestedInitialize();
     void requestedRegisterNodeSignal();
     void requestedRestart(QStringList args);
     void requestedShutdown();
@@ -589,9 +586,9 @@ int main(int argc, char* argv[])
     // Command-line options take precedence:
     ParseParameters(argc, argv);
 
-// Do not refer to data directory yet, this can be overridden by Intro::pickDataDirectory
+    // Do not refer to data directory yet, this can be overridden by Intro::pickDataDirectory
 
-/// 2. Basic Qt initialization (not dependent on parameters or configuration)
+    /// 2. Basic Qt initialization (not dependent on parameters or configuration)
     Q_INIT_RESOURCE(prcycoin_locale);
     Q_INIT_RESOURCE(prcycoin);
 

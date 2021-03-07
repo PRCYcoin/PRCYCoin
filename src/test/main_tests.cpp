@@ -42,7 +42,7 @@ BOOST_AUTO_TEST_CASE(subsidy_limit_test)
     for (int nHeight = 151200; nHeight < 259200; nHeight += 1) {
         /* PoW Phase Two */
         CAmount nSubsidy = GetBlockValue(nHeight);
-       // BOOST_CHECK(nSubsidy <= 45 * COIN);
+        // BOOST_CHECK(nSubsidy <= 45 * COIN);
         nSum += nSubsidy;
         //BOOST_CHECK(nSum > 0 && nSum <= nMoneySupplyPoWEnd);
     }

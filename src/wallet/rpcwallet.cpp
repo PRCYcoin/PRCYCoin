@@ -305,7 +305,7 @@ UniValue getaccount(const UniValue& params, bool fHelp)
     map<CTxDestination, CAddressBookData>::iterator mi = pwalletMain->mapAddressBook.find(address.Get());
     if (mi != pwalletMain->mapAddressBook.end() && !(*mi).second.name.empty())
         strAccount = (*mi).second.name;
-    
+
     return strAccount;
 }
 
@@ -396,7 +396,7 @@ UniValue sendtoaddress(const UniValue& params, bool fHelp)
 
     if (!pwalletMain->SendToStealthAddress(stealthAddr, nAmount, wtx)) {
         throw JSONRPCError(RPC_WALLET_ERROR,
-                           "Failed to create transaction.");
+            "Failed to create transaction.");
     }
     return wtx.GetHash().GetHex();
 }
@@ -428,7 +428,7 @@ UniValue sendtoaddressix(const UniValue& params, bool fHelp)
 
     if (!pwalletMain->SendToStealthAddress(stealthAddr, nAmount, wtx)) {
         throw JSONRPCError(RPC_WALLET_ERROR,
-                           "Failed to create transaction.");
+            "Failed to create transaction.");
     }
     return wtx.GetHash().GetHex();
 }
@@ -927,10 +927,10 @@ UniValue sendmany(const UniValue& params, bool fHelp)
     for (const string& name_ : keys) {
         CBitcoinAddress address(name_);
         if (!address.IsValid())
-            throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, string("Invalid PIVX address: ")+name_);
+            throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, string("Invalid PIVX address: ") + name_);
 
         if (setAddress.count(address))
-            throw JSONRPCError(RPC_INVALID_PARAMETER, string("Invalid parameter, duplicated address: ")+name_);
+            throw JSONRPCError(RPC_INVALID_PARAMETER, string("Invalid parameter, duplicated address: ") + name_);
         setAddress.insert(address);
 
         CScript scriptPubKey = GetScriptForDestination(address.Get());
@@ -1199,7 +1199,7 @@ UniValue listreceivedbyaccount(const UniValue& params, bool fHelp)
     return ListReceived(params, true);
 }
 
-static void MaybePushAddress(UniValue & entry, const CTxDestination &dest)
+static void MaybePushAddress(UniValue& entry, const CTxDestination& dest)
 {
     CBitcoinAddress addr;
     if (addr.Set(dest))
@@ -1363,7 +1363,7 @@ UniValue listtransactions(const UniValue& params, bool fHelp)
 
     UniValue ret(UniValue::VARR);
 
-    const CWallet::TxItems & txOrdered = pwalletMain->wtxOrdered;
+    const CWallet::TxItems& txOrdered = pwalletMain->wtxOrdered;
 
     // iterate backwards until we have nCount items to return:
     for (CWallet::TxItems::const_reverse_iterator it = txOrdered.rbegin(); it != txOrdered.rend(); ++it) {
@@ -1389,7 +1389,7 @@ UniValue listtransactions(const UniValue& params, bool fHelp)
     std::advance(first, nFrom);
 
     vector<UniValue>::iterator last = arrTmp.begin();
-    std::advance(last, nFrom + nCount);	   
+    std::advance(last, nFrom + nCount);
 
     if (last != arrTmp.end()) arrTmp.erase(last, arrTmp.end());
     if (first != arrTmp.begin()) arrTmp.erase(arrTmp.begin(), first);
@@ -1462,7 +1462,7 @@ UniValue listaccounts(const UniValue& params, bool fHelp)
         }
     }
 
-    const list<CAccountingEntry> & acentries = pwalletMain->laccentries;
+    const list<CAccountingEntry>& acentries = pwalletMain->laccentries;
     for (const CAccountingEntry& entry : acentries)
         mapAccountBalances[entry.strAccount] += entry.nCreditDebit;
 
@@ -1609,7 +1609,7 @@ UniValue gettransaction(const UniValue& params, bool fHelp)
 
     CAmount nCredit = wtx.GetCredit(filter);
     CAmount nDebit = wtx.GetDebit(filter);
-    CAmount nNet = (nCredit > nDebit)? (nCredit - nDebit):(nDebit - nCredit);
+    CAmount nNet = (nCredit > nDebit) ? (nCredit - nDebit) : (nDebit - nCredit);
     CAmount nFee = wtx.nTxFee;
     entry.push_back(Pair("amount", ValueFromAmount(nNet)));
     if (wtx.IsFromMe(filter))
@@ -1750,8 +1750,8 @@ UniValue unlockwallet(const UniValue& params, bool fHelp)
 
 
     if (nSleepTime > 0) {
-        nWalletUnlockTime = GetTime () + nSleepTime;
-        RPCRunLater ("lockwallet", boost::bind (LockWallet, pwalletMain), nSleepTime);
+        nWalletUnlockTime = GetTime() + nSleepTime;
+        RPCRunLater("lockwallet", boost::bind(LockWallet, pwalletMain), nSleepTime);
     }
     return NullUniValue;
 }
@@ -2040,7 +2040,7 @@ UniValue getwalletinfo(const UniValue& params, bool fHelp)
     obj.push_back(Pair("keypoolsize", (int)pwalletMain->GetKeyPoolSize()));
     if (pwalletMain->IsCrypted())
         obj.push_back(Pair("walletunlocked", !pwalletMain->IsLocked()));
-        obj.push_back(Pair("unlocked_until", nWalletUnlockTime));
+    obj.push_back(Pair("unlocked_until", nWalletUnlockTime));
     obj.push_back(Pair("paytxfee", ValueFromAmount(payTxFee.GetFeePerK())));
     return obj;
 }
@@ -2173,47 +2173,46 @@ UniValue getstakesplitthreshold(const UniValue& params, bool fHelp)
 
 UniValue autocombinedust(const UniValue& params, bool fHelp)
 {
-	if(pwalletMain->fCombineDust){
-    bool fEnable;
-    if (params.size() >= 1)
-        fEnable = params[0].get_bool();
+    if (pwalletMain->fCombineDust) {
+        bool fEnable;
+        if (params.size() >= 1)
+            fEnable = params[0].get_bool();
 
-    if (fHelp || params.size() < 1 || (fEnable && params.size() != 2) || params.size() > 2)
-        throw runtime_error(
-            "autocombinedust true|false ( threshold )\n"
-            "\nWallet will automatically monitor for any coins with value below the threshold amount, and combine them if they reside with the same PRCY address\n"
-            "When autocombinedust runs it will create a transaction, and therefore will be subject to transaction fees. Minimum of 25 dust transactions before activation.\n"
+        if (fHelp || params.size() < 1 || (fEnable && params.size() != 2) || params.size() > 2)
+            throw runtime_error(
+                "autocombinedust true|false ( threshold )\n"
+                "\nWallet will automatically monitor for any coins with value below the threshold amount, and combine them if they reside with the same PRCY address\n"
+                "When autocombinedust runs it will create a transaction, and therefore will be subject to transaction fees. Minimum of 25 dust transactions before activation.\n"
 
-            "\nArguments:\n"
-            "1. true|false      (boolean, required) Enable auto combine (true) or disable (false)\n"
-            "2. threshold       (numeric, optional) Threshold amount (default: 0)\n"
-            "\nExamples:\n" +
-            HelpExampleCli("autocombinedust", "true 10") + HelpExampleRpc("autocombinedust", "true 150"));
+                "\nArguments:\n"
+                "1. true|false      (boolean, required) Enable auto combine (true) or disable (false)\n"
+                "2. threshold       (numeric, optional) Threshold amount (default: 0)\n"
+                "\nExamples:\n" +
+                HelpExampleCli("autocombinedust", "true 10") + HelpExampleRpc("autocombinedust", "true 150"));
 
-    CWalletDB walletdb(pwalletMain->strWalletFile);
-    CAmount nThreshold = 0;
+        CWalletDB walletdb(pwalletMain->strWalletFile);
+        CAmount nThreshold = 0;
 
-    if (fEnable) {
-        nThreshold = params[1].get_int();
+        if (fEnable) {
+            nThreshold = params[1].get_int();
+        } else {
+            nThreshold = 0;
+        }
+
+        pwalletMain->fCombineDust = fEnable;
+        pwalletMain->nAutoCombineThreshold = nThreshold;
+
+        if (!walletdb.WriteAutoCombineSettings(fEnable, nThreshold))
+            throw runtime_error("Changed settings in wallet but failed to save to database\n");
+
+        UniValue result(UniValue::VOBJ);
+        result.push_back(Pair("autocombinedust", params[0].get_bool()));
+        result.push_back(Pair("amount", int(pwalletMain->nAutoCombineThreshold)));
+        return result;
     } else {
-        nThreshold = 0;
+        throw runtime_error(
+            "autocombinedust is disabled in your prcycoin.conf");
     }
-
-    pwalletMain->fCombineDust = fEnable;
-    pwalletMain->nAutoCombineThreshold = nThreshold;
-
-    if (!walletdb.WriteAutoCombineSettings(fEnable, nThreshold))
-        throw runtime_error("Changed settings in wallet but failed to save to database\n");
-
-    UniValue result(UniValue::VOBJ);
-    result.push_back(Pair("autocombinedust", params[0].get_bool()));
-    result.push_back(Pair("amount", int(pwalletMain->nAutoCombineThreshold)));
-    return result;
-    }
-	else{
-		throw runtime_error(
-		"autocombinedust is disabled in your prcycoin.conf");
-	}
 }
 
 UniValue printMultiSend()
@@ -2424,7 +2423,7 @@ UniValue multisend(const UniValue& params, bool fHelp)
         throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid parameter, expected valid percentage");
     if (pwalletMain->IsLocked())
         throw JSONRPCError(RPC_WALLET_UNLOCK_NEEDED, "Error: Please enter the wallet passphrase with unlockwallet first.");
-    unsigned int nPercent = (unsigned int) std::stoul(params[1].get_str().c_str());
+    unsigned int nPercent = (unsigned int)std::stoul(params[1].get_str().c_str());
 
     LOCK(pwalletMain->cs_wallet);
     {
@@ -2460,42 +2459,42 @@ UniValue multisend(const UniValue& params, bool fHelp)
 
 UniValue createprivacywallet(const UniValue& params, bool fHelp)
 {
-    if (fHelp || params.size() >2 || params.size() < 1)
+    if (fHelp || params.size() > 2 || params.size() < 1)
         throw runtime_error(
-                "createprivacywallet \"password\" (\"language\") \n"
-                "\nCreate a new wallet for privacy with dual-key stealth address.\n"
-                "If 'language' is specified, it is used, otherwise english \n"
-                "\nArguments:\n"
-                "1. \"account\"        (string, required) password for the wallet \n"
-                "2. \"language\"        (string, optional) language for the wallet's mnemmonics \n"
-                "\nResult:\n"
-                "\"privacy wallet created\"    (string) the base address of the wallet\n"
-                "\nExamples:\n" +
-                HelpExampleCli("createprivacywallet", "") + HelpExampleCli("createprivacywallet", "\"\"") + HelpExampleCli("createprivacywallet", "\"1234567890\"") + HelpExampleRpc("createprivacywallet", "\"1234567890\""));
+            "createprivacywallet \"password\" (\"language\") \n"
+            "\nCreate a new wallet for privacy with dual-key stealth address.\n"
+            "If 'language' is specified, it is used, otherwise english \n"
+            "\nArguments:\n"
+            "1. \"account\"        (string, required) password for the wallet \n"
+            "2. \"language\"        (string, optional) language for the wallet's mnemmonics \n"
+            "\nResult:\n"
+            "\"privacy wallet created\"    (string) the base address of the wallet\n"
+            "\nExamples:\n" +
+            HelpExampleCli("createprivacywallet", "") + HelpExampleCli("createprivacywallet", "\"\"") + HelpExampleCli("createprivacywallet", "\"1234567890\"") + HelpExampleRpc("createprivacywallet", "\"1234567890\""));
 
     LOCK2(cs_main, pwalletMain->cs_wallet);
 
     //privacy wallet is already created
     throw JSONRPCError(RPC_PRIVACY_WALLET_EXISTED,
-                           "Error: RPC unimplemented.");
+        "Error: RPC unimplemented.");
 }
 
 UniValue createprivacyaccount(const UniValue& params, bool fHelp)
 {
     if (fHelp || params.size() != 0)
         throw runtime_error(
-                "createprivacyaccount \n"
-                "\nCreate a new wallet account for privacy.\n"
-                "\nArguments:\n"
-                "\nResult:\n"
-                "\"account address\"    (string) the address of the created account\n"
-                "\nExamples:\n" +
-                HelpExampleCli("createprivacyaccount", "") + HelpExampleCli("createprivacyaccount", "\"\"") + HelpExampleCli("createprivacyaccount", "") + HelpExampleRpc("createprivacyaccount", ""));
+            "createprivacyaccount \n"
+            "\nCreate a new wallet account for privacy.\n"
+            "\nArguments:\n"
+            "\nResult:\n"
+            "\"account address\"    (string) the address of the created account\n"
+            "\nExamples:\n" +
+            HelpExampleCli("createprivacyaccount", "") + HelpExampleCli("createprivacyaccount", "\"\"") + HelpExampleCli("createprivacyaccount", "") + HelpExampleRpc("createprivacyaccount", ""));
 
     if (!pwalletMain) {
         //privacy wallet is already created
         throw JSONRPCError(RPC_PRIVACY_WALLET_EXISTED,
-                           "Error: There is no privacy wallet, please use createprivacyaccount to create one.");
+            "Error: There is no privacy wallet, please use createprivacyaccount to create one.");
     }
 
     CWalletDB walletdb(pwalletMain->strWalletFile);
@@ -2537,18 +2536,18 @@ UniValue showstealthaddress(const UniValue& params, bool fHelp)
 {
     if (fHelp || params.size() != 0)
         throw runtime_error(
-                "showstealthaddress \n"
-                "\nShow stealth address.\n"
-                "\nArguments:\n"
-                "\nResult:\n"
-                "\"account address\"    (string) the address of the created account\n"
-                "\nExamples:\n" +
-                HelpExampleCli("showstealthaddress", "") + HelpExampleCli("showstealthaddress", "\"\"") + HelpExampleCli("showstealthaddress", "") + HelpExampleRpc("showstealthaddress", ""));
+            "showstealthaddress \n"
+            "\nShow stealth address.\n"
+            "\nArguments:\n"
+            "\nResult:\n"
+            "\"account address\"    (string) the address of the created account\n"
+            "\nExamples:\n" +
+            HelpExampleCli("showstealthaddress", "") + HelpExampleCli("showstealthaddress", "\"\"") + HelpExampleCli("showstealthaddress", "") + HelpExampleRpc("showstealthaddress", ""));
 
     if (!pwalletMain) {
         //privacy wallet is already created
         throw JSONRPCError(RPC_PRIVACY_WALLET_EXISTED,
-                           "Error: There is no privacy wallet, please use createprivacyaccount to create one.");
+            "Error: There is no privacy wallet, please use createprivacyaccount to create one.");
     }
     std::string address;
     pwalletMain->ComputeStealthPublicAddress("masteraccount", address);
@@ -2559,18 +2558,18 @@ UniValue generateintegratedaddress(const UniValue& params, bool fHelp)
 {
     if (fHelp || params.size() > 1)
         throw runtime_error(
-                "generateintegratedaddress <paymentID>\n"
-                "\nGenerate integrated addresses for this wallet with a random payment ID.\n"
-                "\nArguments:\n"
-                "optional: paymentID"
-                "\nResult:\n"
-                "\nExamples:\n" +
-                HelpExampleCli("generateintegratedaddress", "1234") + HelpExampleCli("generateintegratedaddress", "\"\"") + HelpExampleCli("generateintegratedaddress", "") + HelpExampleRpc("generateintegratedaddress", ""));
+            "generateintegratedaddress <paymentID>\n"
+            "\nGenerate integrated addresses for this wallet with a random payment ID.\n"
+            "\nArguments:\n"
+            "optional: paymentID"
+            "\nResult:\n"
+            "\nExamples:\n" +
+            HelpExampleCli("generateintegratedaddress", "1234") + HelpExampleCli("generateintegratedaddress", "\"\"") + HelpExampleCli("generateintegratedaddress", "") + HelpExampleRpc("generateintegratedaddress", ""));
 
     if (!pwalletMain) {
         //privacy wallet is already created
         throw JSONRPCError(RPC_PRIVACY_WALLET_EXISTED,
-                           "Error: There is no privacy wallet, please use createprivacyaccount to create one.");
+            "Error: There is no privacy wallet, please use createprivacyaccount to create one.");
     }
 
     UniValue ret(UniValue::VOBJ);
@@ -2591,18 +2590,18 @@ UniValue importkeys(const UniValue& params, bool fHelp)
 {
     if (fHelp || params.size() != 2)
         throw runtime_error(
-                "importkeys \n"
-                "\nCreate a new wallet account for privacy.\n"
-                "\nArguments:\n"
-                "\nResult:\n"
-                "\"account address\"    (string) the address of the created account\n"
-                "\nExamples:\n" +
-                HelpExampleCli("importkeys", "") + HelpExampleCli("importkeys", "\"\"") + HelpExampleCli("importkeys", "") + HelpExampleRpc("importkeys", ""));
+            "importkeys \n"
+            "\nCreate a new wallet account for privacy.\n"
+            "\nArguments:\n"
+            "\nResult:\n"
+            "\"account address\"    (string) the address of the created account\n"
+            "\nExamples:\n" +
+            HelpExampleCli("importkeys", "") + HelpExampleCli("importkeys", "\"\"") + HelpExampleCli("importkeys", "") + HelpExampleRpc("importkeys", ""));
 
     if (!pwalletMain) {
         //privacy wallet is already created
         throw JSONRPCError(RPC_PRIVACY_WALLET_EXISTED,
-                           "Error: There is no privacy wallet, please use createprivacyaccount to create one.");
+            "Error: There is no privacy wallet, please use createprivacyaccount to create one.");
     }
 
     CWalletDB walletdb(pwalletMain->strWalletFile);
@@ -2640,20 +2639,20 @@ UniValue createprivacysubaddress(const UniValue& params, bool fHelp)
 {
     if (fHelp || params.size() != 1)
         throw runtime_error(
-                "createprivacysubaddress \"label\" \n"
-                "\nCreate a new wallet account subaddress for privacy transaction.\n"
-                "\nArguments:\n"
-                "1. \"label\"        (string, required) label for the wallet account address\n"
-                "\nResult:\n"
-                "\"account address\"    (string) the created address for the corresponding account\n"
-                "\"address index\"    (string) the index of the created address for the account\n"
-                "\nExamples:\n" +
-                HelpExampleCli("createprivacysubaddress", "") + HelpExampleCli("createprivacysubaddress", "\"\"") + HelpExampleCli("createprivacysubaddress", "\"address1\"") + HelpExampleRpc("createprivacysubaddress", "\"address1\""));
+            "createprivacysubaddress \"label\" \n"
+            "\nCreate a new wallet account subaddress for privacy transaction.\n"
+            "\nArguments:\n"
+            "1. \"label\"        (string, required) label for the wallet account address\n"
+            "\nResult:\n"
+            "\"account address\"    (string) the created address for the corresponding account\n"
+            "\"address index\"    (string) the index of the created address for the account\n"
+            "\nExamples:\n" +
+            HelpExampleCli("createprivacysubaddress", "") + HelpExampleCli("createprivacysubaddress", "\"\"") + HelpExampleCli("createprivacysubaddress", "\"address1\"") + HelpExampleRpc("createprivacysubaddress", "\"address1\""));
 
     if (!pwalletMain) {
         //privacy wallet is already created
         throw JSONRPCError(RPC_PRIVACY_WALLET_EXISTED,
-                           "Error: There is no privacy wallet, please use createprivacyaccount to create one.");
+            "Error: There is no privacy wallet, please use createprivacyaccount to create one.");
     }
 
     EnsureWalletIsUnlocked();
@@ -2706,18 +2705,18 @@ UniValue readmasteraccount(const UniValue& params, bool fHelp)
 {
     if (fHelp || params.size() != 0)
         throw runtime_error(
-                "readmasteraccount \n"
-                "\nRead stealth master account address.\n"
-                "\nArguments:\n"
-                "\nResult:\n"
-                "\"public address\" (string) the public address"
-                "\nExamples:\n" +
-                HelpExampleCli("readmasteraccount", "") + HelpExampleCli("readmasteraccount", "\"\"") + HelpExampleCli("readmasteraccount", "") + HelpExampleRpc("readmasteraccount", ""));
+            "readmasteraccount \n"
+            "\nRead stealth master account address.\n"
+            "\nArguments:\n"
+            "\nResult:\n"
+            "\"public address\" (string) the public address"
+            "\nExamples:\n" +
+            HelpExampleCli("readmasteraccount", "") + HelpExampleCli("readmasteraccount", "\"\"") + HelpExampleCli("readmasteraccount", "") + HelpExampleRpc("readmasteraccount", ""));
 
     if (!pwalletMain) {
         //privacy wallet is not yet created
         throw JSONRPCError(RPC_PRIVACY_WALLET_EXISTED,
-                           "Error: There is no privacy wallet, please use createprivacyaccount to create one.");
+            "Error: There is no privacy wallet, please use createprivacyaccount to create one.");
     }
     std::string address;
     pwalletMain->ComputeStealthPublicAddress("masteraccount", address);
@@ -2728,20 +2727,20 @@ UniValue decodestealthaddress(const UniValue& params, bool fHelp)
 {
     if (fHelp || params.size() != 1)
         throw runtime_error(
-                "decodestealthaddress \n"
-                "\nDecode a stealth address into spend and view public keys.\n"
-                "\nArguments:\n"
-                "1. \"stealth_address\"        (string, required) The Base58 stealth address\n"
-                "\nResult:\n"
-                "\"public view key\"    (string) the view public key\n"
-                "\"public spend key\"   (string) the spend public key"
-                "\nExamples:\n" +
-                HelpExampleCli("decodestealthaddress", "") + HelpExampleCli("decodestealthaddress", "\"\"") + HelpExampleCli("decodestealthaddress", "") + HelpExampleRpc("decodestealthaddress", ""));
+            "decodestealthaddress \n"
+            "\nDecode a stealth address into spend and view public keys.\n"
+            "\nArguments:\n"
+            "1. \"stealth_address\"        (string, required) The Base58 stealth address\n"
+            "\nResult:\n"
+            "\"public view key\"    (string) the view public key\n"
+            "\"public spend key\"   (string) the spend public key"
+            "\nExamples:\n" +
+            HelpExampleCli("decodestealthaddress", "") + HelpExampleCli("decodestealthaddress", "\"\"") + HelpExampleCli("decodestealthaddress", "") + HelpExampleRpc("decodestealthaddress", ""));
 
     if (!pwalletMain) {
         //privacy wallet is already created
         throw JSONRPCError(RPC_PRIVACY_WALLET_EXISTED,
-                           "Error: There is no privacy wallet, please use createprivacyaccount to create one.");
+            "Error: There is no privacy wallet, please use createprivacyaccount to create one.");
     }
     std::string addr = params[0].get_str();
 
@@ -2752,7 +2751,7 @@ UniValue decodestealthaddress(const UniValue& params, bool fHelp)
 
     if (!CWallet::DecodeStealthAddress(addr, viewKey, spendKey, hasPaymentID, paymentID)) {
         throw JSONRPCError(RPC_WALLET_ERROR,
-                           "Error: Stealth address is not correctly formatted.");
+            "Error: Stealth address is not correctly formatted.");
     }
     ret.push_back(Pair("spendpublickey", spendKey.GetHex()));
     ret.push_back(Pair("viewpublickey", viewKey.GetHex()));
@@ -2767,16 +2766,16 @@ UniValue sendtostealthaddress(const UniValue& params, bool fHelp)
 {
     if (fHelp || params.size() != 2)
         throw runtime_error(
-                "sendtostealthaddress \"prcystealthaddress\" amount\n"
-                "\nSend an amount to a given prcy stealth address address. The amount is a real and is rounded to the nearest 0.00000001\n" +
-                HelpRequiringPassphrase() +
-                "\nArguments:\n"
-                "1. \"prcystealthaddress\"  (string, required) The prcycoin stealth address to send to.\n"
-                "2. \"amount\"      (numeric, required) The amount in PRCY to send. eg 0.1\n"
-                "\nResult:\n"
-                "\"transactionid\"  (string) The transaction id.\n"
-                "\nExamples:\n" +
-                HelpExampleCli("sendtostealthaddress", "\"Pap5WCV4SjVMGLyYf98MEX82ErBEMVpg9ViQ1up3aBib6Fz4841SahrRXG6eSNSLBSNvEiGuQiWKXJC3RDfmotKv15oCrh6N2Ym\" 0.1") + HelpExampleCli("sendtostealthaddress", "\"Pap5WCV4SjVMGLyYf98MEX82ErBEMVpg9ViQ1up3aBib6Fz4841SahrRXG6eSNSLBSNvEiGuQiWKXJC3RDfmotKv15oCrh6N2Ym\" 0.1 \"donation\" \"seans outpost\"") + HelpExampleRpc("sendtostealthaddress", "\"Pap5WCV4SjVMGLyYf98MEX82ErBEMVpg9ViQ1up3aBib6Fz4841SahrRXG6eSNSLBSNvEiGuQiWKXJC3RDfmotKv15oCrh6N2Ym\", 0.1, \"donation\", \"seans outpost\""));
+            "sendtostealthaddress \"prcystealthaddress\" amount\n"
+            "\nSend an amount to a given prcy stealth address address. The amount is a real and is rounded to the nearest 0.00000001\n" +
+            HelpRequiringPassphrase() +
+            "\nArguments:\n"
+            "1. \"prcystealthaddress\"  (string, required) The prcycoin stealth address to send to.\n"
+            "2. \"amount\"      (numeric, required) The amount in PRCY to send. eg 0.1\n"
+            "\nResult:\n"
+            "\"transactionid\"  (string) The transaction id.\n"
+            "\nExamples:\n" +
+            HelpExampleCli("sendtostealthaddress", "\"Pap5WCV4SjVMGLyYf98MEX82ErBEMVpg9ViQ1up3aBib6Fz4841SahrRXG6eSNSLBSNvEiGuQiWKXJC3RDfmotKv15oCrh6N2Ym\" 0.1") + HelpExampleCli("sendtostealthaddress", "\"Pap5WCV4SjVMGLyYf98MEX82ErBEMVpg9ViQ1up3aBib6Fz4841SahrRXG6eSNSLBSNvEiGuQiWKXJC3RDfmotKv15oCrh6N2Ym\" 0.1 \"donation\" \"seans outpost\"") + HelpExampleRpc("sendtostealthaddress", "\"Pap5WCV4SjVMGLyYf98MEX82ErBEMVpg9ViQ1up3aBib6Fz4841SahrRXG6eSNSLBSNvEiGuQiWKXJC3RDfmotKv15oCrh6N2Ym\", 0.1, \"donation\", \"seans outpost\""));
 
     std::string stealthAddr = params[0].get_str();
 
@@ -2790,7 +2789,7 @@ UniValue sendtostealthaddress(const UniValue& params, bool fHelp)
 
     if (!pwalletMain->SendToStealthAddress(stealthAddr, nAmount, wtx)) {
         throw JSONRPCError(RPC_WALLET_ERROR,
-                           "Cannot create transaction.");
+            "Cannot create transaction.");
     }
     return wtx.GetHash().GetHex();
 }
@@ -2799,27 +2798,27 @@ UniValue setdecoyconfirmation(const UniValue& params, bool fHelp)
 {
     if (fHelp || params.size() != 1)
         throw runtime_error(
-                "setdecoyconfirmation\n"
-                "\nSend the minimum confirmation for decoys in RingCT\n" +
-                HelpRequiringPassphrase() +
-                "\nArguments:\n"
-                "2. \"confirm\"      (numeric, required) The required minim confirmation for decoys\n"
-                "\nResult:\n"
-                "\"decoy_confirmation\"  (numeric) The minimum decoy confirmation.\n"
-                "\nExamples:\n" +
-                HelpExampleCli("setdecoyconfirmation", "\"20\"") + HelpExampleCli("setdecoyconfirmation", "\"20\"") + HelpExampleRpc("setdecoyconfirmation", "\"20\""));
+            "setdecoyconfirmation\n"
+            "\nSend the minimum confirmation for decoys in RingCT\n" +
+            HelpRequiringPassphrase() +
+            "\nArguments:\n"
+            "2. \"confirm\"      (numeric, required) The required minim confirmation for decoys\n"
+            "\nResult:\n"
+            "\"decoy_confirmation\"  (numeric) The minimum decoy confirmation.\n"
+            "\nExamples:\n" +
+            HelpExampleCli("setdecoyconfirmation", "\"20\"") + HelpExampleCli("setdecoyconfirmation", "\"20\"") + HelpExampleRpc("setdecoyconfirmation", "\"20\""));
 
     if (!pwalletMain) {
         //privacy wallet is already created
         throw JSONRPCError(RPC_PRIVACY_WALLET_EXISTED,
-                           "Error: There is no privacy wallet, please use createprivacyaccount to create one.");
+            "Error: There is no privacy wallet, please use createprivacyaccount to create one.");
     }
 
     int confirmation = params[0].get_int();
 
     if (confirmation <= 0) {
         throw JSONRPCError(RPC_PRIVACY_DECOY_MIN,
-                           "Error: Min decoy confirmation must be positive.");
+            "Error: Min decoy confirmation must be positive.");
     }
     pwalletMain->DecoyConfirmationMinimum = confirmation;
     UniValue ret(UniValue::VOBJ);
@@ -2831,18 +2830,18 @@ UniValue getdecoyconfirmation(const UniValue& params, bool fHelp)
 {
     if (fHelp || params.size() != 0)
         throw runtime_error(
-                "getdecoyconfirmation\n"
-                "\nShow the current decoy confirmation\n" +
-                HelpRequiringPassphrase() +
-                "\nArguments:\n"
-                "\nResult:\n"
-                "\"decoy_confirmation\"  (numeric) The minimum decoy confirmation.\n"
-                "\nExamples:\n" +
-                HelpExampleCli("getdecoyconfirmation", "") + HelpExampleCli("getdecoyconfirmation", "") + HelpExampleRpc("getdecoyconfirmation", ""));
+            "getdecoyconfirmation\n"
+            "\nShow the current decoy confirmation\n" +
+            HelpRequiringPassphrase() +
+            "\nArguments:\n"
+            "\nResult:\n"
+            "\"decoy_confirmation\"  (numeric) The minimum decoy confirmation.\n"
+            "\nExamples:\n" +
+            HelpExampleCli("getdecoyconfirmation", "") + HelpExampleCli("getdecoyconfirmation", "") + HelpExampleRpc("getdecoyconfirmation", ""));
     if (!pwalletMain) {
         //privacy wallet is already created
         throw JSONRPCError(RPC_PRIVACY_WALLET_EXISTED,
-                           "Error: There is no privacy wallet, please use createprivacyaccount to create one.");
+            "Error: There is no privacy wallet, please use createprivacyaccount to create one.");
     }
 
     UniValue ret(UniValue::VOBJ);
@@ -2850,29 +2849,31 @@ UniValue getdecoyconfirmation(const UniValue& params, bool fHelp)
     return ret;
 }
 
-std::string GetHex(const unsigned char* vch, int sz) {
+std::string GetHex(const unsigned char* vch, int sz)
+{
     char psz[sz * 2 + 1];
     for (int i = 0; i < sz; i++)
         sprintf(psz + i * 2, "%02x", vch[sz - i - 1]);
     return std::string(psz, psz + sz * 2);
 }
 
-UniValue revealviewprivatekey(const UniValue& params, bool fHelp) {
+UniValue revealviewprivatekey(const UniValue& params, bool fHelp)
+{
     if (fHelp || params.size() != 0)
         throw runtime_error(
-                "revealviewprivatekey \n"
-                "\nReveal view private key.\n"
-                "\nArguments:\n"
-                "\nResult:\n"
-                "\"Private view key\"    (string) the private view key\n"
-                "\nExamples:\n" +
-                HelpExampleCli("revealviewprivatekey", "") + HelpExampleCli("revealviewprivatekey", "\"\"") +
-                HelpExampleCli("revealviewprivatekey", "") + HelpExampleRpc("revealviewprivatekey", ""));
+            "revealviewprivatekey \n"
+            "\nReveal view private key.\n"
+            "\nArguments:\n"
+            "\nResult:\n"
+            "\"Private view key\"    (string) the private view key\n"
+            "\nExamples:\n" +
+            HelpExampleCli("revealviewprivatekey", "") + HelpExampleCli("revealviewprivatekey", "\"\"") +
+            HelpExampleCli("revealviewprivatekey", "") + HelpExampleRpc("revealviewprivatekey", ""));
 
     if (!pwalletMain) {
         //privacy wallet is already created
         throw JSONRPCError(RPC_PRIVACY_WALLET_EXISTED,
-                           "Error: There is no privacy wallet, please use createprivacyaccount to create one.");
+            "Error: There is no privacy wallet, please use createprivacyaccount to create one.");
     }
 
     EnsureWalletIsUnlocked();
@@ -2882,22 +2883,23 @@ UniValue revealviewprivatekey(const UniValue& params, bool fHelp) {
     return CBitcoinSecret(view).ToString();
 }
 
-UniValue revealspendprivatekey(const UniValue& params, bool fHelp) {
+UniValue revealspendprivatekey(const UniValue& params, bool fHelp)
+{
     if (fHelp || params.size() != 0)
         throw runtime_error(
-                "revealspendprivatekey \n"
-                "\nReveal view private key.\n"
-                "\nArguments:\n"
-                "\nResult:\n"
-                "\"Private spend key\"    (string) the private spend key\n"
-                "\nExamples:\n" +
-                HelpExampleCli("revealspendprivatekey", "") + HelpExampleCli("revealspendprivatekey", "\"\"") +
-                HelpExampleCli("revealspendprivatekey", "") + HelpExampleRpc("revealspendprivatekey", ""));
+            "revealspendprivatekey \n"
+            "\nReveal view private key.\n"
+            "\nArguments:\n"
+            "\nResult:\n"
+            "\"Private spend key\"    (string) the private spend key\n"
+            "\nExamples:\n" +
+            HelpExampleCli("revealspendprivatekey", "") + HelpExampleCli("revealspendprivatekey", "\"\"") +
+            HelpExampleCli("revealspendprivatekey", "") + HelpExampleRpc("revealspendprivatekey", ""));
 
     if (!pwalletMain) {
         //privacy wallet is already created
         throw JSONRPCError(RPC_PRIVACY_WALLET_EXISTED,
-                           "Error: There is no privacy wallet, please use createprivacyaccount to create one.");
+            "Error: There is no privacy wallet, please use createprivacyaccount to create one.");
     }
 
     EnsureWalletIsUnlocked();
@@ -2907,53 +2909,56 @@ UniValue revealspendprivatekey(const UniValue& params, bool fHelp) {
     return CBitcoinSecret(spend).ToString();
 }
 
-UniValue showtxprivatekeys(const UniValue& params, bool fHelp) {
+UniValue showtxprivatekeys(const UniValue& params, bool fHelp)
+{
     if (fHelp || params.size() != 1)
         throw runtime_error(
-                "showtxprivatekeys <txhash>\n"
-                "\nShow transaction private keys for each UTXO of a transaction.\n"
-                "\nArguments:\n"
-                "\nResult:\n"
-                "\"Private spend key\"    (string) the private spend key\n"
-                "\nExamples:\n" +
-                HelpExampleCli("showtxprivatekeys", "") + HelpExampleCli("showtxprivatekeys", "\"\"") +
-                HelpExampleCli("showtxprivatekeys", "") + HelpExampleRpc("showtxprivatekeys", ""));
+            "showtxprivatekeys <txhash>\n"
+            "\nShow transaction private keys for each UTXO of a transaction.\n"
+            "\nArguments:\n"
+            "\nResult:\n"
+            "\"Private spend key\"    (string) the private spend key\n"
+            "\nExamples:\n" +
+            HelpExampleCli("showtxprivatekeys", "") + HelpExampleCli("showtxprivatekeys", "\"\"") +
+            HelpExampleCli("showtxprivatekeys", "") + HelpExampleRpc("showtxprivatekeys", ""));
 
     if (!pwalletMain) {
         //privacy wallet is already created
         throw JSONRPCError(RPC_PRIVACY_WALLET_EXISTED,
-                           "Error: There is no privacy wallet, please use createprivacyaccount to create one.");
+            "Error: There is no privacy wallet, please use createprivacyaccount to create one.");
     }
 
     EnsureWalletIsUnlocked();
     UniValue ret(UniValue::VOBJ);
     CWalletDB db(pwalletMain->strWalletFile);
-    for(int i = 0; i < 10; i++) {
+    for (int i = 0; i < 10; i++) {
         std::string key = params[0].get_str() + std::to_string(i);
         std::string secret;
         if (db.ReadTxPrivateKey(key, secret)) {
             ret.push_back(Pair(std::to_string(i), secret));
-        } else break;
+        } else
+            break;
     }
     return ret;
 }
 
-UniValue rescan(const UniValue& params, bool fHelp) {
+UniValue rescan(const UniValue& params, bool fHelp)
+{
     if (fHelp || params.size() != 0)
         throw runtime_error(
-                "rescan\n"
-                "\nRescan wallet transactions from the first block.\n"
-                "\nArguments:\n"
-                "\nResult:\n"
-                "\"scanned wallet transactions\"    \n"
-                "\nExamples:\n" +
-                HelpExampleCli("rescan", "") + HelpExampleCli("rescan", "\"\"") +
-                HelpExampleRpc("rescan", ""));
+            "rescan\n"
+            "\nRescan wallet transactions from the first block.\n"
+            "\nArguments:\n"
+            "\nResult:\n"
+            "\"scanned wallet transactions\"    \n"
+            "\nExamples:\n" +
+            HelpExampleCli("rescan", "") + HelpExampleCli("rescan", "\"\"") +
+            HelpExampleRpc("rescan", ""));
 
     if (!pwalletMain) {
         //privacy wallet is already created
         throw JSONRPCError(RPC_PRIVACY_WALLET_EXISTED,
-                           "Error: There is no privacy wallet, please use createprivacyaccount to create one.");
+            "Error: There is no privacy wallet, please use createprivacyaccount to create one.");
     }
 
     EnsureWalletIsUnlocked();
@@ -2965,23 +2970,24 @@ UniValue rescan(const UniValue& params, bool fHelp) {
     return "Done";
 }
 
-UniValue rescanwallettransactions(const UniValue& params, bool fHelp) {
+UniValue rescanwallettransactions(const UniValue& params, bool fHelp)
+{
     if (fHelp || params.size() != 1)
         throw runtime_error(
-                "rescanwallettransactions \"block height\"\n"
-                "\nRescan wallet transactions from a certain block height.\n"
-                "\nArguments:\n"
-                "\nblock height: block height from which the chain will be rescanned\n"
-                "\nResult:\n"
-                "\"scanned wallet transactions\"    \n"
-                "\nExamples:\n" +
-                HelpExampleCli("rescanwallettransactions", "") + HelpExampleCli("rescanwallettransactions", "\"\"") +
-                HelpExampleRpc("rescanwallettransactions", ""));
+            "rescanwallettransactions \"block height\"\n"
+            "\nRescan wallet transactions from a certain block height.\n"
+            "\nArguments:\n"
+            "\nblock height: block height from which the chain will be rescanned\n"
+            "\nResult:\n"
+            "\"scanned wallet transactions\"    \n"
+            "\nExamples:\n" +
+            HelpExampleCli("rescanwallettransactions", "") + HelpExampleCli("rescanwallettransactions", "\"\"") +
+            HelpExampleRpc("rescanwallettransactions", ""));
 
     if (!pwalletMain) {
         //privacy wallet is already created
         throw JSONRPCError(RPC_PRIVACY_WALLET_EXISTED,
-                           "Error: There is no privacy wallet, please use createprivacyaccount to create one.");
+            "Error: There is no privacy wallet, please use createprivacyaccount to create one.");
     }
 
     EnsureWalletIsUnlocked();
@@ -3000,27 +3006,27 @@ UniValue revealmnemonicphrase(const UniValue& params, bool fHelp)
 {
     if (fHelp || params.size() != 0)
         throw runtime_error(
-                "revealmnemonicphrase \n"
-                "\nReveal Mnemonic Phrase.\n"
-                "\nArguments:\n"
-                "\nResult:\n"
-                "\"Mnemonic Phrase\"    (string) mnemonic phrase\n"
-                "\nExamples:\n" +
-                HelpExampleCli("revealmnemonicphrase", "") + HelpExampleCli("revealmnemonicphrase", "\"\"") +
-                HelpExampleCli("revealmnemonicphrase", "") + HelpExampleRpc("revealmnemonicphrase", ""));
+            "revealmnemonicphrase \n"
+            "\nReveal Mnemonic Phrase.\n"
+            "\nArguments:\n"
+            "\nResult:\n"
+            "\"Mnemonic Phrase\"    (string) mnemonic phrase\n"
+            "\nExamples:\n" +
+            HelpExampleCli("revealmnemonicphrase", "") + HelpExampleCli("revealmnemonicphrase", "\"\"") +
+            HelpExampleCli("revealmnemonicphrase", "") + HelpExampleRpc("revealmnemonicphrase", ""));
 
     EnsureWalletIsUnlocked();
-    
+
     CHDChain hdChainCurrent;
     if (!pwalletMain->GetDecryptedHDChain(hdChainCurrent))
         throw JSONRPCError(RPC_WALLET_ERROR,
-                           "Error: There was a problem while getting mnemonic phrase.");
+            "Error: There was a problem while getting mnemonic phrase.");
 
     SecureString mnemonic;
     SecureString mnemonicPass;
     if (!hdChainCurrent.GetMnemonic(mnemonic, mnemonicPass))
         throw JSONRPCError(RPC_WALLET_ERROR,
-                           "Error: There was a problem while getting mnemonic phrase.");
+            "Error: There was a problem while getting mnemonic phrase.");
 
     string mPhrase = std::string(mnemonic.begin(), mnemonic.end()).c_str();
 

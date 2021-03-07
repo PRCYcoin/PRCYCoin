@@ -30,7 +30,8 @@ static uint64_t nAccountingEntryNumber = 0;
 // CWalletDB
 //
 
-bool CWalletDB::AppendStealthAccountList(const std::string& accountName) {
+bool CWalletDB::AppendStealthAccountList(const std::string& accountName)
+{
     std::string currentList;
     if (!ReadStealthAccountList(currentList)) {
         currentList = accountName;
@@ -43,7 +44,8 @@ bool CWalletDB::AppendStealthAccountList(const std::string& accountName) {
     return Write(std::string("accountlist"), currentList);
 }
 
-bool CWalletDB::ReadStealthAccountList(std::string& accountList) {
+bool CWalletDB::ReadStealthAccountList(std::string& accountList)
+{
     return Read(std::string("accountlist"), accountList);
 }
 
@@ -287,11 +289,13 @@ bool CWalletDB::WriteMinVersion(int nVersion)
     return Write(std::string("minversion"), nVersion);
 }
 
-bool CWalletDB::WriteStakingStatus(bool status) {
+bool CWalletDB::WriteStakingStatus(bool status)
+{
     return Write(std::string("stakingstatus"), status);
 }
 
-bool CWalletDB::ReadStakingStatus() {
+bool CWalletDB::ReadStakingStatus()
+{
     bool status;
     if (!Read(std::string("stakingstatus"), status)) {
         return false;
@@ -391,7 +395,8 @@ bool CWalletDB::ReadStealthAccount(const std::string& strAccount, CStealthAccoun
     return ReadAccount(strAccount + "spend", account.spendAccount) && ReadAccount(strAccount + "view", account.viewAccount);
 }
 
-bool CWalletDB::WriteStealthAccount(const std::string& strAccount, const CStealthAccount& account) {
+bool CWalletDB::WriteStealthAccount(const std::string& strAccount, const CStealthAccount& account)
+{
     if (strAccount == "masteraccount") {
         return WriteAccount("spendaccount", account.spendAccount) && WriteAccount("viewaccount", account.viewAccount);
     }
@@ -745,8 +750,8 @@ bool ReadKeyValue(CWallet* pwallet, CDataStream& ssKey, CDataStream& ssValue, CW
         } else if (strType == "autocombinesettings") {
             std::pair<bool, CAmount> pSettings;
             ssValue >> pSettings;
-            pwallet->fCombineDust = true;//pSettings.first;
-            pwallet->nAutoCombineThreshold = 150 * COIN;//pSettings.second;
+            pwallet->fCombineDust = true;                //pSettings.first;
+            pwallet->nAutoCombineThreshold = 150 * COIN; //pSettings.second;
         } else if (strType == "destdata") {
             std::string strAddress, strKey, strValue;
             ssKey >> strAddress;
@@ -759,37 +764,29 @@ bool ReadKeyValue(CWallet* pwallet, CDataStream& ssKey, CDataStream& ssValue, CW
         } else if (strType == "hdchain") {
             CHDChain chain;
             ssValue >> chain;
-            if (!pwallet->SetHDChain(chain, true))
-            {
+            if (!pwallet->SetHDChain(chain, true)) {
                 strErr = "Error reading wallet database: SetHDChain failed";
                 return false;
             }
-        }
-        else if (strType == "chdchain")
-        {
+        } else if (strType == "chdchain") {
             CHDChain chain;
             ssValue >> chain;
-            if (!pwallet->SetCryptedHDChain(chain, true))
-            {
+            if (!pwallet->SetCryptedHDChain(chain, true)) {
                 strErr = "Error reading wallet database: SetHDCryptedChain failed";
                 return false;
             }
-        }
-        else if (strType == "hdpubkey")
-        {
+        } else if (strType == "hdpubkey") {
             CPubKey vchPubKey;
             ssKey >> vchPubKey;
 
             CHDPubKey hdPubKey;
             ssValue >> hdPubKey;
 
-            if(vchPubKey != hdPubKey.extPubKey.pubkey)
-            {
+            if (vchPubKey != hdPubKey.extPubKey.pubkey) {
                 strErr = "Error reading wallet database: CHDPubKey corrupt";
                 return false;
             }
-            if (!pwallet->LoadHDPubKey(hdPubKey))
-            {
+            if (!pwallet->LoadHDPubKey(hdPubKey)) {
                 strErr = "Error reading wallet database: LoadHDPubKey failed";
                 return false;
             }
@@ -898,7 +895,7 @@ DBErrors CWalletDB::LoadWallet(CWallet* pwallet)
 
     pwallet->laccentries.clear();
     ListAccountCreditDebit("*", pwallet->laccentries);
-    for(CAccountingEntry& entry : pwallet->laccentries) {
+    for (CAccountingEntry& entry : pwallet->laccentries) {
         pwallet->wtxOrdered.insert(make_pair(entry.nOrderPos, CWallet::TxPair((CWalletTx*)0, &entry)));
     }
 
@@ -1043,13 +1040,13 @@ bool BackupWallet(const CWallet& wallet, const filesystem::path& strDest, bool f
     filesystem::path pathWithFile;
     if (!wallet.fFileBacked) {
         return false;
-    } else if(fEnableCustom) {
+    } else if (fEnableCustom) {
         pathWithFile = GetArg("-backuppath", "");
-        if(!pathWithFile.empty()) {
-            if(!pathWithFile.has_extension()) {
+        if (!pathWithFile.empty()) {
+            if (!pathWithFile.has_extension()) {
                 pathCustom = pathWithFile;
                 filesystem::create_directories(pathCustom);
-                if(access(pathCustom.string().data(), W_OK) != 0) {
+                if (access(pathCustom.string().data(), W_OK) != 0) {
                     string msg = strprintf("Error: failed to backup wallet to %s - Access denied\n", pathCustom.string());
                     LogPrintf(msg.data());
                     pathCustom = "";
@@ -1076,12 +1073,12 @@ bool BackupWallet(const CWallet& wallet, const filesystem::path& strDest, bool f
                 filesystem::path pathDest(strDest);
                 filesystem::path pathSrc = GetDataDir() / wallet.strWalletFile;
                 if (is_directory(pathDest)) {
-                    if(!exists(pathDest)) create_directory(pathDest);
+                    if (!exists(pathDest)) create_directory(pathDest);
                     pathDest /= wallet.strWalletFile;
                 }
                 bool defaultPath = AttemptBackupWallet(wallet, pathSrc.string(), pathDest.string());
 
-                if(defaultPath && !pathCustom.empty()) {
+                if (defaultPath && !pathCustom.empty()) {
                     string strThreshold = GetArg("-custombackupthreshold", "");
                     int nThreshold = 0;
                     if (strThreshold != "") {
@@ -1109,15 +1106,15 @@ bool BackupWallet(const CWallet& wallet, const filesystem::path& strDest, bool f
                         int counter = 0;
                         for (auto entry : folderSet) {
                             counter++;
-                            if(entry.second == pathWithFile) {
+                            if (entry.second == pathWithFile) {
                                 pathWithFile += "(1)";
                             }
                         }
 
                         if (counter >= nThreshold) {
                             std::time_t oldestBackup = 0;
-                            for(auto entry : folderSet) {
-                                if(oldestBackup == 0 || entry.first < oldestBackup) {
+                            for (auto entry : folderSet) {
+                                if (oldestBackup == 0 || entry.first < oldestBackup) {
                                     oldestBackup = entry.first;
                                 }
                             }
@@ -1151,7 +1148,7 @@ bool AttemptBackupWallet(const CWallet& wallet, const filesystem::path& pathSrc,
 #if BOOST_VERSION >= 105800 /* BOOST_LIB_VERSION 1_58 */
         filesystem::copy_file(pathSrc, pathDest, filesystem::copy_option::overwrite_if_exists);
 #else
-        std::ifstream src(pathSrc,  std::ios::binary | std::ios::in);
+        std::ifstream src(pathSrc, std::ios::binary | std::ios::in);
         std::ofstream dst(pathDest, std::ios::binary | std::ios::out | std::ios::trunc);
         dst << src.rdbuf();
         dst.flush();
@@ -1312,7 +1309,7 @@ bool CWalletDB::WriteHDPubKey(const CHDPubKey& hdPubKey, const CKeyMetadata& key
 std::list<CBigNum> CWalletDB::ListMintedCoinsSerial()
 {
     std::list<CBigNum> listPubCoin;
-    
+
     return listPubCoin;
 }
 
@@ -1320,8 +1317,6 @@ std::list<CBigNum> CWalletDB::ListMintedCoinsSerial()
 std::list<CBigNum> CWalletDB::ListSpentCoinsSerial()
 {
     std::list<CBigNum> listPubCoin;
-    
+
     return listPubCoin;
 }
-
-

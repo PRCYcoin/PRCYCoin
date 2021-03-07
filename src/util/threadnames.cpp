@@ -26,7 +26,7 @@ static void SetThreadName(const char* name)
 #if defined(PR_SET_NAME)
     // Only the first 15 characters are used (16 - NUL terminator)
     ::prctl(PR_SET_NAME, name, 0, 0, 0);
-#elif (defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__DragonFly__))
+#elif(defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__DragonFly__))
     pthread_set_name_np(pthread_self(), name);
 #elif defined(MAC_OSX)
     pthread_setname_np(name);
@@ -45,13 +45,12 @@ const std::string& util::ThreadGetInternalName() { return g_thread_name; }
 //! Set the in-memory internal name for this thread. Does not affect the process
 //! name.
 static void SetInternalName(std::string name) { g_thread_name = std::move(name); }
-
 // Without thread_local available, don't handle internal name at all.
 #else
 
 static const std::string empty_string;
 const std::string& util::ThreadGetInternalName() { return empty_string; }
-static void SetInternalName(std::string name) { }
+static void SetInternalName(std::string name) {}
 #endif
 
 void util::ThreadRename(std::string&& name)

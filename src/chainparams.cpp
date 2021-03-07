@@ -19,7 +19,8 @@
 using namespace std;
 using namespace boost::assign;
 
-std::string CDNSSeedData::getHost(uint64_t requiredServiceBits) const {
+std::string CDNSSeedData::getHost(uint64_t requiredServiceBits) const
+{
     //use default host for non-filter-capable seeds or if we use the default service bits (NODE_NETWORK)
     if (!supportsServiceBitsFiltering || requiredServiceBits == NODE_NETWORK)
         return host;
@@ -38,30 +39,15 @@ std::string CDNSSeedData::getHost(uint64_t requiredServiceBits) const {
  * + Contains no strange transactions
  */
 static Checkpoints::MapCheckpoints mapCheckpoints =
-    boost::assign::map_list_of
-    (0, uint256("000006957e238ff4e6bcf00c8a7d1b3e7249c0a2109b0391d8740821a40c1d8c"))
-    (500, uint256("00214da9b906c7c14558395b9bc88293301e6e5f87a714194079dd651293fadb")) // Final POW Block
-    (561, uint256("54872c72e81b34117bc5a6095d6f1b8d85746992d2513d7adc90a2aceed1651e")) // First PoA Block
-    (562, uint256("0f00d3a6636c8a265724764da082fdef8106fce7057dfdda94ab6537f7211b4f")) // First Block after PoA
-    (14905, uint256("6389ecdb851500d9467b41a54d02c58b1542bfc2d5c99339821c89d25135a4b0")) // Chain split
-	(17128, uint256("98d76615ef96b3ced1d9902715ba432393335b791b2256936883c323f0bb91f4"))
-	(17133, uint256("d9dcec83e8a675db0f7b6d28fde591f494a1b0766f7cb56ea8d8cb95348f835b"))
-	(17150, uint256("bad4dccf8fd86f00d6c215802d39342e4de64e21155b76b38f0182ba7d96edd2"))
-    (17153, uint256("4e63d92ac5209f0a342c2e74098778bbe36324de66734ff41132c7f3db3ad628"))
-    (18375, uint256("c291cf0a7bcd73a91c6f68d28dc6ce9e1acee973fd134f4250c1ee80bf3d0c03"))
-    (18813, uint256("ccf401e6fb24f34c105b2f693c2eb75c2ba7a2a4e3ffbbfe152e98ae9806d418"))
-    (18814, uint256("f8092b5c474cc260edb7c378c4f7e2123b007a55018d32f97b9b729f729067ae"))
-    (19317, uint256("0bd530827eff9bdc79893739c02c14c02bb35a39b943eaeeb72e04767e0597a5"))	
-    (19400, uint256("cdeebfe4fdeda461ab2025d08248e89b13a1e970c76b91ac2788837c147e6f33"))
-    (77852, uint256("e6ec3ddccfb6bd378ca3cf5cc292c011ec235536a9edbb8c3fdbe17abd921d44"))
-    (98715, uint256("04b3cfde139af89ddacf3cb790daf734e4953119c4a58da9b8f07be888271670"))
-    (98768, uint256("43f42aaba4a1e8f7a4981b7d8620e5967974b0bbdee4ae22e42f14585be3a52f"))
-    (105629, uint256("82ae47c00a0338f33a41b8505162cabaa4740f2187feb07f4ee4bc6138461acb"))
-    ;
+    boost::assign::map_list_of(0, uint256("000006957e238ff4e6bcf00c8a7d1b3e7249c0a2109b0391d8740821a40c1d8c"))(500, uint256("00214da9b906c7c14558395b9bc88293301e6e5f87a714194079dd651293fadb")) // Final POW Block
+    (561, uint256("54872c72e81b34117bc5a6095d6f1b8d85746992d2513d7adc90a2aceed1651e"))                                                                                                           // First PoA Block
+    (562, uint256("0f00d3a6636c8a265724764da082fdef8106fce7057dfdda94ab6537f7211b4f"))                                                                                                           // First Block after PoA
+    (14905, uint256("6389ecdb851500d9467b41a54d02c58b1542bfc2d5c99339821c89d25135a4b0"))                                                                                                         // Chain split
+    (17128, uint256("98d76615ef96b3ced1d9902715ba432393335b791b2256936883c323f0bb91f4"))(17133, uint256("d9dcec83e8a675db0f7b6d28fde591f494a1b0766f7cb56ea8d8cb95348f835b"))(17150, uint256("bad4dccf8fd86f00d6c215802d39342e4de64e21155b76b38f0182ba7d96edd2"))(17153, uint256("4e63d92ac5209f0a342c2e74098778bbe36324de66734ff41132c7f3db3ad628"))(18375, uint256("c291cf0a7bcd73a91c6f68d28dc6ce9e1acee973fd134f4250c1ee80bf3d0c03"))(18813, uint256("ccf401e6fb24f34c105b2f693c2eb75c2ba7a2a4e3ffbbfe152e98ae9806d418"))(18814, uint256("f8092b5c474cc260edb7c378c4f7e2123b007a55018d32f97b9b729f729067ae"))(19317, uint256("0bd530827eff9bdc79893739c02c14c02bb35a39b943eaeeb72e04767e0597a5"))(19400, uint256("cdeebfe4fdeda461ab2025d08248e89b13a1e970c76b91ac2788837c147e6f33"))(77852, uint256("e6ec3ddccfb6bd378ca3cf5cc292c011ec235536a9edbb8c3fdbe17abd921d44"))(98715, uint256("04b3cfde139af89ddacf3cb790daf734e4953119c4a58da9b8f07be888271670"))(98768, uint256("43f42aaba4a1e8f7a4981b7d8620e5967974b0bbdee4ae22e42f14585be3a52f"))(105629, uint256("82ae47c00a0338f33a41b8505162cabaa4740f2187feb07f4ee4bc6138461acb"));
 static const Checkpoints::CCheckpointData data = {
     &mapCheckpoints,
-    1614113250,          // * UNIX timestamp of last checkpoint block
-    219212,          // * total number of transactions between genesis and last checkpoint
+    1614113250, // * UNIX timestamp of last checkpoint block
+    219212,     // * total number of transactions between genesis and last checkpoint
                 //   (the tx=... number in the SetBestChain debug.log lines)
     1440        // * estimated number of transactions per day after checkpoint
 };
@@ -102,7 +88,7 @@ public:
         bnProofOfWorkLimit = ~uint256(0) >> 1; // PRCYcoin starting difficulty is 1 / 2^12
         nSubsidyHalvingInterval = 210000;
         nMaxReorganizationDepth = 100;
-        nEnforceBlockUpgradeMajority = 8100; // 75%
+        nEnforceBlockUpgradeMajority = 8100;  // 75%
         nRejectBlockOutdatedMajority = 10260; // 95%
         nToCheckBlockUpgradeMajority = 10800; // Approximate expected amount of blocks in 7 days (1440*7.5)
         nMinerThreads = 0;
@@ -148,35 +134,29 @@ public:
         genesis.nNonce = 28141687;
 
         //change blockhash from 0x00000e9468bba3df97334bfb5015543488a0fb38193c82b101472937590e3037 because of transaction structure change
-        if(genesis.GetHash()!=uint256("000006957e238ff4e6bcf00c8a7d1b3e7249c0a2109b0391d8740821a40c1d8c"))
-        {
+        if (genesis.GetHash() != uint256("000006957e238ff4e6bcf00c8a7d1b3e7249c0a2109b0391d8740821a40c1d8c")) {
             printf("Searchingforgenesisblock...\n");
-            uint256 hashTarget=uint256().SetCompact(genesis.nBits);
+            uint256 hashTarget = uint256().SetCompact(genesis.nBits);
 
-            printf("hashTarget:%s\n",hashTarget.ToString().c_str());
+            printf("hashTarget:%s\n", hashTarget.ToString().c_str());
 
-            while(uint256(genesis.GetHash())>hashTarget)
-            {
-                printf("loop:%s\n",genesis.GetHash().ToString().c_str());
+            while (uint256(genesis.GetHash()) > hashTarget) {
+                printf("loop:%s\n", genesis.GetHash().ToString().c_str());
                 ++genesis.nNonce;
-                if(genesis.nNonce==0)
-                {
+                if (genesis.nNonce == 0) {
                     printf("NONCEWRAPPED,incrementingtime");
-                    std::cout<<std::string("NONCEWRAPPED,incrementingtime:\n");
+                    std::cout << std::string("NONCEWRAPPED,incrementingtime:\n");
                     ++genesis.nTime;
                 }
-                if(genesis.nNonce%10000==0)
-                {
-                    printf("Mainnet:nonce%08u:hash=%s\n",genesis.nNonce,genesis.GetHash().ToString().c_str());
+                if (genesis.nNonce % 10000 == 0) {
+                    printf("Mainnet:nonce%08u:hash=%s\n", genesis.nNonce, genesis.GetHash().ToString().c_str());
                 }
             }
-            printf("block.nTime=%u\n",genesis.nTime);
-            printf("block.nNonce=%u\n",genesis.nNonce);
-            printf("block.GetHash=%s\n",genesis.GetHash().ToString().c_str());
-            printf("hashMerkleRoot=%s\n",genesis.hashMerkleRoot.ToString().c_str());
-
+            printf("block.nTime=%u\n", genesis.nTime);
+            printf("block.nNonce=%u\n", genesis.nNonce);
+            printf("block.GetHash=%s\n", genesis.GetHash().ToString().c_str());
+            printf("hashMerkleRoot=%s\n", genesis.hashMerkleRoot.ToString().c_str());
         }
-
 
 
         hashGenesisBlock = genesis.GetHash();
@@ -184,18 +164,18 @@ public:
         assert(genesis.hashMerkleRoot == uint256("cd01f1ca20c22b336f1ee83af9fd8b7facbf42083bf3bed49af045f5cadc9cd4"));
 
         // nodes with support for servicebits filtering should be at the top
-        vSeeds.push_back(CDNSSeedData("seed.prcycoin.com", "seed.prcycoin.com"));        // Single node address
-        vSeeds.push_back(CDNSSeedData("seed1.prcycoin.com", "seed1.prcycoin.com"));        // Single node address
-        vSeeds.push_back(CDNSSeedData("seed2.prcycoin.com", "seed2.prcycoin.com"));        // Single node address
-        vSeeds.push_back(CDNSSeedData("seed3.prcycoin.com", "seed3.prcycoin.com"));        // Single node address
-        vSeeds.push_back(CDNSSeedData("seed4.prcycoin.com", "seed4.prcycoin.com"));        // Single node address
-        vSeeds.push_back(CDNSSeedData("seed5.prcycoin.com", "seed5.prcycoin.com"));        // Single node address
-        vSeeds.push_back(CDNSSeedData("vps.prcycoin.com", "vps.prcycoin.com"));        // Single node address
-        vSeeds.push_back(CDNSSeedData("vps1.prcycoin.com", "vps1.prcycoin.com"));        // Single node address
-        vSeeds.push_back(CDNSSeedData("vps2.prcycoin.com", "vps2.prcycoin.com"));        // Single node address
-        vSeeds.push_back(CDNSSeedData("vps3.prcycoin.com", "vps3.prcycoin.com"));        // Single node address
-        vSeeds.push_back(CDNSSeedData("vps4.prcycoin.com", "vps4.prcycoin.com"));        // Single node address
-        vSeeds.push_back(CDNSSeedData("vps5.prcycoin.com", "vps5.prcycoin.com"));        // Single node address
+        vSeeds.push_back(CDNSSeedData("seed.prcycoin.com", "seed.prcycoin.com"));   // Single node address
+        vSeeds.push_back(CDNSSeedData("seed1.prcycoin.com", "seed1.prcycoin.com")); // Single node address
+        vSeeds.push_back(CDNSSeedData("seed2.prcycoin.com", "seed2.prcycoin.com")); // Single node address
+        vSeeds.push_back(CDNSSeedData("seed3.prcycoin.com", "seed3.prcycoin.com")); // Single node address
+        vSeeds.push_back(CDNSSeedData("seed4.prcycoin.com", "seed4.prcycoin.com")); // Single node address
+        vSeeds.push_back(CDNSSeedData("seed5.prcycoin.com", "seed5.prcycoin.com")); // Single node address
+        vSeeds.push_back(CDNSSeedData("vps.prcycoin.com", "vps.prcycoin.com"));     // Single node address
+        vSeeds.push_back(CDNSSeedData("vps1.prcycoin.com", "vps1.prcycoin.com"));   // Single node address
+        vSeeds.push_back(CDNSSeedData("vps2.prcycoin.com", "vps2.prcycoin.com"));   // Single node address
+        vSeeds.push_back(CDNSSeedData("vps3.prcycoin.com", "vps3.prcycoin.com"));   // Single node address
+        vSeeds.push_back(CDNSSeedData("vps4.prcycoin.com", "vps4.prcycoin.com"));   // Single node address
+        vSeeds.push_back(CDNSSeedData("vps5.prcycoin.com", "vps5.prcycoin.com"));   // Single node address
 
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1, 55);
         base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1, 61);
@@ -252,7 +232,7 @@ public:
         nTargetSpacing = 1 * 60;  // PRCYcoin: 1 minute
         nLastPOWBlock = 500;
         nStartPOABlock = 560;
-        nPoABlockTime = 30 * 60;  //1 PoA block every 30 minutes
+        nPoABlockTime = 30 * 60; //1 PoA block every 30 minutes
         nMinNumPoSBlocks = 20;
         nMaturity = 15;
         nMasternodeCountDrift = 4;
@@ -265,33 +245,28 @@ public:
         genesis.nTime = 1608422400;
         genesis.nNonce = 23323155;
 
-        if(genesis.GetHash()!=uint256("000001488be8bb442cd72cb737ade49a31de90dbbe5dce36f7d7e07f5dde2b77"))
-        {
+        if (genesis.GetHash() != uint256("000001488be8bb442cd72cb737ade49a31de90dbbe5dce36f7d7e07f5dde2b77")) {
             printf("Searchingforgenesisblock...\n");
-            uint256 hashTarget=uint256().SetCompact(genesis.nBits);
+            uint256 hashTarget = uint256().SetCompact(genesis.nBits);
 
-            printf("hashTarget:%s\n",hashTarget.ToString().c_str());
+            printf("hashTarget:%s\n", hashTarget.ToString().c_str());
 
-            while(uint256(genesis.GetHash())>hashTarget)
-            {
-                printf("loop:%s\n",genesis.GetHash().ToString().c_str());
+            while (uint256(genesis.GetHash()) > hashTarget) {
+                printf("loop:%s\n", genesis.GetHash().ToString().c_str());
                 ++genesis.nNonce;
-                if(genesis.nNonce==0)
-                {
+                if (genesis.nNonce == 0) {
                     printf("NONCEWRAPPED,incrementingtime");
-                    std::cout<<std::string("NONCEWRAPPED,incrementingtime:\n");
+                    std::cout << std::string("NONCEWRAPPED,incrementingtime:\n");
                     ++genesis.nTime;
                 }
-                if(genesis.nNonce%10000==0)
-                {
-                    printf("Mainnet:nonce%08u:hash=%s\n",genesis.nNonce,genesis.GetHash().ToString().c_str());
+                if (genesis.nNonce % 10000 == 0) {
+                    printf("Mainnet:nonce%08u:hash=%s\n", genesis.nNonce, genesis.GetHash().ToString().c_str());
                 }
             }
-            printf("block.nTime=%u\n",genesis.nTime);
-            printf("block.nNonce=%u\n",genesis.nNonce);
-            printf("block.GetHash=%s\n",genesis.GetHash().ToString().c_str());
-            printf("hashMerkleRoot=%s\n",genesis.hashMerkleRoot.ToString().c_str());
-
+            printf("block.nTime=%u\n", genesis.nTime);
+            printf("block.nNonce=%u\n", genesis.nNonce);
+            printf("block.GetHash=%s\n", genesis.GetHash().ToString().c_str());
+            printf("hashMerkleRoot=%s\n", genesis.hashMerkleRoot.ToString().c_str());
         }
 
         hashGenesisBlock = genesis.GetHash();
@@ -325,8 +300,8 @@ public:
         nPoolMaxTransactions = 2;
         strObfuscationPoolDummyAddress = "y57cqfGRkekRyDRNeJiLtYVEbvhXrNbmox";
         nStartMasternodePayments = 1420837558; //Fri, 09 Jan 2015 21:05:58 GMT
-        nBudget_Fee_Confirmations = 3; // Number of confirmations for the finalization fee. We have to make this very short
-                                       // here because we only have a 8 block finalization window on testnet
+        nBudget_Fee_Confirmations = 3;         // Number of confirmations for the finalization fee. We have to make this very short
+                                               // here because we only have a 8 block finalization window on testnet
     }
     const Checkpoints::CCheckpointData& Checkpoints() const
     {
@@ -362,33 +337,28 @@ public:
         genesis.nBits = 0x207fffff;
         genesis.nNonce = 12361;
 
-        if(genesis.GetHash()!=uint256("690cbb5c7ae999de1de49948a3c109d3b15fe4de4297980de8ff0cbfe3c7823a"))
-        {
+        if (genesis.GetHash() != uint256("690cbb5c7ae999de1de49948a3c109d3b15fe4de4297980de8ff0cbfe3c7823a")) {
             printf("Searchingforgenesisblock...\n");
-            uint256 hashTarget=uint256().SetCompact(genesis.nBits);
+            uint256 hashTarget = uint256().SetCompact(genesis.nBits);
 
-            printf("hashTarget:%s\n",hashTarget.ToString().c_str());
+            printf("hashTarget:%s\n", hashTarget.ToString().c_str());
 
-            while(uint256(genesis.GetHash())>hashTarget)
-            {
-                printf("loop:%s\n",genesis.GetHash().ToString().c_str());
+            while (uint256(genesis.GetHash()) > hashTarget) {
+                printf("loop:%s\n", genesis.GetHash().ToString().c_str());
                 ++genesis.nNonce;
-                if(genesis.nNonce==0)
-                {
+                if (genesis.nNonce == 0) {
                     printf("NONCEWRAPPED,incrementingtime");
-                    std::cout<<std::string("NONCEWRAPPED,incrementingtime:\n");
+                    std::cout << std::string("NONCEWRAPPED,incrementingtime:\n");
                     ++genesis.nTime;
                 }
-                if(genesis.nNonce%10000==0)
-                {
-                    printf("Mainnet:nonce%08u:hash=%s\n",genesis.nNonce,genesis.GetHash().ToString().c_str());
+                if (genesis.nNonce % 10000 == 0) {
+                    printf("Mainnet:nonce%08u:hash=%s\n", genesis.nNonce, genesis.GetHash().ToString().c_str());
                 }
             }
-            printf("block.nTime=%u\n",genesis.nTime);
-            printf("block.nNonce=%u\n",genesis.nNonce);
-            printf("block.GetHash=%s\n",genesis.GetHash().ToString().c_str());
-            printf("hashMerkleRoot=%s\n",genesis.hashMerkleRoot.ToString().c_str());
-
+            printf("block.nTime=%u\n", genesis.nTime);
+            printf("block.nNonce=%u\n", genesis.nNonce);
+            printf("block.GetHash=%s\n", genesis.GetHash().ToString().c_str());
+            printf("hashMerkleRoot=%s\n", genesis.hashMerkleRoot.ToString().c_str());
         }
 
         hashGenesisBlock = genesis.GetHash();

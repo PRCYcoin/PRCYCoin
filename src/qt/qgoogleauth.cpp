@@ -10,7 +10,7 @@ QGoogleAuth::QGoogleAuth()
 
 QByteArray QGoogleAuth::hmacSha1(QByteArray key, QByteArray baseString)
 {
-    int blockSize = 64; // HMAC-SHA-1 block size, defined in SHA-1 standard
+    int blockSize = 64;             // HMAC-SHA-1 block size, defined in SHA-1 standard
     if (key.length() > blockSize) { // if key is longer than block size (64), reduce key length with SHA-1 compression
         key = QCryptographicHash::hash(key, QCryptographicHash::Sha1);
     }
@@ -34,13 +34,13 @@ QByteArray QGoogleAuth::hmacSha1(QByteArray key, QByteArray baseString)
     return hashed;
 }
 
-int QGoogleAuth::base32_decode(const quint8 *encoded, quint8 *result, int bufSize)
+int QGoogleAuth::base32_decode(const quint8* encoded, quint8* result, int bufSize)
 {
     int buffer = 0;
     int bitsLeft = 0;
     int count = 0;
 
-    for (const quint8 *ptr = encoded; count < bufSize && *ptr; ++ptr) {
+    for (const quint8* ptr = encoded; count < bufSize && *ptr; ++ptr) {
         quint8 ch = *ptr;
 
         if (ch == ' ' || ch == '\t' || ch == '\r' || ch == '\n' || ch == '-') {
@@ -90,15 +90,12 @@ QString QGoogleAuth::generatePin(const QByteArray key)
 
     int secretLen = (key.length() + 7) / 8 * 5;
     quint8 secret[100];
-    int res = base32_decode(reinterpret_cast<const quint8 *>(key.constData()), secret, secretLen);
-    QByteArray hmac = hmacSha1(QByteArray(reinterpret_cast<const char *>(secret), res), QByteArray((char*)&current, sizeof(current)));
+    int res = base32_decode(reinterpret_cast<const quint8*>(key.constData()), secret, secretLen);
+    QByteArray hmac = hmacSha1(QByteArray(reinterpret_cast<const char*>(secret), res), QByteArray((char*)&current, sizeof(current)));
 
     int offset = (hmac[hmac.length() - 1] & 0xf);
     int binary =
-            ((hmac[offset] & 0x7f) << 24)
-            | ((hmac[offset + 1] & 0xff) << 16)
-            | ((hmac[offset + 2] & 0xff) << 8)
-            | (hmac[offset + 3] & 0xff);
+        ((hmac[offset] & 0x7f) << 24) | ((hmac[offset + 1] & 0xff) << 16) | ((hmac[offset + 2] & 0xff) << 8) | (hmac[offset + 3] & 0xff);
     QSettings settings;
     int digits = settings.value("2fadigits").toInt();
     int password;

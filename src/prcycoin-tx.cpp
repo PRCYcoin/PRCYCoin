@@ -24,7 +24,7 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/assign/list_of.hpp>
 
-#define MAX_FILE_LENGTH (1024 * 1024)       // 1MB
+#define MAX_FILE_LENGTH (1024 * 1024) // 1MB
 
 using namespace boost::assign;
 using namespace std;
@@ -78,10 +78,10 @@ static bool AppInitRawTx(int argc, char* argv[])
         strUsage += HelpMessageOpt("outaddr=VALUE:ADDRESS", _("Add address-based output to TX"));
         strUsage += HelpMessageOpt("outscript=VALUE:SCRIPT", _("Add raw script output to TX"));
         strUsage += HelpMessageOpt("sign=SIGHASH-FLAGS", _("Add zero or more signatures to transaction") + ". " +
-            _("This command requires JSON registers:") +
-            _("prevtxs=JSON object") + ", " +
-            _("privatekeys=JSON object") + ". " +
-            _("See signrawtransaction docs for format of sighash flags, JSON objects."));
+                                                             _("This command requires JSON registers:") +
+                                                             _("prevtxs=JSON object") + ", " +
+                                                             _("privatekeys=JSON object") + ". " +
+                                                             _("See signrawtransaction docs for format of sighash flags, JSON objects."));
         fprintf(stdout, "%s", strUsage.c_str());
 
         strUsage = HelpMessageGroup(_("Register Commands:"));

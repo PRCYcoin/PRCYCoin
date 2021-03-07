@@ -7,7 +7,6 @@
 //
 
 
-
 #include "clientversion.h"
 #include "main.h"
 #include "utiltime.h"
@@ -26,8 +25,7 @@ bool read_block(const std::string& filename, CBlock& block)
     namespace fs = boost::filesystem;
     fs::path testFile = fs::current_path() / "data" / filename;
 #ifdef TEST_DATA_DIR
-    if (!fs::exists(testFile))
-    {
+    if (!fs::exists(testFile)) {
         testFile = fs::path(BOOST_PP_STRINGIZE(TEST_DATA_DIR)) / filename;
     }
 #endif
@@ -54,8 +52,7 @@ BOOST_AUTO_TEST_CASE(May15)
     SetMockTime(tMay15); // Test as if it was right at May 15
 
     CBlock forkingBlock;
-    if (read_block("Mar12Fork.dat", forkingBlock))
-    {
+    if (read_block("Mar12Fork.dat", forkingBlock)) {
         CValidationState state;
 
         // After May 15'th, big blocks are OK:

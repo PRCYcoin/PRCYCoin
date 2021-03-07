@@ -11,19 +11,22 @@
 #include <string.h>
 
 constexpr static inline uint32_t rotl32(uint32_t v, int c) { return (v << c) | (v >> (32 - c)); }
-
-#define QUARTERROUND(a,b,c,d) \
-  a += b; d = rotl32(d ^ a, 16); \
-  c += d; b = rotl32(b ^ c, 12); \
-  a += b; d = rotl32(d ^ a, 8); \
-  c += d; b = rotl32(b ^ c, 7);
+#define QUARTERROUND(a, b, c, d) \
+    a += b;                      \
+    d = rotl32(d ^ a, 16);       \
+    c += d;                      \
+    b = rotl32(b ^ c, 12);       \
+    a += b;                      \
+    d = rotl32(d ^ a, 8);        \
+    c += d;                      \
+    b = rotl32(b ^ c, 7);
 
 static const unsigned char sigma[] = "expand 32-byte k";
 static const unsigned char tau[] = "expand 16-byte k";
 
 void ChaCha20::SetKey(const unsigned char* k, size_t keylen)
 {
-    const unsigned char *constants;
+    const unsigned char* constants;
 
     input[4] = ReadLE32(k + 0);
     input[5] = ReadLE32(k + 4);
@@ -75,13 +78,13 @@ void ChaCha20::Output(unsigned char* c, size_t bytes)
 {
     uint32_t x[16];
     uint32_t j[16];
-    unsigned char *ctarget = nullptr;
+    unsigned char* ctarget = nullptr;
     unsigned char tmp[64];
     unsigned int i;
 
     if (!bytes) return;
 
-    for (uint32_t i=0; i<16; i++) {
+    for (uint32_t i = 0; i < 16; i++) {
         j[i] = input[i];
     }
 
@@ -90,33 +93,34 @@ void ChaCha20::Output(unsigned char* c, size_t bytes)
             ctarget = c;
             c = tmp;
         }
-        for (uint32_t i=0; i<16; i++) {
+        for (uint32_t i = 0; i < 16; i++) {
             x[i] = j[i];
         }
-        for (i = 20;i > 0;i -= 2) {
-            QUARTERROUND( x[0], x[4], x[8],x[12])
-            QUARTERROUND( x[1], x[5], x[9],x[13])
-            QUARTERROUND( x[2], x[6],x[10],x[14])
-            QUARTERROUND( x[3], x[7],x[11],x[15])
-            QUARTERROUND( x[0], x[5],x[10],x[15])
-            QUARTERROUND( x[1], x[6],x[11],x[12])
-            QUARTERROUND( x[2], x[7], x[8],x[13])
-            QUARTERROUND( x[3], x[4], x[9],x[14])
+        for (i = 20; i > 0; i -= 2) {
+            QUARTERROUND(x[0], x[4], x[8], x[12])
+            QUARTERROUND(x[1], x[5], x[9], x[13])
+            QUARTERROUND(x[2], x[6], x[10], x[14])
+            QUARTERROUND(x[3], x[7], x[11], x[15])
+            QUARTERROUND(x[0], x[5], x[10], x[15])
+            QUARTERROUND(x[1], x[6], x[11], x[12])
+            QUARTERROUND(x[2], x[7], x[8], x[13])
+            QUARTERROUND(x[3], x[4], x[9], x[14])
         }
-        for (uint32_t i=0; i<16; i++) {
+        for (uint32_t i = 0; i < 16; i++) {
             x[i] += j[i];
         }
 
         ++j[12];
         if (!j[12]) ++j[13];
 
-        for (uint32_t i=0; i<16; i++) {
-            WriteLE32(c + 4*i, x[i]);
+        for (uint32_t i = 0; i < 16; i++) {
+            WriteLE32(c + 4 * i, x[i]);
         }
 
         if (bytes <= 64) {
             if (bytes < 64) {
-                for (i = 0;i < bytes;++i) ctarget[i] = c[i];
+                for (i = 0; i < bytes; ++i)
+                    ctarget[i] = c[i];
             }
             input[12] = j[12];
             input[13] = j[13];

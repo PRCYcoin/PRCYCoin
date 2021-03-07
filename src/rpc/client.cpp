@@ -55,12 +55,12 @@ static const CRPCConvertParam vRPCConvertParams[] =
         {"getbalances", 0},
         {"getbalance", 2},
         {"getblockhash", 0},
-        { "waitforblockheight", 0 },
-        { "waitforblockheight", 1 },
-        { "waitforblock", 1 },
-        { "waitforblock", 2 },
-        { "waitfornewblock", 0 },
-        { "waitfornewblock", 1 },
+        {"waitforblockheight", 0},
+        {"waitforblockheight", 1},
+        {"waitforblock", 1},
+        {"waitforblock", 2},
+        {"waitfornewblock", 0},
+        {"waitfornewblock", 1},
         {"setmaxreorgdepth", 0},
         {"resyncfrom", 0},
         {"setdecoyconfirmation", 0},
@@ -134,8 +134,7 @@ static const CRPCConvertParam vRPCConvertParams[] =
         {"reservebalance", 1},
         {"setstakesplitthreshold", 0},
         {"autocombinedust", 0},
-        {"autocombinedust", 1}
-    };
+        {"autocombinedust", 1}};
 
 class CRPCConvertTable
 {
@@ -170,14 +169,14 @@ static CRPCConvertTable rpcCvtTable;
 UniValue ParseNonRFCJSONValue(const std::string& strVal)
 {
     UniValue jVal;
-    if (!jVal.read(std::string("[")+strVal+std::string("]")) ||
-        !jVal.isArray() || jVal.size()!=1)
-        throw runtime_error(string("Error parsing JSON:")+strVal);
+    if (!jVal.read(std::string("[") + strVal + std::string("]")) ||
+        !jVal.isArray() || jVal.size() != 1)
+        throw runtime_error(string("Error parsing JSON:") + strVal);
     return jVal[0];
 }
 
 /** Convert strings to command-specific RPC representation */
-UniValue RPCConvertValues(const std::string &strMethod, const std::vector<std::string> &strParams)
+UniValue RPCConvertValues(const std::string& strMethod, const std::vector<std::string>& strParams)
 {
     UniValue params(UniValue::VARR);
 

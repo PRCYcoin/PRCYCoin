@@ -179,8 +179,7 @@ void WalletFrame::unlockWallet(bool setContext)
 {
     if (setContext) {
         unlockWallet(AskPassphraseDialog::Context::Unlock_Full);
-    }
-    else {
+    } else {
         unlockWallet(AskPassphraseDialog::Context::Unlock_Menu);
     }
 }

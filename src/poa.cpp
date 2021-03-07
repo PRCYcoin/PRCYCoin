@@ -168,9 +168,10 @@ uint256 GetBlockProof(const CBlockIndex& block)
     return (~bnTarget / (bnTarget + 1)) + 1;
 }
 
-CBlockIndex* FindPrevPoSBlock(CBlockIndex* p) {
+CBlockIndex* FindPrevPoSBlock(CBlockIndex* p)
+{
     if (!p || !p->pprev) return NULL;
-    return p->pprev->IsProofOfStake()?p->pprev:FindPrevPoSBlock(p->pprev);
+    return p->pprev->IsProofOfStake() ? p->pprev : FindPrevPoSBlock(p->pprev);
 }
 
 //If blockheight = -1, the to-be-checked block is not included yet in the chain, otherwise, that is the height of the poa block
@@ -215,7 +216,7 @@ bool CheckPoAContainRecentHash(const CBlock& block)
         }
     } else {
         if (pindex->nHeight >= Params().START_POA_BLOCK()) {
-            // Bypass bad block			
+            // Bypass bad block
             if (pindex->nHeight == 17077 || pindex->nHeight == 17154) {
                 return true;
             }
@@ -245,7 +246,7 @@ bool CheckPoAContainRecentHash(const CBlock& block)
 
             //check there is no pos block between lastAuditedPoSHash and currentFirstPoSAuditedHash
             CBlockIndex* pIndexLoop = pCurrentFirstPoSAuditedIndex->pprev;
-            while(pIndexLoop && !pIndexLoop->IsProofOfStake()) {
+            while (pIndexLoop && !pIndexLoop->IsProofOfStake()) {
                 pIndexLoop = pIndexLoop->pprev;
             }
             if (!pIndexLoop || (pIndexLoop->GetBlockHash() != lastAuditedPoSHash && !IsFixedAudit(fixedPoSAuditedHash.GetHex()))) {
@@ -253,7 +254,7 @@ bool CheckPoAContainRecentHash(const CBlock& block)
             }
 
             //alright, check all pos blocks audited in the block is conseutive in the chain
-            for(size_t i = block.posBlocksAudited.size() - 1; i > 0; i--) {
+            for (size_t i = block.posBlocksAudited.size() - 1; i > 0; i--) {
                 uint256 thisPoSAduditedHash = block.posBlocksAudited[i].hash;
                 if (mapBlockIndex.count(thisPoSAduditedHash) < 1) {
                     return error("CheckPoAContainRecentHash(): PoS block %s not found\n", thisPoSAduditedHash.GetHex());
@@ -297,7 +298,7 @@ bool CheckPoAContainRecentHash(const CBlock& block)
 bool CheckNumberOfAuditedPoSBlocks(const CBlock& block, const CBlockIndex* pindex)
 {
     bool ret = true;
-    if (block.posBlocksAudited.size() < (size_t)Params().MIN_NUM_POS_BLOCKS_AUDITED() || block.posBlocksAudited.size() > (size_t)Params().MAX_NUM_POS_BLOCKS_AUDITED() ) {
+    if (block.posBlocksAudited.size() < (size_t)Params().MIN_NUM_POS_BLOCKS_AUDITED() || block.posBlocksAudited.size() > (size_t)Params().MAX_NUM_POS_BLOCKS_AUDITED()) {
         ret = false;
     }
     return ret;
@@ -378,7 +379,7 @@ bool CheckPoABlockNotContainingPoABlockInfo(const CBlock& block, const CBlockInd
     // Bypass bad block
     if (pindex->nHeight == 17154) {
         return true;
-    } 
+    }
     uint32_t numOfPoSBlocks = block.posBlocksAudited.size();
     for (uint32_t i = 0; i < numOfPoSBlocks; i++) {
         PoSBlockSummary pos = block.posBlocksAudited.at(i);
@@ -467,6 +468,7 @@ bool CheckPoABlockRewardAmount(const CBlock& block, const CBlockIndex* pindex)
     return ret;
 }
 
-bool IsFixedAudit(std::string txid) {
+bool IsFixedAudit(std::string txid)
+{
     return (txid == "9965850037f14dcb4abf1168016e9f96f53692322714e7fac92a2b8838544135");
 }

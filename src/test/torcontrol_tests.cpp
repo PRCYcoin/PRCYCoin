@@ -50,7 +50,7 @@ BOOST_AUTO_TEST_CASE(util_SplitTorReplyLine)
     CheckSplitTorReplyLine("COMMAND   EVEN+more  ARGS", "COMMAND", "  EVEN+more  ARGS");
 }
 
-void CheckParseTorReplyMapping(std::string input, std::map<std::string,std::string> expected)
+void CheckParseTorReplyMapping(std::string input, std::map<std::string, std::string> expected)
 {
     BOOST_TEST_MESSAGE(std::string("CheckParseTorReplyMapping(") + input + ")");
     auto ret = ParseTorReplyMapping(input);
@@ -70,97 +70,101 @@ BOOST_AUTO_TEST_CASE(util_ParseTorReplyMapping)
     // Data we should receive during normal usage
     CheckParseTorReplyMapping(
         "METHODS=COOKIE,SAFECOOKIE COOKIEFILE=\"/home/x/.tor/control_auth_cookie\"", {
-            {"METHODS", "COOKIE,SAFECOOKIE"},
-            {"COOKIEFILE", "/home/x/.tor/control_auth_cookie"},
-        });
+                                                                                         {"METHODS", "COOKIE,SAFECOOKIE"},
+                                                                                         {"COOKIEFILE", "/home/x/.tor/control_auth_cookie"},
+                                                                                     });
     CheckParseTorReplyMapping(
         "METHODS=NULL", {
-            {"METHODS", "NULL"},
-        });
+                            {"METHODS", "NULL"},
+                        });
     CheckParseTorReplyMapping(
         "METHODS=HASHEDPASSWORD", {
-            {"METHODS", "HASHEDPASSWORD"},
-        });
+                                      {"METHODS", "HASHEDPASSWORD"},
+                                  });
     CheckParseTorReplyMapping(
         "Tor=\"0.2.9.8 (git-a0df013ea241b026)\"", {
-            {"Tor", "0.2.9.8 (git-a0df013ea241b026)"},
-        });
+                                                      {"Tor", "0.2.9.8 (git-a0df013ea241b026)"},
+                                                  });
     CheckParseTorReplyMapping(
         "SERVERHASH=aaaa SERVERNONCE=bbbb", {
-            {"SERVERHASH", "aaaa"},
-            {"SERVERNONCE", "bbbb"},
-        });
+                                                {"SERVERHASH", "aaaa"},
+                                                {"SERVERNONCE", "bbbb"},
+                                            });
     CheckParseTorReplyMapping(
         "ServiceID=exampleonion1234", {
-            {"ServiceID", "exampleonion1234"},
-        });
+                                          {"ServiceID", "exampleonion1234"},
+                                      });
     CheckParseTorReplyMapping(
         "PrivateKey=RSA1024:BLOB", {
-            {"PrivateKey", "RSA1024:BLOB"},
-        });
+                                       {"PrivateKey", "RSA1024:BLOB"},
+                                   });
     CheckParseTorReplyMapping(
         "ClientAuth=bob:BLOB", {
-            {"ClientAuth", "bob:BLOB"},
-        });
+                                   {"ClientAuth", "bob:BLOB"},
+                               });
 
     // Other valid inputs
     CheckParseTorReplyMapping(
         "Foo=Bar=Baz Spam=Eggs", {
-            {"Foo", "Bar=Baz"},
-            {"Spam", "Eggs"},
-        });
+                                     {"Foo", "Bar=Baz"},
+                                     {"Spam", "Eggs"},
+                                 });
     CheckParseTorReplyMapping(
         "Foo=\"Bar=Baz\"", {
-            {"Foo", "Bar=Baz"},
-        });
+                               {"Foo", "Bar=Baz"},
+                           });
     CheckParseTorReplyMapping(
         "Foo=\"Bar Baz\"", {
-            {"Foo", "Bar Baz"},
-        });
+                               {"Foo", "Bar Baz"},
+                           });
 
     // Escapes
     CheckParseTorReplyMapping(
         "Foo=\"Bar\\ Baz\"", {
-            {"Foo", "Bar Baz"},
-        });
+                                 {"Foo", "Bar Baz"},
+                             });
     CheckParseTorReplyMapping(
         "Foo=\"Bar\\Baz\"", {
-            {"Foo", "BarBaz"},
-        });
+                                {"Foo", "BarBaz"},
+                            });
     CheckParseTorReplyMapping(
         "Foo=\"Bar\\@Baz\"", {
-            {"Foo", "Bar@Baz"},
-        });
+                                 {"Foo", "Bar@Baz"},
+                             });
     CheckParseTorReplyMapping(
         "Foo=\"Bar\\\"Baz\" Spam=\"\\\"Eggs\\\"\"", {
-            {"Foo", "Bar\"Baz"},
-            {"Spam", "\"Eggs\""},
-        });
+                                                        {"Foo", "Bar\"Baz"},
+                                                        {"Spam", "\"Eggs\""},
+                                                    });
     CheckParseTorReplyMapping(
         "Foo=\"Bar\\\\Baz\"", {
-            {"Foo", "Bar\\Baz"},
-        });
+                                  {"Foo", "Bar\\Baz"},
+                              });
 
     // C escapes
     CheckParseTorReplyMapping(
         "Foo=\"Bar\\nBaz\\t\" Spam=\"\\rEggs\" Octals=\"\\1a\\11\\17\\18\\81\\377\\378\\400\\2222\" Final=Check", {
-            {"Foo", "Bar\nBaz\t"},
-            {"Spam", "\rEggs"},
-            {"Octals", "\1a\11\17\1" "881\377\37" "8\40" "0\222" "2"},
-            {"Final", "Check"},
-        });
+                                                                                                                      {"Foo", "Bar\nBaz\t"},
+                                                                                                                      {"Spam", "\rEggs"},
+                                                                                                                      {"Octals", "\1a\11\17\1"
+                                                                                                                                 "881\377\37"
+                                                                                                                                 "8\40"
+                                                                                                                                 "0\222"
+                                                                                                                                 "2"},
+                                                                                                                      {"Final", "Check"},
+                                                                                                                  });
     CheckParseTorReplyMapping(
         "Valid=Mapping Escaped=\"Escape\\\\\"", {
-            {"Valid", "Mapping"},
-            {"Escaped", "Escape\\"},
-        });
+                                                    {"Valid", "Mapping"},
+                                                    {"Escaped", "Escape\\"},
+                                                });
     CheckParseTorReplyMapping(
         "Valid=Mapping Bare=\"Escape\\\"", {});
     CheckParseTorReplyMapping(
         "OneOctal=\"OneEnd\\1\" TwoOctal=\"TwoEnd\\11\"", {
-            {"OneOctal", "OneEnd\1"},
-            {"TwoOctal", "TwoEnd\11"},
-        });
+                                                              {"OneOctal", "OneEnd\1"},
+                                                              {"TwoOctal", "TwoEnd\11"},
+                                                          });
 
     // Special handling for null case
     // (needed because string comparison reads the null as end-of-string)
@@ -178,8 +182,8 @@ BOOST_AUTO_TEST_CASE(util_ParseTorReplyMapping)
     // parsing it.
     CheckParseTorReplyMapping(
         "SOME=args,here MORE optional=arguments  here", {
-            {"SOME", "args,here"},
-        });
+                                                            {"SOME", "args,here"},
+                                                        });
 
     // Inputs that are effectively invalid under the target grammar.
     // PROTOCOLINFO accepts an OtherLine that is just an OptArguments, which

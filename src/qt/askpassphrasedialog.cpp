@@ -18,11 +18,11 @@
 #include <QPushButton>
 
 AskPassphraseDialog::AskPassphraseDialog(Mode mode, QWidget* parent, WalletModel* model, Context context) : QDialog(parent, Qt::WindowSystemMenuHint | Qt::WindowTitleHint | Qt::WindowCloseButtonHint),
-                                                                                           ui(new Ui::AskPassphraseDialog),
-                                                                                           mode(mode),
-                                                                                           model(model),
-                                                                                           context(context),
-                                                                                           fCapsLock(false)
+                                                                                                            ui(new Ui::AskPassphraseDialog),
+                                                                                                            mode(mode),
+                                                                                                            model(model),
+                                                                                                            context(context),
+                                                                                                            fCapsLock(false)
 {
     ui->setupUi(this);
 
@@ -77,8 +77,7 @@ AskPassphraseDialog::AskPassphraseDialog(Mode mode, QWidget* parent, WalletModel
     // Set checkbox "For anonymization, automint, and staking only" depending on from where we were called
     if (context == Context::Unlock_Menu || context == Context::BIP_38) {
         ui->anonymizationCheckBox->setChecked(true);
-    }
-    else {
+    } else {
         ui->anonymizationCheckBox->setChecked(false);
     }
 

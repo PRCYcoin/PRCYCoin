@@ -179,7 +179,8 @@ TransactionView::TransactionView(QWidget* parent) : QWidget(parent), model(0), t
     connect(hideOrphansAction, SIGNAL(toggled(bool)), this, SLOT(updateHideOrphans(bool)));
 }
 
-TransactionView::~TransactionView() {
+TransactionView::~TransactionView()
+{
     delete contextMenu;
 }
 
@@ -332,7 +333,6 @@ void TransactionView::updateHideOrphans(bool fHide)
     // retain consistency with other checkboxes
     if (hideOrphansAction->isChecked() != fHide)
         hideOrphansAction->setChecked(fHide);
-
 }
 
 void TransactionView::chooseWatchonly(int idx)
@@ -400,11 +400,10 @@ void TransactionView::exportClicked()
 
     if (fExport) {
         Q_EMIT message(tr("Exporting Successful"), tr("The transaction history was successfully saved to %1.").arg(filename),
-                     CClientUIInterface::MSG_INFORMATION);
-    } 
-    else {
+            CClientUIInterface::MSG_INFORMATION);
+    } else {
         Q_EMIT message(tr("Exporting Failed"), tr("There was an error trying to save the transaction history to %1.").arg(filename),
-                     CClientUIInterface::MSG_ERROR);
+            CClientUIInterface::MSG_ERROR);
     }
 }
 
@@ -495,7 +494,7 @@ void TransactionView::computeSum()
         return;
     QModelIndexList selection = transactionView->selectionModel()->selectedRows();
 
-   Q_FOREACH (QModelIndex index, selection) {
+    Q_FOREACH (QModelIndex index, selection) {
         amount += index.data(TransactionTableModel::AmountRole).toLongLong();
     }
     QString strAmount(BitcoinUnits::formatWithUnit(nDisplayUnit, amount, true, BitcoinUnits::separatorAlways));

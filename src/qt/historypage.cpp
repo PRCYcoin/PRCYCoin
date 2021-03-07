@@ -91,7 +91,7 @@ void HistoryPage::connectWidgets() //add functions to widget signals
     connect(timeEditTo, SIGNAL(timeChanged(const QTime&)), this, SLOT(updateFilter()));
 }
 
-void HistoryPage::on_cellClicked(int row, int column) 
+void HistoryPage::on_cellClicked(int row, int column)
 {
     if (pwalletMain->IsLocked()) return;
     //1 is column index for type
@@ -155,13 +155,13 @@ void HistoryPage::on_cellClicked(int row, int column)
         if (stdType == "Minted") {
             privkeyFound = false;
             txdlgMsg = "Minted transactions do not have a PrivKey";
-        }    
+        }
         if (pwalletMain->IsLocked()) {
             privkeyFound = false;
             txdlgMsg = "Wallet must be unlocked to view PrivKey";
         }
         if (!privkeyFound) txdlg.setTxPrivKey(std::string(txdlgMsg).c_str());
-        
+
         txdlg.exec();
     }
 }
@@ -197,8 +197,7 @@ void HistoryPage::updateTableData(CWallet* wallet)
     {
         if (!wallet || wallet->IsLocked()) return;
         ui->tableView->setSortingEnabled(false);
-        while (ui->tableView->rowCount() > 0)
-        {
+        while (ui->tableView->rowCount() > 0) {
             ui->tableView->removeRow(0);
         }
         ui->tableView->setRowCount(0);
@@ -206,7 +205,7 @@ void HistoryPage::updateTableData(CWallet* wallet)
         if (wallet->IsLocked()) {
             {
                 LOCK(pwalletMain->cs_wallet);
-                vector<std::map<QString, QString>> txs;// = WalletUtil::getTXs(pwalletMain);
+                vector<std::map<QString, QString> > txs; // = WalletUtil::getTXs(pwalletMain);
 
                 std::map<uint256, CWalletTx> txMap = pwalletMain->mapWallet;
                 std::vector<CWalletTx> latestTxes;
@@ -289,7 +288,7 @@ void HistoryPage::updateFilter()
             (ui->dateTimeEditFrom->dateTime() > date) || (ui->dateTimeEditTo->dateTime() < date) || //record is not between selected dates
 
             (amount < selectedAmount) //record smaller than selected min amount
-        )
+            )
             hide = true;
         if (selectedType != tr("All Types")) {
             if (selectedType == tr("Received")) {
@@ -318,5 +317,5 @@ void HistoryPage::setModel(WalletModel* model)
 {
     this->model = model;
     connect(model, SIGNAL(WalletUnlocked()), this,
-                                             SLOT(updateTableData()));
+        SLOT(updateTableData()));
 }

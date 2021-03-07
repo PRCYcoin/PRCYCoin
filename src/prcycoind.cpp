@@ -60,7 +60,6 @@ void WaitForShutdown()
 //
 bool AppInit(int argc, char* argv[])
 {
-
     bool fRet = false;
 
     //

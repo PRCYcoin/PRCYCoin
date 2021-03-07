@@ -95,7 +95,7 @@ static bool SelectBlockFromCandidates(
             break;
 
         //if the lowest block height (vSortedByTimestamp[0]) is >= switch height, use new modifier calc
-        if (fFirstRun){
+        if (fFirstRun) {
             fModifierV2 = pindex->nHeight >= Params().ModifierUpgradeBlock();
             fFirstRun = false;
         }
@@ -105,7 +105,7 @@ static bool SelectBlockFromCandidates(
 
         // compute the selection hash by hashing an input that is unique to that block
         uint256 hashProof;
-        if(fModifierV2)
+        if (fModifierV2)
             hashProof = pindex->GetBlockHash();
         else
             hashProof = pindex->IsProofOfStake() ? 0 : pindex->GetBlockHash();
@@ -224,7 +224,7 @@ bool ComputeNextStakeModifier(const CBlockIndex* pindexPrev, uint64_t& nStakeMod
                 strSelectionMap.replace(pindex->nHeight - nHeightFirstCandidate, 1, "=");
             pindex = pindex->pprev;
         }
-        for (const std::pair<const uint256, const CBlockIndex*> &item : mapSelectedBlocks) {
+        for (const std::pair<const uint256, const CBlockIndex*>& item : mapSelectedBlocks) {
             // 'S' indicates selected proof-of-stake blocks
             // 'W' indicates selected proof-of-work blocks
             strSelectionMap.replace(item.second->nHeight - nHeightFirstCandidate, 1, item.second->IsProofOfStake() ? "S" : "W");
@@ -292,7 +292,7 @@ bool CheckStakeKernelHash(unsigned int nBits, const CBlockHeader blockFrom, cons
 {
     //assign new variables to make it easier to read
     //check encryptionKey hash
-    CAmount nValueIn;// = txPrev.vout[prevout.n].nValue;
+    CAmount nValueIn; // = txPrev.vout[prevout.n].nValue;
     uint256 val = txPrev.vout[prevout.n].maskValue.amount;
     uint256 mask = txPrev.vout[prevout.n].maskValue.mask;
     CKey decodedMask;
@@ -355,7 +355,7 @@ bool CheckStakeKernelHash(unsigned int nBits, const CBlockHeader blockFrom, cons
         nTimeTx = nTryTime;
 
         if (fDebug || fPrintProofOfStake) {
-                LogPrintf("CheckStakeKernelHash() : using modifier %s at height=%d timestamp=%s for block from height=%d timestamp=%s\n",
+            LogPrintf("CheckStakeKernelHash() : using modifier %s at height=%d timestamp=%s for block from height=%d timestamp=%s\n",
                 std::to_string(nStakeModifier).c_str(), nStakeModifierHeight,
                 DateTimeStrFormat("%Y-%m-%d %H:%M:%S", nStakeModifierTime).c_str(),
                 mapBlockIndex[blockFrom.GetHash()]->nHeight,

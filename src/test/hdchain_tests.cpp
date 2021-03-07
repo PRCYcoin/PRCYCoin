@@ -27,12 +27,12 @@ BOOST_AUTO_TEST_CASE(hd_test1)
 
     SecureVector vchSeed = newHdChain.GetSeed();
 
-    CExtKey masterKey;              //hd master key
-    CExtKey purposeKey;             //key at m/purpose'
-    CExtKey cointypeKey;            //key at m/purpose'/coin_type'
-    CExtKey accountKey;             //key at m/purpose'/coin_type'/account'
-    CExtKey changeKey;              //key at m/purpose'/coin_type'/account'/change
-    CExtKey childKey;               //key at m/purpose'/coin_type'/account'/change/address_index
+    CExtKey masterKey;   //hd master key
+    CExtKey purposeKey;  //key at m/purpose'
+    CExtKey cointypeKey; //key at m/purpose'/coin_type'
+    CExtKey accountKey;  //key at m/purpose'/coin_type'/account'
+    CExtKey changeKey;   //key at m/purpose'/coin_type'/account'/change
+    CExtKey childKey;    //key at m/purpose'/coin_type'/account'/change/address_index
     CKey newKey;
     CPubKey newPubKey;
     int nAccountIndex = 0;

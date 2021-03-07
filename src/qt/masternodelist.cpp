@@ -131,7 +131,7 @@ void MasternodeList::StartAll(std::string strCommand)
             CMasternodeBroadcast mnb;
 
             int nIndex;
-            if(!mne.castOutputIndex(nIndex))
+            if (!mne.castOutputIndex(nIndex))
                 continue;
 
             CTxIn txin = CTxIn(uint256S(mne.getTxHash()), uint32_t(nIndex));
@@ -188,7 +188,7 @@ void MasternodeList::updateMyMasternodeInfo(QString strAlias, QString strAddr, C
     QTableWidgetItem* addrItem = new QTableWidgetItem(pmn ? QString::fromStdString(pmn->addr.ToString()) : strAddr);
     QTableWidgetItem* statusItem = new QTableWidgetItem(QString::fromStdString(pmn ? pmn->GetStatus() : "MISSING"));
     GUIUtil::DHMSTableWidgetItem* activeSecondsItem = new GUIUtil::DHMSTableWidgetItem(pmn ? (pmn->lastPing.sigTime - pmn->sigTime) : 0);
-    QTableWidgetItem* lastSeenItem = new QTableWidgetItem(QString::fromStdString(pmn ? DateTimeStrFormat("%Y-%m-%d %H:%M",  pmn->lastPing.sigTime) : ""));
+    QTableWidgetItem* lastSeenItem = new QTableWidgetItem(QString::fromStdString(pmn ? DateTimeStrFormat("%Y-%m-%d %H:%M", pmn->lastPing.sigTime) : ""));
     QTableWidgetItem* pubkeyItem = new QTableWidgetItem(QString::fromStdString(pmn ? pmn->pubKeyCollateralAddress.GetHex() : ""));
 
     ui->tableWidgetMyMasternodes->setItem(nNewRow, 0, aliasItem);
@@ -214,7 +214,7 @@ void MasternodeList::updateMyNodeList(bool fForce)
         ui->tableWidgetMyMasternodes->setSortingEnabled(false);
         for (CMasternodeConfig::CMasternodeEntry mne : masternodeConfig.getEntries()) {
             int nIndex;
-            if(!mne.castOutputIndex(nIndex))
+            if (!mne.castOutputIndex(nIndex))
                 continue;
 
             CTxIn txin = CTxIn(uint256S(mne.getTxHash()), uint32_t(nIndex));

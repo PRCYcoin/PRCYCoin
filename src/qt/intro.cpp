@@ -47,8 +47,7 @@ public:
 public Q_SLOTS:
     void check();
 
-Q_SIGNALS:
-    void reply(int status, const QString& message, quint64 available);
+    Q_SIGNALS : void reply(int status, const QString& message, quint64 available);
 
 private:
     Intro* intro;

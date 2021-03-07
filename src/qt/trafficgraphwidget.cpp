@@ -138,10 +138,10 @@ void TrafficGraphWidget::updateRates()
     }
 
     float tmax = 0.0f;
-   Q_FOREACH (float f, vSamplesIn) {
+    Q_FOREACH (float f, vSamplesIn) {
         if (f > tmax) tmax = f;
     }
-   Q_FOREACH (float f, vSamplesOut) {
+    Q_FOREACH (float f, vSamplesOut) {
         if (f > tmax) tmax = f;
     }
     fMax = tmax;

@@ -249,13 +249,13 @@ bool LogAcceptCategory(const char* category)
     return true;
 }
 
-std::string FilterInjection(const std::string& str) 
+std::string FilterInjection(const std::string& str)
 {
     //std::cout << "filtering" << std::endl;
-    int n = str.length(); 
+    int n = str.length();
     char char_array[n + 1];
     strcpy(char_array, str.c_str());
-    
+
     for (int i = 0; i < n; i++) {
         if (char_array[i] == '\r' || char_array[i] == '\t' || char_array[i] == '\0')
             char_array[i] = ' ';
@@ -263,9 +263,8 @@ std::string FilterInjection(const std::string& str)
             if (i == n - 1)
                 continue;
             char_array[i] = ' ';
-        }
-        else if (char_array[i] == '%' || char_array[i] == '&' || char_array[i] == '<' ||
-            char_array[i] == '>' || char_array[i] == '\"' || char_array[i] == '\'')
+        } else if (char_array[i] == '%' || char_array[i] == '&' || char_array[i] == '<' ||
+                   char_array[i] == '>' || char_array[i] == '\"' || char_array[i] == '\'')
             char_array[i] = '$';
     }
 
@@ -323,7 +322,7 @@ static bool InterpretBool(const std::string& strValue)
 /** Turn -noX into -X=0 */
 static void InterpretNegativeSetting(std::string& strKey, std::string& strValue)
 {
-    if (strKey.length()>3 && strKey[0]=='-' && strKey[1]=='n' && strKey[2]=='o') {
+    if (strKey.length() > 3 && strKey[0] == '-' && strKey[1] == 'n' && strKey[2] == 'o') {
         strKey = "-" + strKey.substr(3);
         strValue = InterpretBool(strValue) ? "0" : "1";
     }
@@ -403,13 +402,15 @@ static const int screenWidth = 79;
 static const int optIndent = 2;
 static const int msgIndent = 7;
 
-std::string HelpMessageGroup(const std::string &message) {
+std::string HelpMessageGroup(const std::string& message)
+{
     return std::string(message) + std::string("\n\n");
 }
 
-std::string HelpMessageOpt(const std::string &option, const std::string &message) {
-    return std::string(optIndent,' ') + std::string(option) +
-           std::string("\n") + std::string(msgIndent,' ') +
+std::string HelpMessageOpt(const std::string& option, const std::string& message)
+{
+    return std::string(optIndent, ' ') + std::string(option) +
+           std::string("\n") + std::string(msgIndent, ' ') +
            FormatParagraph(message, screenWidth - msgIndent, msgIndent) +
            std::string("\n\n");
 }
@@ -560,7 +561,7 @@ boost::filesystem::path GetPidFile()
     if (boost::filesystem::is_directory(boost::filesystem::status(pathPidFile)) ||
         boost::filesystem::exists(boost::filesystem::status(pathPidFile)))
         pathPidFile = GetDataDir() / boost::filesystem::path("prcycoind.pid");
-    
+
     return pathPidFile;
 }
 
@@ -786,7 +787,8 @@ void SetupEnvironment()
     boost::filesystem::path::imbue(loc);
 }
 
-bool PointHashingSuccessively(const CPubKey& pk, const unsigned char* tweak, unsigned char* out) {
+bool PointHashingSuccessively(const CPubKey& pk, const unsigned char* tweak, unsigned char* out)
+{
     unsigned char pubData[65];
     uint256 hash = pk.GetHash();
     pubData[0] = *(pk.begin());
@@ -808,8 +810,8 @@ bool SetupNetworking()
 #ifdef WIN32
     // Initialize Windows Sockets
     WSADATA wsadata;
-    int ret = WSAStartup(MAKEWORD(2,2), &wsadata);
-    if (ret != NO_ERROR || LOBYTE(wsadata.wVersion ) != 2 || HIBYTE(wsadata.wVersion) != 2)
+    int ret = WSAStartup(MAKEWORD(2, 2), &wsadata);
+    if (ret != NO_ERROR || LOBYTE(wsadata.wVersion) != 2 || HIBYTE(wsadata.wVersion) != 2)
         return false;
 #endif
     return true;

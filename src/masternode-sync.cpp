@@ -48,7 +48,7 @@ bool CMasternodeSync::IsBlockchainSynced()
     {
         TRY_LOCK(cs_main, lockMain);
         if (!lockMain) return false;
-        CBlockIndex *pindex = chainActive.Tip();
+        CBlockIndex* pindex = chainActive.Tip();
         if (pindex == nullptr) return false;
         blockTime = pindex->nTime;
     }
@@ -328,10 +328,8 @@ void CMasternodeSync::Process()
 
         if (pnode->nVersion >= ActiveProtocol()) {
             if (RequestedMasternodeAssets == MASTERNODE_SYNC_BUDGET) {
-                
                 // We'll start rejecting votes if we accidentally get set as synced too soon
-                if (lastBudgetItem > 0 && lastBudgetItem < GetTime() - MASTERNODE_SYNC_TIMEOUT * 2 && RequestedMasternodeAttempt >= MASTERNODE_SYNC_THRESHOLD) { 
-                    
+                if (lastBudgetItem > 0 && lastBudgetItem < GetTime() - MASTERNODE_SYNC_TIMEOUT * 2 && RequestedMasternodeAttempt >= MASTERNODE_SYNC_THRESHOLD) {
                     // Hasn't received a new item in the last five seconds, so we'll move to the
                     GetNextAsset();
 

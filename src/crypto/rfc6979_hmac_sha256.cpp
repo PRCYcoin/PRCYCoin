@@ -16,10 +16,24 @@ RFC6979_HMAC_SHA256::RFC6979_HMAC_SHA256(const unsigned char* key, size_t keylen
     memset(V, 0x01, sizeof(V));
     memset(K, 0x00, sizeof(K));
 
-    CHMAC_SHA256(K, sizeof(K)).Write(V, sizeof(V)).Write(zero, sizeof(zero)).Write(key, keylen).Write(msg, msglen).Finalize(K);
-    CHMAC_SHA256(K, sizeof(K)).Write(V, sizeof(V)).Finalize(V);
-    CHMAC_SHA256(K, sizeof(K)).Write(V, sizeof(V)).Write(one, sizeof(one)).Write(key, keylen).Write(msg, msglen).Finalize(K);
-    CHMAC_SHA256(K, sizeof(K)).Write(V, sizeof(V)).Finalize(V);
+    CHMAC_SHA256(K, sizeof(K))
+        .Write(V, sizeof(V))
+        .Write(zero, sizeof(zero))
+        .Write(key, keylen)
+        .Write(msg, msglen)
+        .Finalize(K);
+    CHMAC_SHA256(K, sizeof(K))
+        .Write(V, sizeof(V))
+        .Finalize(V);
+    CHMAC_SHA256(K, sizeof(K))
+        .Write(V, sizeof(V))
+        .Write(one, sizeof(one))
+        .Write(key, keylen)
+        .Write(msg, msglen)
+        .Finalize(K);
+    CHMAC_SHA256(K, sizeof(K))
+        .Write(V, sizeof(V))
+        .Finalize(V);
 }
 
 RFC6979_HMAC_SHA256::~RFC6979_HMAC_SHA256()
@@ -31,12 +45,19 @@ RFC6979_HMAC_SHA256::~RFC6979_HMAC_SHA256()
 void RFC6979_HMAC_SHA256::Generate(unsigned char* output, size_t outputlen)
 {
     if (retry) {
-        CHMAC_SHA256(K, sizeof(K)).Write(V, sizeof(V)).Write(zero, sizeof(zero)).Finalize(K);
-        CHMAC_SHA256(K, sizeof(K)).Write(V, sizeof(V)).Finalize(V);
+        CHMAC_SHA256(K, sizeof(K))
+            .Write(V, sizeof(V))
+            .Write(zero, sizeof(zero))
+            .Finalize(K);
+        CHMAC_SHA256(K, sizeof(K))
+            .Write(V, sizeof(V))
+            .Finalize(V);
     }
 
     while (outputlen > 0) {
-        CHMAC_SHA256(K, sizeof(K)).Write(V, sizeof(V)).Finalize(V);
+        CHMAC_SHA256(K, sizeof(K))
+            .Write(V, sizeof(V))
+            .Finalize(V);
         size_t len = std::min(outputlen, sizeof(V));
         memcpy(output, V, len);
         output += len;

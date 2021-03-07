@@ -34,7 +34,7 @@ bool SignBlock(CBlock& block, const CKeyStore& keystore)
     CKeyID keyID;
     if (block.IsProofOfWork()) {
         bool fFoundID = false;
-        for (const CTxOut& txout :block.vtx[0].vout) {
+        for (const CTxOut& txout : block.vtx[0].vout) {
             if (!GetKeyIDFromUTXO(txout, keyID))
                 continue;
             fFoundID = true;
