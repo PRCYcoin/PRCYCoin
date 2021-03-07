@@ -105,6 +105,8 @@ public:
     int LAST_POW_BLOCK() const { return nLastPOWBlock; }
     int START_POA_BLOCK() const { return nStartPOABlock; }
     int SoftFork() const { return nSoftForkBlock;}
+	
+    int NewSigsActive(const int nHeight) const { return nHeight >= nBlockEnforceNewMessageSignatures; }
 
     //For PoA block time
     int POA_BLOCK_TIME() const { return nPoABlockTime; }
@@ -120,6 +122,7 @@ protected:
     uint256 hashGenesisBlock;
     MessageStartChars pchMessageStart;
     //! Raw pub key bytes for the broadcast alert signing key.
+    int nBlockEnforceNewMessageSignatures;
     int nDefaultPort;
     int nExtCoinType;
     uint256 bnProofOfWorkLimit;
