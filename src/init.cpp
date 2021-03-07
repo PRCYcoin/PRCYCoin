@@ -1755,8 +1755,8 @@ bool AppInit2(bool isDaemon)
         uiInterface.NotifyBlockTip.disconnect(BlockNotifyGenesisWait);
     }
 
-    // ********************************************************* Step 10: setup ObfuScation
-
+    // ********************************************************* Step 10: setup layer 2 data
+	
     uiInterface.InitMessage(_("Loading masternode cache..."));
 
     CMasternodeDB mndb;

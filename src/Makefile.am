@@ -109,7 +109,6 @@ BITCOIN_CORE_H = \
   primitives/transaction.h \
   core_io.h \
   crypter.h \
-  obfuscation.h \
   wallet/db.h \
   eccryptoverify.h \
   ecwrapper.h \
@@ -267,7 +266,6 @@ libbitcoin_wallet_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 libbitcoin_wallet_a_SOURCES = \
   activemasternode.cpp \
   bip38.cpp \
-  obfuscation.cpp \
   wallet/db.cpp \
   crypter.cpp \
   swifttx.cpp \

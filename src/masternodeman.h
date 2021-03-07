@@ -7,6 +7,7 @@
 #ifndef MASTERNODEMAN_H
 #define MASTERNODEMAN_H
 
+#include "activemasternode.h"
 #include "base58.h"
 #include "key.h"
 #include "main.h"
@@ -21,8 +22,12 @@
 using namespace std;
 
 class CMasternodeMan;
+class CActiveMasternode;
 
 extern CMasternodeMan mnodeman;
+extern CActiveMasternode activeMasternode;
+extern std::string strMasterNodePrivKey;
+
 void DumpMasternodes();
 
 /** Access to the MN database (mncache.dat)
