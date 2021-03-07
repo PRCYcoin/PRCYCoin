@@ -81,12 +81,6 @@ public:
         MNReward,
         RecvFromOther,
         SendToSelf,
-        RecvWithObfuscation,
-        ObfuscationDenominate,
-        ObfuscationCollateralPayment,
-        ObfuscationMakeCollaterals,
-        ObfuscationCreateDenominations,
-        Obfuscated
     };
 
     /** Number of confirmation recommended for accepting a transaction */
