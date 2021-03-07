@@ -114,7 +114,6 @@ HEADERS += src/activemasternode.h \
            src/net.h \
            src/netbase.h \
            src/noui.h \
-           src/obfuscation-relay.h \
            src/obfuscation.h \
            src/poa.h \
            src/protocol.h \
@@ -439,7 +438,6 @@ SOURCES += src/activemasternode.cpp \
            src/net.cpp \
            src/netbase.cpp \
            src/noui.cpp \
-           src/obfuscation-relay.cpp \
            src/obfuscation.cpp \
            src/poa.cpp \
            src/protocol.cpp \

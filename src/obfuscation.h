@@ -7,11 +7,11 @@
 #ifndef OBFUSCATION_H
 #define OBFUSCATION_H
 
+#include "activemasternode.h"
 #include "main.h"
 #include "masternode-payments.h"
 #include "masternode-sync.h"
 #include "masternodeman.h"
-#include "obfuscation-relay.h"
 #include "sync.h"
 
 class CTxIn;
