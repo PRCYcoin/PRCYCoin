@@ -95,7 +95,6 @@ public:
     const std::vector<SeedSpec6>& FixedSeeds() const { return vFixedSeeds; }
     virtual const Checkpoints::CCheckpointData& Checkpoints() const = 0;
     int PoolMaxTransactions() const { return nPoolMaxTransactions; }
-    std::string ObfuscationPoolDummyAddress() const { return strObfuscationPoolDummyAddress; }
     int64_t StartMasternodePayments() const { return nStartMasternodePayments; }
     int64_t Budget_Fee_Confirmations() const { return nBudget_Fee_Confirmations; }
     CBaseChainParams::Network NetworkID() const { return networkID; }
@@ -154,7 +153,6 @@ protected:
     bool fTestnetToBeDeprecatedFieldRPC;
     bool fHeadersFirstSyncingActive;
     int nPoolMaxTransactions;
-    std::string strObfuscationPoolDummyAddress;
     int64_t nStartMasternodePayments;
     int64_t nBudget_Fee_Confirmations;
 
