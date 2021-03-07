@@ -1241,28 +1241,6 @@ CAmount CWallet::GetDebit(const CTxIn& txin, const isminefilter& filter) const
     return 0;
 }
 
-bool CWallet::IsDenominated(const CTxIn& txin) const
-{
-    {
-        LOCK(cs_wallet);
-        COutPoint prevout = findMyOutPoint(txin);
-        map<uint256, CWalletTx>::const_iterator mi = mapWallet.find(prevout.hash);
-        if (mi != mapWallet.end()) {
-            const CWalletTx& prev = (*mi).second;
-            if (prevout.n < prev.vout.size()) return IsDenominatedAmount(getCTxOutValue(prev, prev.vout[prevout.n]));
-        }
-    }
-    return false;
-}
-
-bool CWallet::IsDenominatedAmount(CAmount nInputAmount) const
-{
-    for (CAmount d : obfuScationDenominations)
-        if (nInputAmount == d)
-            return true;
-    return false;
-}
-
 bool CWallet::IsChange(const CTxOut& txout) const
 {
     if (::IsMine(*this, txout.scriptPubKey)) {
@@ -1959,15 +1937,7 @@ bool CWallet::AvailableCoins(const uint256 wtxid, const CWalletTx* pcoin, vector
             }
             bool found = false;
             CAmount value = getCTxOutValue(*pcoin, pcoin->vout[i]);
-            if (nCoinType == ONLY_DENOMINATED) {
-                found = IsDenominatedAmount(value);
-            } else if (nCoinType == ONLY_NOT5000IFMN) {
-                found = !(fMasterNode && value == 5000 * COIN);
-            } else if (nCoinType == ONLY_NONDENOMINATED_NOT5000IFMN) {
-                if (IsCollateralAmount(value)) return false; // do not use collateral amounts
-                found = !IsDenominatedAmount(value);
-                if (found && fMasterNode) found = value != 5000 * COIN; // do not use Hot MN funds
-            } else if (nCoinType == ONLY_5000) {
+            if (nCoinType == ONLY_5000) {
                 found = value == 5000 * COIN;
             } else {
                 COutPoint outpoint(pcoin->GetHash(), i);
@@ -2073,24 +2043,6 @@ static CAmount ApproximateBestSubset(int numOut, int ringSize, vector<pair<CAmou
         }
     }
     return nFeeNeeded;
-}
-
-
-// TODO: find appropriate place for this sort function
-// move denoms down
-bool less_then_denom(const COutput& out1, const COutput& out2)
-{
-    const CWalletTx* pcoin1 = out1.tx;
-    const CWalletTx* pcoin2 = out2.tx;
-
-    bool found1 = false;
-    bool found2 = false;
-    for (CAmount d : obfuScationDenominations) // loop through predefined denoms
-    {
-        if (pwalletMain->getCTxOutValue(*pcoin1, pcoin1->vout[out1.i]) == d) found1 = true;
-        if (pwalletMain->getCTxOutValue(*pcoin2, pcoin2->vout[out2.i]) == d) found2 = true;
-    }
-    return (!found1 && found2);
 }
 
 bool CWallet::SelectStakeCoins(std::set<std::pair<const CWalletTx*, unsigned int> >& setCoins, CAmount nTargetAmount)
@@ -2318,71 +2270,52 @@ bool CWallet::SelectCoinsMinConf(bool needFee, CAmount& feeNeeded, int ringSize,
     CAmount nTotalLower = 0;
 
     random_shuffle(vCoins.begin(), vCoins.end(), GetRandInt);
-    // move denoms down on the list
-    sort(vCoins.begin(), vCoins.end(), less_then_denom);
+    for (const COutput& output : vCoins) {
+        if (!output.fSpendable)
+            continue;
 
-    // try to find nondenom first to prevent unneeded spending of mixed coins
-    for (unsigned int tryDenom = 0; tryDenom < 2; tryDenom++) {
-        if (fDebug) LogPrint("selectcoins", "tryDenom: %d\n", tryDenom);
-        vValue.clear();
-        nTotalLower = 0;
-        for (const COutput& output : vCoins) {
-            if (!output.fSpendable)
-                continue;
+        const CWalletTx* pcoin = output.tx;
 
-            const CWalletTx* pcoin = output.tx;
-            CAmount n = 0;
-            if (output.nDepth < (pcoin->IsFromMe(ISMINE_ALL) ? nConfMine : nConfTheirs))
-                continue;
+        if (output.nDepth < (pcoin->IsFromMe(ISMINE_ALL) ? nConfMine : nConfTheirs))
+            continue;
 
-            if (!IsSpent(pcoin->GetHash(), output.i)) {
-                n = getCTxOutValue(*pcoin, pcoin->vout[output.i]);
-            }
-            if (n == 0) continue;
-            int i = output.i;
+        if (n == 0) continue;
+        int i = output.i;
+        CAmount n = pcoin->vout[i].nValue;
 
-            pair<CAmount, pair<const CWalletTx*, unsigned int> > coin = make_pair(n, make_pair(pcoin, i));
-            if (needFee) {
-                feeNeeded = ComputeFee(vValue.size() + 1, numOut, ringSize);
-                feeForOneInput = ComputeFee(1, numOut, ringSize);
-            }
-            if (n == nTargetValue + feeForOneInput) {
-                setCoinsRet.clear();
-                setCoinsRet.insert(coin.second);
-                nValueRet = coin.first;
-                feeNeeded = feeForOneInput;
-                return true;
-            } else if (n < nTargetValue + feeNeeded) {
-                vValue.push_back(coin);
-                nTotalLower += n;
-            } else if (n < coinLowestLarger.first) {
-                coinLowestLarger = coin;
-            }
+        std::pair<CAmount, std::pair<const CWalletTx*, unsigned int> > coin = std::make_pair(n, std::make_pair(pcoin, i));
+        if (needFee) {
+            feeNeeded = ComputeFee(vValue.size() + 1, numOut, ringSize);
+            feeForOneInput = ComputeFee(1, numOut, ringSize);
         }
-
-        if (vValue.size() <= MAX_TX_INPUTS) {
-            if (nTotalLower == nTargetValue + feeNeeded) {
-                for (unsigned int i = 0; i < vValue.size(); ++i) {
-                    setCoinsRet.insert(vValue[i].second);
-                    nValueRet += vValue[i].first;
-                }
-                return true;
-            }
-        }
-        if (nTotalLower < nTargetValue + feeNeeded) {
-            if (coinLowestLarger.second.first == NULL) // there is no input larger than nTargetValue
-            {
-                if (tryDenom == 0)
-                    // we didn't look at denom yet, let's do it
-                    continue;
-                else {
-                    // we looked at everything possible and didn't find anything, no luck
-                    return false;
-                }
-            }
-            setCoinsRet.insert(coinLowestLarger.second);
-            nValueRet += coinLowestLarger.first;
+        if (n == nTargetValue + feeForOneInput) {
+            setCoinsRet.insert(coin.second);
+            nValueRet += coin.first;
+			feeNeeded = feeForOneInput;
             return true;
+        } else if (n < nTargetValue + feeNeeded) {
+            vValue.push_back(coin);
+            nTotalLower += n;
+        } else if (n < coinLowestLarger.first) {
+            coinLowestLarger = coin;
+        }
+    }
+
+    if (vValue.size() <= MAX_TX_INPUTS) {
+        if (nTotalLower == nTargetValue + feeNeeded) {
+            for (unsigned int i = 0; i < vValue.size(); ++i) {
+                setCoinsRet.insert(vValue[i].second);
+                nValueRet += vValue[i].first;
+            }
+            return true;
+        }
+    }
+    if (nTotalLower < nTargetValue + feeNeeded) {
+        if (coinLowestLarger.second.first == NULL)
+                return false;
+        setCoinsRet.insert(coinLowestLarger.second);
+        nValueRet += coinLowestLarger.first;
+        return true;
         } else {
             CAmount maxFee = ComputeFee(50, numOut, ringSize);
             if (vValue.size() <= MAX_TX_INPUTS) {
@@ -2568,11 +2501,6 @@ bool CWallet::IsCollateralized(const COutPoint& outpoint)
 bool CWallet::IsMasternodeController()
 {
     return masternodeConfig.getEntries().size() > 0;
-}
-
-bool CWallet::IsCollateralAmount(CAmount nInputAmount) const
-{
-    return nInputAmount != 0 && nInputAmount % OBFUSCATION_COLLATERAL == 0 && nInputAmount < OBFUSCATION_COLLATERAL * 5 && nInputAmount > OBFUSCATION_COLLATERAL;
 }
 
 bool CWallet::GetBudgetSystemCollateralTX(CTransaction& tx, uint256 hash, bool useIX)
@@ -2962,8 +2890,6 @@ bool CWallet::CreateTransaction(const vector<pair<CScript, CAmount> >& vecSend,
                 if (!SelectCoins(true, estimatedFee, 10, 2, nTotalValue, setCoins, nValueIn, coinControl, coin_type, useIX)) {
                     if (coin_type == ALL_COINS) {
                         strFailReason = _("Insufficient funds.");
-                    } else if (coin_type == ONLY_NOT5000IFMN) {
-                        strFailReason = _("Unable to locate enough funds for this transaction that are not equal 10000 PRCY.");
                     } else {
                         strFailReason = _("Error in CreateTransaction. Please try again.");
                     }
@@ -2985,13 +2911,6 @@ bool CWallet::CreateTransaction(const vector<pair<CScript, CAmount> >& vecSend,
                 }
 
                 CAmount nChange = nValueIn - nValue - nFeeRet;
-
-                //over pay for denominated transactions
-                if (coin_type == ONLY_DENOMINATED) {
-                    nFeeRet += nChange;
-                    nChange = 0;
-                    wtxNew.mapValue["DS"] = "1";
-                }
 
                 if (nChange > 0) {
                     // Fill a vout to ourself
@@ -5903,10 +5822,6 @@ void CWalletTx::Init(CWallet* pwalletIn)
     fCreditCached = false;
     fImmatureCreditCached = false;
     fAvailableCreditCached = false;
-    fAnonymizableCreditCached = false;
-    fAnonymizedCreditCached = false;
-    fDenomUnconfCreditCached = false;
-    fDenomConfCreditCached = false;
     fWatchDebitCached = false;
     fWatchCreditCached = false;
     fImmatureWatchCreditCached = false;
@@ -5916,10 +5831,6 @@ void CWalletTx::Init(CWallet* pwalletIn)
     nCreditCached = 0;
     nImmatureCreditCached = 0;
     nAvailableCreditCached = 0;
-    nAnonymizableCreditCached = 0;
-    nAnonymizedCreditCached = 0;
-    nDenomUnconfCreditCached = 0;
-    nDenomConfCreditCached = 0;
     nWatchDebitCached = 0;
     nWatchCreditCached = 0;
     nAvailableWatchCreditCached = 0;
@@ -5965,10 +5876,6 @@ void CWalletTx::MarkDirty()
 {
     fCreditCached = false;
     fAvailableCreditCached = false;
-    fAnonymizableCreditCached = false;
-    fAnonymizedCreditCached = false;
-    fDenomUnconfCreditCached = false;
-    fDenomConfCreditCached = false;
     fWatchDebitCached = false;
     fWatchCreditCached = false;
     fAvailableWatchCreditCached = false;
