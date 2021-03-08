@@ -409,7 +409,7 @@ void CMasternodePayments::ProcessMessageMasternodePayments(CNode* pfrom, std::st
             return;
         }
 
-        if (!winner.SignatureValid()) {
+        if (!winner.CheckSignature()) {
             if (masternodeSync.IsSynced()) {
                 LogPrintf("CMasternodePayments::ProcessMessageMasternodePayments() : mnw - invalid signature\n");
                 Misbehaving(pfrom->GetId(), 20);
@@ -474,6 +474,33 @@ bool CMasternodePaymentWinner::Sign(CKey& keyMasternode, CPubKey& pubKeyMasterno
         if (!CMessageSigner::VerifyMessage(pubKeyMasternode, vchSig, strMessage, strError)) {
             return error("%s : VerifyMessage() failed, error: %s\n", __func__, strError);
         }
+    return true;
+}
+
+bool CMasternodePaymentWinner::CheckSignature() const
+{
+    CMasternode* pmn = mnodeman.Find(vinMasternode);
+    if (pmn == nullptr) {
+        return error("%s : vinMasternode not found", __func__);
+    }
+
+    std::string strError = "";
+
+    uint256 hash = GetSignatureHash();
+
+    if (CHashSigner::VerifyHash(hash, pmn->pubKeyMasternode, vchSig, strError))
+        return true;
+
+    // if new signature fails, try old format
+    std::string strError = "";
+    HEX_DATA_STREAM_PROTOCOL(PROTOCOL_VERSION) << vinMasternode.prevout.GetHash() << nBlockHeight << payee;
+    std::string strMessage = HEX_STR(ser);
+
+    if (!CMessageSigner::VerifyMessage(pmn->pubKeyMasternode, vchSig, strMessage, strError)) {
+        return error("%s - Got bad masternode signature for %s: %s\n", __func__,
+                vinMasternode.prevout.hash.ToString(), strError);
+    }
+
     return true;
 }
 
