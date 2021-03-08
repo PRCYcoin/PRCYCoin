@@ -57,6 +57,7 @@ private:
     std::vector<unsigned char> vchSig;
 	
 public:
+    int nMessVersion;
     bool fValid;  //if the vote is currently valid / counted
     bool fSynced; //if we've sent this to our peers
     CTxIn vin;
@@ -91,11 +92,22 @@ public:
     template <typename Stream, typename Operation>
     inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion)
     {
-        READWRITE(vin);
-        READWRITE(nProposalHash);
-        READWRITE(nVote);
-        READWRITE(nTime);
-        READWRITE(vchSig);
+        try
+        {
+            READWRITE(nMessVersion);
+            READWRITE(vin);
+            READWRITE(nProposalHash);
+            READWRITE(nVote);
+            READWRITE(nTime);
+            READWRITE(vchSig);
+        } catch(...) {
+            nMessVersion = MessageVersion::MESS_VER_STRMESS;
+            READWRITE(vin);
+            READWRITE(nProposalHash);
+            READWRITE(nVote);
+            READWRITE(nTime);
+            READWRITE(vchSig);
+        }
     }
 };
 
@@ -109,6 +121,7 @@ private:
     std::vector<unsigned char> vchSig;
 
 public:
+    int nMessVersion;
     bool fValid;  //if the vote is currently valid / counted
     bool fSynced; //if we've sent this to our peers
     CTxIn vin;

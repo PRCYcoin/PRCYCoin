@@ -11,7 +11,6 @@
 #include "masternode-payments.h"
 #include "masternode-sync.h"
 #include "masternodeman.h"
-#include "messagesigner.h"
 #include "sync.h"
 #include "util.h"
 #include "streams.h"
@@ -344,6 +343,7 @@ bool CMasternode::IsInputAssociatedWithPubkey() const
 
 CMasternodeBroadcast::CMasternodeBroadcast()
 {
+    nMessVersion = MessageVersion::MESS_VER_HASH;
     vin = CTxIn();
     addr = CService();
     pubKeyCollateralAddress = CPubKey();
@@ -364,6 +364,7 @@ CMasternodeBroadcast::CMasternodeBroadcast()
 
 CMasternodeBroadcast::CMasternodeBroadcast(CService newAddr, CTxIn newVin, CPubKey pubKeyCollateralAddressNew, CPubKey pubKeyMasternodeNew, int protocolVersionIn)
 {
+    nMessVersion = MessageVersion::MESS_VER_HASH;
     vin = newVin;
     addr = newAddr;
     pubKeyCollateralAddress = pubKeyCollateralAddressNew;
@@ -384,6 +385,7 @@ CMasternodeBroadcast::CMasternodeBroadcast(CService newAddr, CTxIn newVin, CPubK
 
 CMasternodeBroadcast::CMasternodeBroadcast(const CMasternode& mn)
 {
+    nMessVersion = MessageVersion::MESS_VER_HASH;
     vin = mn.vin;
     addr = mn.addr;
     pubKeyCollateralAddress = mn.pubKeyCollateralAddress;
@@ -721,6 +723,7 @@ bool CMasternodeBroadcast::Sign(CKey& keyCollateralAddress)
     sigTime = GetAdjustedTime();
 
     if (Params().NewSigsActive(nHeight)) {
+        nMessVersion = MessageVersion::MESS_VER_HASH;
         uint256 hash = GetSignatureHash();
 
         if(!CHashSigner::SignHash(hash, keyCollateralAddress, vchSig)) {
@@ -732,6 +735,7 @@ bool CMasternodeBroadcast::Sign(CKey& keyCollateralAddress)
         }
     } else {
         // use old signature format
+        nMessVersion = MessageVersion::MESS_VER_STRMESS;
         std::string vchPubKey(pubKeyCollateralAddress.begin(), pubKeyCollateralAddress.end());
         std::string vchPubKey2(pubKeyMasternode.begin(), pubKeyMasternode.end());
         std::string ss = addr.ToString();
@@ -753,19 +757,22 @@ bool CMasternodeBroadcast::Sign(CKey& keyCollateralAddress)
 bool CMasternodeBroadcast::CheckSignature() const
 {
     std::string strError = "";
-    uint256 hash = GetSignatureHash();
 
-    if(CHashSigner::VerifyMessage(pubKeyCollateralAddress, vchSig, GetNewStrMessage(), strError)
-       && CHashSigner::VerifyMessage(pubKeyCollateralAddress, vchSig, GetOldStrMessage(), strError))
-        return error("CMasternodeBroadcast::VerifySignature() - Error: %s", strError);
+    if (nMessVersion == MessageVersion::MESS_VER_HASH) {
+        uint256 hash = GetSignatureHash();
+        if (!CHashSigner::VerifyHash(hash, pubKeyMasternode, vchSig, strError)) {
+            return error("%s : VerifyHash failed for %s: %s", __func__,
+                    vin.prevout.hash.ToString(), strError);
+        }
 
+    } else {
     // if new signature fails, try old format
     HEX_DATA_STREAM_PROTOCOL(protocolVersion) << addr.ToString() << sigTime << pubKeyCollateralAddress << pubKeyMasternode << protocolVersion;
     std::string strMessage = HEX_STR(ser);
     if(!CMessageSigner::VerifyMessage(pubKeyCollateralAddress, vchSig, GetNewStrMessage(), strError)
        && !CMessageSigner::VerifyMessage(pubKeyCollateralAddress, vchSig, GetOldStrMessage(), strError))
-        return error("%s : Got bad masternode signature for %s: %s\n", __func__,
-                vin.prevout.hash.ToString(), strError);
+            return error("%s : VerifyMessage failed for %s: %s", __func__,
+                    vin.prevout.hash.ToString(), strError);
     }
 
     return true;
@@ -788,20 +795,15 @@ std:: string CMasternodeBroadcast::GetNewStrMessage()
 
 CMasternodePing::CMasternodePing() :
         vchSig(),
+        nMessVersion(MessageVersion::MESS_VER_HASH),
         vin(),
         blockHash(0),
         sigTime(0)
-{
-    int nHeight;
-    {
-        LOCK(cs_main);
-        nHeight = chainActive.Height();
-    }
-    fNewSigs = Params().NewSigsActive(nHeight);
-}
+{ }
 
 CMasternodePing::CMasternodePing(CTxIn& newVin) :
         vchSig(),
+        nMessVersion(MessageVersion::MESS_VER_HASH),
         vin(),
         sigTime(0)
 {
@@ -812,14 +814,13 @@ CMasternodePing::CMasternodePing(CTxIn& newVin) :
         if (nHeight > 12)
             blockHash = chainActive[nHeight - 12]->GetBlockHash();
     }
-    fNewSigs = Params().NewSigsActive(nHeight);
 }
 
 uint256 CMasternodePing::GetHash() const
 {
     CHashWriter ss(SER_GETHASH, PROTOCOL_VERSION);
     ss << vin;
-    if (fNewSigs) ss << blockHash;
+    if (nMessVersion == MessageVersion::MESS_VER_HASH) ss << blockHash;
     ss << sigTime;
     return ss.GetHash();
 }
@@ -831,10 +832,17 @@ std::string CMasternodePing::GetStrMessage() const
 
 bool CMasternodePing::Sign(CKey& keyMasternode, CPubKey& pubKeyMasternode)
 {
+    int nHeight;
+    {
+        LOCK(cs_main);
+        nHeight = chainActive.Height();
+    }
+
     std::string strError = "";
     sigTime = GetAdjustedTime();
 	
-   if (fNewSigs) {
+    if (Params().NewSigsActive(nHeight)) {
+        nMessVersion = MessageVersion::MESS_VER_HASH;
         uint256 hash = GetSignatureHash();
         if(!CHashSigner::SignHash(hash, keyMasternode, vchSig)) {
             return error("%s : SignHash() failed", __func__);
@@ -845,6 +853,7 @@ bool CMasternodePing::Sign(CKey& keyMasternode, CPubKey& pubKeyMasternode)
         }
     } else {
         // use old signature format
+        nMessVersion = MessageVersion::MESS_VER_STRMESS;
         HEX_DATA_STREAM_PROTOCOL(PROTOCOL_VERSION) << vin.ToString() << blockHash.ToString() << sigTime;
         std::string strMessage = HEX_STR(ser);
 
@@ -864,22 +873,21 @@ bool CMasternodePing::CheckSignature(CPubKey& pubKeyMasternode, int &nDos) const
 {
     std::string strError = "";
 	
-    if (fNewSigs) {
+    if (nMessVersion == MessageVersion::MESS_VER_HASH) {
         uint256 hash = GetSignatureHash();
-
         if (!CHashSigner::VerifyHash(hash, pubKeyMasternode, vchSig, strError)) {
             nDos = 33;
-            return error("%s : Got bad masternode ping hash signature, error: %s\n", __func__, strError);
+            return error("%s : VerifyHash failed for %s: %s", __func__,
+                    vin.prevout.hash.ToString(), strError);
         }
 
     } else {
-
     HEX_DATA_STREAM_PROTOCOL(PROTOCOL_VERSION) << vin.ToString() << blockHash.ToString() << sigTime;
     std::string strMessage = HEX_STR(ser);
-
         if (!CMessageSigner::VerifyMessage(pubKeyMasternode, vchSig, strMessage, strError)) {
             nDos = 33;
-            return error("%s : Got bad masternode ping message signature, error: %s\n", __func__, strError);
+            return error("%s : VerifyMessage failed for %s: %s", __func__,
+                    vin.prevout.hash.ToString(), strError);
         }
     }
     return true;
