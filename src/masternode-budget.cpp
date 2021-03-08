@@ -1655,22 +1655,22 @@ void CBudgetProposalBroadcast::Relay()
 }
 
 CBudgetVote::CBudgetVote() :
+        vchSig(),
         fValid(true),
         fSynced(false),
         vin(),
         nProposalHash(0),
         nVote(VOTE_ABSTAIN),
-        nTime(0),
-        vchSig()
+        nTime(0)
 { }
 
 CBudgetVote::CBudgetVote(CTxIn vinIn, uint256 nProposalHashIn, int nVoteIn) :
+        vchSig(),
         fValid(true),
         fSynced(false),
         vin(vinIn),
         nProposalHash(nProposalHashIn),
-        nVote(nVoteIn),
-        vchSig()
+        nVote(nVoteIn)
 {
     nTime = GetAdjustedTime();
 }
@@ -2090,17 +2090,18 @@ void CFinalizedBudget::SubmitVote()
     }
 }
 
-CFinalizedBudgetBroadcast::CFinalizedBudgetBroadcast()
+CFinalizedBudgetBroadcast::CFinalizedBudgetBroadcast() :
+        vchSig()
 {
     strBudgetName = "";
     nBlockStart = 0;
     vecBudgetPayments.clear();
     mapVotes.clear();
-    vchSig.clear();
     nFeeTXHash = 0;
 }
 
-CFinalizedBudgetBroadcast::CFinalizedBudgetBroadcast(const CFinalizedBudget& other)
+CFinalizedBudgetBroadcast::CFinalizedBudgetBroadcast(const CFinalizedBudget& other) :
+        vchSig()
 {
     strBudgetName = other.strBudgetName;
     nBlockStart = other.nBlockStart;
@@ -2127,20 +2128,20 @@ void CFinalizedBudgetBroadcast::Relay()
 }
 
 CFinalizedBudgetVote::CFinalizedBudgetVote() :
+        vchSig(),
         fValid(true),
         fSynced(false),
         vin(),
         nBudgetHash(0),
-        nTime(0),
-        vchSig()
+        nTime(0)
 { }
 
 CFinalizedBudgetVote::CFinalizedBudgetVote(CTxIn vinIn, uint256 nBudgetHashIn) :
+        vchSig(),
         fValid(true),
         fSynced(false),
         vin(vinIn),
-        nBudgetHash(nBudgetHashIn),
-        vchSig()
+        nBudgetHash(nBudgetHashIn)
 {
     nTime = GetAdjustedTime();
 }
