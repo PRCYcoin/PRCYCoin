@@ -66,7 +66,7 @@ public:
     CBudgetVote(CTxIn vin, uint256 nProposalHash, int nVoteIn);
 
     bool Sign(CKey& keyMasternode, CPubKey& pubKeyMasternode);
-    bool SignatureValid(bool fSignatureCheck);
+    bool CheckSignature(bool fSignatureCheck);
     void Relay();
 
     std::string GetVoteString()
@@ -77,15 +77,11 @@ public:
         return ret;
     }
 
-    uint256 GetHash()
-    {
-        CHashWriter ss(SER_GETHASH, PROTOCOL_VERSION);
-        ss << vin;
-        ss << nProposalHash;
-        ss << nVote;
-        ss << nTime;
-        return ss.GetHash();
-    }
+    uint256 GetHash() const;
+    uint256 GetSignatureHash() const { return GetHash(); }
+    std::string GetStrMessage() const;
+
+
 
     ADD_SERIALIZE_METHODS;
 
