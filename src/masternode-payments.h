@@ -162,37 +162,31 @@ class CMasternodePaymentWinner
 {
 public:
     CTxIn vinMasternode;
-
     int nBlockHeight;
     std::vector<unsigned char> payee;//masternode stealth public address
     std::vector<unsigned char> vchSig;
 
-    CMasternodePaymentWinner()
-    {
-        nBlockHeight = 0;
-        vinMasternode = CTxIn();
-    }
+    CMasternodePaymentWinner() :
+        vinMasternode(),
+        nBlockHeight(0),
+        payee(),
+        vchSig()
+    {}
 
-    CMasternodePaymentWinner(CTxIn vinIn)
-    {
-        nBlockHeight = 0;
-        vinMasternode = vinIn;
-        payee = vinIn.masternodeStealthAddress;
-    }
+    CMasternodePaymentWinner(CTxIn vinIn) :
+        vinMasternode(vinIn),
+        nBlockHeight(0),
+        payee(),
+        vchSig()
+    {}
 
-    uint256 GetHash()
-    {
-        CHashWriter ss(SER_GETHASH, PROTOCOL_VERSION);
-        ss << payee;
-        ss << nBlockHeight;
-        ss << vinMasternode.prevout;
+    uint256 GetHash() const;
+    uint256 GetSignatureHash() const { return GetHash(); }
+    std::string GetStrMessage() const;
 
-        return ss.GetHash();
-    }
-
-    bool Sign(CKey& keyMasternode, CPubKey& pubKeyMasternode);
+    bool Sign(CKey& keyMasternode, CPubKey& pubKeyMasternod);
     bool IsValid(CNode* pnode, std::string& strError);
-    bool SignatureValid();
+    bool SignatureValid() const;
     void Relay();
 
     void AddPayee(std::vector<unsigned char> payeeIn)

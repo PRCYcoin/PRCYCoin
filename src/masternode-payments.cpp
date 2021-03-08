@@ -426,25 +426,54 @@ void CMasternodePayments::ProcessMessageMasternodePayments(CNode* pfrom, std::st
     }
 }
 
+uint256 CMasternodePaymentWinner::GetHash() const
+{
+    CHashWriter ss(SER_GETHASH, PROTOCOL_VERSION);
+    ss << payee;
+    ss << nBlockHeight;
+    ss << vinMasternode.prevout;
+    return ss.GetHash();
+}
+
+std::string CMasternodePaymentWinner::GetStrMessage() const
+{
+    return vinMasternode.prevout.ToStringShort() + std::to_string(nBlockHeight) + payee.ToString();
+}
+
 bool CMasternodePaymentWinner::Sign(CKey& keyMasternode, CPubKey& pubKeyMasternode)
 {
+    int nHeight;
+    {
+        LOCK(cs_main);
+        nHeight = chainActive.Height();
+    }
+
     std::string strError = "";
-    std::string strMasterNodeSignMessage;
-    std::string payeeString(payee.begin(), payee.end());
-    HEX_DATA_STREAM_PROTOCOL(PROTOCOL_VERSION) << vinMasternode.prevout.GetHash() << nBlockHeight << payee;
-    std::string strMessage = HEX_STR(ser);
 
+    if (Params().NewSigsActive(nHeight)) {
+        uint256 hash = GetSignatureHash();
 
-    if (!CMessageSigner::SignMessage(strMessage, vchSig, keyMasternode)) {
-        LogPrint("masternode","%s - SignMessage Error.%s\n", __func__);
-        return false;
-    }
+        if(!CHashSigner::SignHash(hash, keyMasternode, vchSig)) {
+            return error("%s : SignHash() failed", __func__);
+        }
 
-    if (!CMessageSigner::VerifyMessage(pubKeyMasternode, vchSig, strMessage, strError)) {
-        LogPrint("masternode","%s - VerifyMessage Error: %s\n", __func__, strError);
-        return false;
-    }
+        if (!CHashSigner::VerifyHash(hash, pubKeyMasternode, vchSig, strError)) {
+            return error("%s : VerifyHash() failed, error: %s", __func__, strError);
+        }
+    } else {
+        // use old signature format
+        std::string strMasterNodeSignMessage;
+        std::string payeeString(payee.begin(), payee.end());
+        HEX_DATA_STREAM_PROTOCOL(PROTOCOL_VERSION) << vinMasternode.prevout.GetHash() << nBlockHeight << payee;
+        std::string strMessage = HEX_STR(ser);
 
+        if (!CMessageSigner::SignMessage(strMessage, vchSig, keyMasternode)) {
+            return error("%s : SignMessage() failed", __func__);
+        }
+
+        if (!CMessageSigner::VerifyMessage(pubKeyMasternode, vchSig, strMessage, strError)) {
+            return error("%s : VerifyMessage() failed, error: %s\n", __func__, strError);
+        }
     return true;
 }
 
@@ -738,22 +767,30 @@ void CMasternodePaymentWinner::Relay()
     RelayInv(inv);
 }
 
-bool CMasternodePaymentWinner::SignatureValid()
+bool CMasternodePaymentWinner::SignatureValid() const
 {
     CMasternode* pmn = mnodeman.Find(vinMasternode);
-
-    if (pmn != NULL) {
-        HEX_DATA_STREAM_PROTOCOL(PROTOCOL_VERSION) << vinMasternode.prevout.GetHash() << nBlockHeight << payee;
-        std::string strMessage = HEX_STR(ser);
-        std::string strError = "";
-        if (!CMessageSigner::VerifyMessage(pmn->pubKeyMasternode, vchSig, strMessage, strError)) {
-            return error("CMasternodePaymentWinner::SignatureValid() - Got bad Masternode address signature for %s: %s\n", vinMasternode.prevout.hash.ToString(), strError);
-        }
-
-        return true;
+    if (pmn == nullptr) {
+        return error("%s : vinMasternode not found", __func__);
     }
 
-    return false;
+    std::string strError = "";
+	
+    uint256 hash = GetSignatureHash();
+
+    if (CHashSigner::VerifyHash(hash, pmn->pubKeyMasternode, vchSig, strError))
+        return true;
+
+    // if new signature fails, try old format
+        std::string strError = "";
+        HEX_DATA_STREAM_PROTOCOL(PROTOCOL_VERSION) << vinMasternode.prevout.GetHash() << nBlockHeight << payee;
+        std::string strMessage = HEX_STR(ser);
+    if (!CMessageSigner::VerifyMessage(pmn->pubKeyMasternode, vchSig, strMessage, strError)) {
+        return error("%s - Got bad masternode signature for %s: %s\n", __func__,
+                vinMasternode.prevout.hash.ToString(), strError);
+        }
+
+    return true;
 }
 
 void CMasternodePayments::Sync(CNode* node, int nCountNeeded)
