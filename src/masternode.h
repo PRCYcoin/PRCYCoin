@@ -38,13 +38,9 @@ bool GetBlockHash(uint256& hash, int nBlockHeight);
 // The Masternode Ping Class : Contains a different serialize method for sending pings from masternodes throughout the network
 //
 
-class CMasternodePing
+class CMasternodePing : public CSignedMessage
 {
-private:
-    std::vector<unsigned char> vchSig;
-
 public:
-    int nMessVersion;
     CTxIn vin;
     uint256 blockHash;
     int64_t sigTime; //mnb message times
@@ -74,18 +70,20 @@ public:
     }
 
     uint256 GetHash() const;
-    uint256 GetSignatureHash() const { return GetHash(); }
-    std::string GetStrMessage() const;
-    std::string GetSignatureBase64() const { return EncodeBase64(&vchSig[0], vchSig.size()); }
+
+    // override CSignedMessage functions
+    uint256 GetSignatureHash() const override { return GetHash(); }
+    std::string GetStrMessage() const override;
+    const CPubKey* GetPublicKey(std::string& strErrorRet) const override;
 
     bool CheckAndUpdate(int& nDos, bool fRequireEnabled = true, bool fCheckSigTimeOnly = false);
-    bool Sign(CKey& keyMasternode, CPubKey& pubKeyMasternode);
-    bool CheckSignature(CPubKey& pubKeyMasternode, int &nDos) const;
 
     void Relay();
 
     void swap(CMasternodePing& first, CMasternodePing& second) // nothrow
     {
+        CSignedMessage::swap(first, second);
+
         // enable ADL (not necessary in our case, but good practice)
         using std::swap;
 
@@ -94,7 +92,6 @@ public:
         swap(first.vin, second.vin);
         swap(first.blockHash, second.blockHash);
         swap(first.sigTime, second.sigTime);
-        swap(first.vchSig, second.vchSig);
     }
 
     CMasternodePing& operator=(CMasternodePing from)
@@ -116,11 +113,8 @@ public:
 // The Masternode Class. It contains the input of the 5000 PRCY, signature to prove
 // it's the one who own that ip address and code for calculating the payment election.
 //
-class CMasternode
+class CMasternode : public CSignedMessage
 {
-protected:
-    std::vector<unsigned char> vchSig;
-
 private:
     // critical section to protect the inner data structures
     mutable RecursiveMutex cs;
@@ -165,12 +159,15 @@ public:
     CMasternode(const CMasternode& other);
     CMasternode(const CMasternodeBroadcast& mnb);
 
-    std::string GetSignatureBase64() const { return EncodeBase64(&vchSig[0], vchSig.size()); }
-    std::vector<unsigned char> GetVchSig() const { return vchSig; }
-    void SetVchSig(const std::vector<unsigned char>& vchSigIn) { vchSig = vchSigIn; }
+    // override CSignedMessage functions
+    uint256 GetSignatureHash() const override;
+    std::string GetStrMessage() const override;
+    const CPubKey* GetPublicKey(std::string& strErrorRet) const override;
 
     void swap(CMasternode& first, CMasternode& second) // nothrow
     {
+        CSignedMessage::swap(first, second);
+
         // enable ADL (not necessary in our case, but good practice)
         using std::swap;
 
@@ -309,7 +306,6 @@ public:
 class CMasternodeBroadcast : public CMasternode
 {
 public:
-    int nMessVersion;
     CMasternodeBroadcast();
     CMasternodeBroadcast(CService newAddr, CTxIn newVin, CPubKey newPubkey, CPubKey newPubkey2, int protocolVersionIn);
     CMasternodeBroadcast(const CMasternode& mn);
@@ -318,15 +314,9 @@ public:
     bool CheckInputsAndAdd(int& nDos);
 
     uint256 GetHash() const;
-    uint256 GetSignatureHash() const;
-    std::string GetStrMessage() const;
 
-    bool Sign(CKey& keyCollateralAddress);
-    bool CheckSignature() const;
     void Relay();
-    std::string GetOldStrMessage();
-    std::string GetNewStrMessage();
-
+	
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
