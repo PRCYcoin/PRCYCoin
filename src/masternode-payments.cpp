@@ -9,6 +9,7 @@
 #include "masternode-budget.h"
 #include "masternode-sync.h"
 #include "masternodeman.h"
+#include "messagesigner.h"
 #include "sync.h"
 #include "util.h"
 #include "utilmoneystr.h"
@@ -427,20 +428,20 @@ void CMasternodePayments::ProcessMessageMasternodePayments(CNode* pfrom, std::st
 
 bool CMasternodePaymentWinner::Sign(CKey& keyMasternode, CPubKey& pubKeyMasternode)
 {
-    std::string errorMessage;
+    std::string strError = "";
     std::string strMasterNodeSignMessage;
     std::string payeeString(payee.begin(), payee.end());
     HEX_DATA_STREAM_PROTOCOL(PROTOCOL_VERSION) << vinMasternode.prevout.GetHash() << nBlockHeight << payee;
     std::string strMessage = HEX_STR(ser);
 
 
-    if (!obfuScationSigner.SignMessage(strMessage, errorMessage, vchSig, keyMasternode)) {
-        LogPrint("masternode", "CMasternodePing::Sign() - Error: %s\n", errorMessage.c_str());
+    if (!CMessageSigner::SignMessage(strMessage, vchSig, keyMasternode)) {
+        LogPrint("masternode","%s - SignMessage Error.%s\n", __func__);
         return false;
     }
 
-    if (!obfuScationSigner.VerifyMessage(pubKeyMasternode, vchSig, strMessage, errorMessage)) {
-        LogPrint("masternode", "CMasternodePing::Sign() - Error: %s\n", errorMessage.c_str());
+    if (!CMessageSigner::VerifyMessage(pubKeyMasternode, vchSig, strMessage, strError)) {
+        LogPrint("masternode","%s - VerifyMessage Error: %s\n", __func__, strError);
         return false;
     }
 
@@ -715,8 +716,8 @@ bool CMasternodePayments::ProcessBlock(int nBlockHeight)
     CPubKey pubKeyMasternode;
     CKey keyMasternode;
 
-    if (!obfuScationSigner.SetKey(strMasterNodePrivKey, errorMessage, keyMasternode, pubKeyMasternode)) {
-        LogPrint("masternode", "CMasternodePayments::ProcessBlock() - Error upon calling SetKey: %s\n", errorMessage.c_str());
+    if (!CMessageSigner::GetKeysFromSecret(strMasterNodePrivKey, keyMasternode, pubKeyMasternode)) {
+        LogPrint("masternode","CMasternodePayments::ProcessBlock() - Error upon calling SetKey.\n");
         return false;
     }
 
@@ -744,9 +745,9 @@ bool CMasternodePaymentWinner::SignatureValid()
     if (pmn != NULL) {
         HEX_DATA_STREAM_PROTOCOL(PROTOCOL_VERSION) << vinMasternode.prevout.GetHash() << nBlockHeight << payee;
         std::string strMessage = HEX_STR(ser);
-        std::string errorMessage = "";
-        if (!obfuScationSigner.VerifyMessage(pmn->pubKeyMasternode, vchSig, strMessage, errorMessage)) {
-            return error("CMasternodePaymentWinner::SignatureValid() - Got bad Masternode address signature %s\n", vinMasternode.prevout.hash.ToString());
+        std::string strError = "";
+        if (!CMessageSigner::VerifyMessage(pmn->pubKeyMasternode, vchSig, strMessage, strError)) {
+            return error("CMasternodePaymentWinner::SignatureValid() - Got bad Masternode address signature for %s: %s\n", vinMasternode.prevout.hash.ToString(), strError);
         }
 
         return true;

@@ -11,6 +11,7 @@
 #include "masternode-payments.h"
 #include "masternode-sync.h"
 #include "masternodeman.h"
+#include "messagesigner.h"
 #include "sync.h"
 #include "util.h"
 #include "streams.h"
@@ -325,6 +326,22 @@ bool CMasternode::IsValidNetAddr()
            (IsReachable(addr) && addr.IsRoutable());
 }
 
+bool CMasternode::IsInputAssociatedWithPubkey() const
+{
+    CScript payee;
+    payee = GetScriptForDestination(pubKeyCollateralAddress.GetID());
+
+    CTransaction txVin;
+    uint256 hash;
+    if(GetTransaction(vin.prevout.hash, txVin, hash, true)) {
+        for (CTxOut out : txVin.vout) {
+            if (out.nValue == 5000 * COIN && out.scriptPubKey == payee) return true;
+        }
+    }
+
+    return false;
+}
+
 CMasternodeBroadcast::CMasternodeBroadcast()
 {
     vin = CTxIn();
@@ -400,7 +417,7 @@ bool CMasternodeBroadcast::Create(std::string strService, std::string strKeyMast
         return false;
     }
 
-    if (!obfuScationSigner.GetKeysFromSecret(strKeyMasternode, keyMasternodeNew, pubKeyMasternodeNew)) {
+    if (!CMessageSigner::GetKeysFromSecret(strKeyMasternode, keyMasternodeNew, pubKeyMasternodeNew)) {
         strErrorRet = strprintf("Invalid masternode key %s", strKeyMasternode);
         LogPrint("masternode","CMasternodeBroadcast::Create -- %s\n", strErrorRet);
         return false;
@@ -521,7 +538,15 @@ bool CMasternodeBroadcast::CheckAndUpdate(int& nDos)
         return false;
     }
 
-    std::string errorMessage = "";
+    std::string strError = "";
+    if (!CMessageSigner::VerifyMessage(pubKeyCollateralAddress, sig, GetStrMessage(), strError))
+    {
+        // don't ban for old masternodes, their sigs could be broken because of the bug
+        nDos = protocolVersion < MIN_PEER_MNANNOUNCE ? 0 : 100;
+        return error("CMasternodeBroadcast::CheckAndUpdate - Got bad Masternode address signature : %s", strError);
+    }
+
+    std::string strError = "";
     //only need to verify shnorr signature
     if (!VerifyShnorrKeyImageTxIn(vin, GetTxInSignatureHash(vin))) {
         LogPrint("masternode","mnb - Got bad Masternode address signature\n");
@@ -538,18 +563,18 @@ bool CMasternodeBroadcast::CheckAndUpdate(int& nDos)
     CMasternode* pmn = mnodeman.Find(vin);
 
     // no such masternode, nothing to update
-    if (pmn == NULL)
-        return true;
-    else {
-        // this broadcast older than we have, it's bad.
-        if (pmn->sigTime > sigTime) {
-            LogPrint("masternode","mnb - Bad sigTime %d for Masternode %s (existing broadcast is at %d)\n",
-                sigTime, vin.prevout.hash.ToString(), pmn->sigTime);
-            return false;
-        }
-        // masternode is not enabled yet/already, nothing to update
-        if (!pmn->IsEnabled()) return true;
+    if (pmn == NULL) return true;
+
+    // this broadcast is older or equal than the one that we already have - it's bad and should never happen
+    // unless someone is doing something fishy
+    // (mapSeenMasternodeBroadcast in CMasternodeMan::ProcessMessage should filter legit duplicates)
+    if(pmn->sigTime >= sigTime) {
+        return error("CMasternodeBroadcast::CheckAndUpdate - Bad sigTime %d for Masternode %20s %105s (existing broadcast is at %d)",
+                      sigTime, addr.ToString(), vin.ToString(), pmn->sigTime);
     }
+	
+    // masternode is not enabled yet/already, nothing to update
+    if (!pmn->IsEnabled()) return true;
 
     // mn.pubkey = pubkey, IsVinAssociatedWithPubkey is validated once below,
     //   after that they just need to match
@@ -656,7 +681,7 @@ void CMasternodeBroadcast::Relay()
 
 bool CMasternodeBroadcast::Sign(CKey& keyCollateralAddress)
 {
-    std::string errorMessage;
+    std::string strError = "";
 
     std::string vchPubKey(pubKeyCollateralAddress.begin(), pubKeyCollateralAddress.end());
     std::string vchPubKey2(pubKeyMasternode.begin(), pubKeyMasternode.end());
@@ -666,14 +691,11 @@ bool CMasternodeBroadcast::Sign(CKey& keyCollateralAddress)
     HEX_DATA_STREAM_PROTOCOL(protocolVersion) << addr.ToString() << sigTime << pubKeyCollateralAddress << pubKeyMasternode << protocolVersion;
     std::string strMessage = HEX_STR(ser);
 
-    if (!obfuScationSigner.SignMessage(strMessage, errorMessage, sig, keyCollateralAddress)) {
-        LogPrint("masternode","CMasternodeBroadcast::Sign() - Error: %s\n", errorMessage);
-        return false;
-    }
+    if (!CMessageSigner::SignMessage(strMessage, sig, keyCollateralAddress))
+        return error("CMasternodeBroadcast::Sign() - Error.");
 
-    if (!obfuScationSigner.VerifyMessage(pubKeyCollateralAddress, sig, strMessage, errorMessage)) {
-        LogPrint("masternode","CMasternodeBroadcast::Sign() - Error: %s\n", errorMessage);
-        return false;
+    if (!CMessageSigner::VerifyMessage(pubKeyCollateralAddress, sig, strMessage, strError))
+        return error("CMasternodeBroadcast::Sign() - Error: %s", strError);
     }
 
     return true;
@@ -681,11 +703,11 @@ bool CMasternodeBroadcast::Sign(CKey& keyCollateralAddress)
 
 bool CMasternodeBroadcast::VerifySignature()
 {
-    std::string errorMessage;
+    std::string strError;
 
-    if(!obfuScationSigner.VerifyMessage(pubKeyCollateralAddress, sig, GetNewStrMessage(), errorMessage)
-       && !obfuScationSigner.VerifyMessage(pubKeyCollateralAddress, sig, GetOldStrMessage(), errorMessage))
-        return error("CMasternodeBroadcast::VerifySignature() - Error: %s", errorMessage);
+    if(!CMessageSigner::VerifyMessage(pubKeyCollateralAddress, sig, GetNewStrMessage(), strError)
+       && !CMessageSigner::VerifyMessage(pubKeyCollateralAddress, sig, GetOldStrMessage(), strError))
+        return error("CMasternodeBroadcast::VerifySignature() - Error: %s", strError);
 
     return true;
 }
@@ -704,7 +726,6 @@ std:: string CMasternodeBroadcast::GetNewStrMessage()
 
     return strMessage;
 }
-
 
 CMasternodePing::CMasternodePing()
 {
@@ -725,34 +746,35 @@ CMasternodePing::CMasternodePing(CTxIn& newVin)
 
 bool CMasternodePing::Sign(CKey& keyMasternode, CPubKey& pubKeyMasternode)
 {
-    std::string errorMessage;
+    std::string strError = "";
     std::string strMasterNodeSignMessage;
 
     sigTime = GetAdjustedTime();
     HEX_DATA_STREAM_PROTOCOL(PROTOCOL_VERSION) << vin.ToString() << blockHash.ToString() << sigTime;
     std::string strMessage = HEX_STR(ser);
 
-    if (!obfuScationSigner.SignMessage(strMessage, errorMessage, vchSig, keyMasternode)) {
-        LogPrint("masternode","CMasternodePing::Sign() - Error: %s\n", errorMessage);
+    if (!CMessageSigner::SignMessage(strMessage, vchSig, keyMasternode)) {
+        LogPrint("masternode","%s : SignMessage() - Error.", __func__);
         return false;
     }
 
-    if (!obfuScationSigner.VerifyMessage(pubKeyMasternode, vchSig, strMessage, errorMessage)) {
-        LogPrint("masternode","CMasternodePing::Sign() - Error: %s\n", errorMessage);
+    if (!CMessageSigner::VerifyMessage(pubKeyMasternode, vchSig, strMessage, strError)) {
+        LogPrint("masternode","%s : VerifyMessage() - Error: %s\n", __func__, strError);
         return false;
     }
 
     return true;
 }
 
-bool CMasternodePing::VerifySignature(CPubKey& pubKeyMasternode, int &nDos) {
+bool CMasternodePing::VerifySignature(CPubKey& pubKeyMasternode, int &nDos)
+{
+    std::string strError = "";
     HEX_DATA_STREAM_PROTOCOL(PROTOCOL_VERSION) << vin.ToString() << blockHash.ToString() << sigTime;
     std::string strMessage = HEX_STR(ser);
-    std::string errorMessage = "";
 
-    if(!obfuScationSigner.VerifyMessage(pubKeyMasternode, vchSig, strMessage, errorMessage)){
+    if(!CMessageSigner::VerifyMessage(pubKeyMasternode, vchSig, strMessage, strError)){
         nDos = 33;
-        return error("CMasternodePing::VerifySignature - Got bad Masternode ping signature %s Error: %s", vin.ToString(), errorMessage);
+        return error("CMasternodePing::VerifySignature - Got bad Masternode ping signature %s Error: %s", vin.ToString(), strError);
     }
     return true;
 }

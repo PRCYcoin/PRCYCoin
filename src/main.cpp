@@ -19,6 +19,7 @@
 #include "masternode-sync.h"
 #include "masternodeman.h"
 #include "merkleblock.h"
+#include "messagesigner.h"
 #include "net.h"
 #include "poa.h"
 #include "swifttx.h"

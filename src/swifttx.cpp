@@ -11,6 +11,7 @@
 #include "key.h"
 #include "masternode-sync.h"
 #include "masternodeman.h"
+#include "messagesigner.h"
 #include "net.h"
 #include "protocol.h"
 #include "sync.h"
