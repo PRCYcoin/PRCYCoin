@@ -72,12 +72,21 @@ public:
     CTxIn vinMasternode;
     uint256 txHash;
     int nBlockHeight;
-    std::vector<unsigned char> vchMasterNodeSignature;
+    std::vector<unsigned char> vchSig;
+
+    CConsensusVote() :
+        vinMasternode(),
+        txHash(),
+        nBlockHeight(0),
+        vchSig()
+    {}
 
     uint256 GetHash() const;
+    uint256 GetSignatureHash() const;
+    std::string GetStrMessage() const;
 
-    bool SignatureValid();
     bool Sign();
+    bool SignatureValid() const;
 
     ADD_SERIALIZE_METHODS;
 
@@ -86,7 +95,7 @@ public:
     {
         READWRITE(txHash);
         READWRITE(vinMasternode);
-        READWRITE(vchMasterNodeSignature);
+        READWRITE(vchSig);
         READWRITE(nBlockHeight);
     }
 };
