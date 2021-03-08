@@ -732,7 +732,14 @@ CMasternodePing::CMasternodePing() :
         blockHash(0),
         sigTime(0),
         vchSig()
-{ }
+{
+    int nHeight;
+    {
+        LOCK(cs_main);
+        nHeight = chainActive.Height();
+    }
+    fNewSigs = Params().NewSigsActive(nHeight);
+}
 
 CMasternodePing::CMasternodePing(CTxIn& newVin) :
         vin(),
@@ -746,12 +753,14 @@ CMasternodePing::CMasternodePing(CTxIn& newVin) :
         if (nHeight > 12)
             blockHash = chainActive[nHeight - 12]->GetBlockHash();
     }
+    fNewSigs = Params().NewSigsActive(nHeight);
 }
 
 uint256 CMasternodePing::GetHash() const
 {
     CHashWriter ss(SER_GETHASH, PROTOCOL_VERSION);
     ss << vin;
+    if (fNewSigs) ss << blockHash;
     ss << sigTime;
     return ss.GetHash();
 }
@@ -763,16 +772,10 @@ std::string CMasternodePing::GetStrMessage() const
 
 bool CMasternodePing::Sign(CKey& keyMasternode, CPubKey& pubKeyMasternode)
 {
-    int nHeight;
-    {
-        LOCK(cs_main);
-        nHeight = chainActive.Height();
-    }
-
     std::string strError = "";
     sigTime = GetAdjustedTime();
 	
-    if (Params().NewSigsActive(nHeight)) {
+   if (fNewSigs) {
         uint256 hash = GetSignatureHash();
         if(!CHashSigner::SignHash(hash, keyMasternode, vchSig)) {
             return error("%s : SignHash() failed", __func__);
@@ -800,15 +803,9 @@ bool CMasternodePing::Sign(CKey& keyMasternode, CPubKey& pubKeyMasternode)
 
 bool CMasternodePing::CheckSignature(CPubKey& pubKeyMasternode, int &nDos) const
 {
-    int nHeight;
-    {
-        LOCK(cs_main);
-        nHeight = chainActive.Height();
-    }
-	
     std::string strError = "";
 	
-    if (Params().NewSigsActive(nHeight)) {
+    if (fNewSigs) {
         uint256 hash = GetSignatureHash();
 
         if (!CHashSigner::VerifyHash(hash, pubKeyMasternode, vchSig, strError)) {
