@@ -497,7 +497,7 @@ bool CMasternodePaymentWinner::CheckSignature() const
     std::string strMessage = HEX_STR(ser);
 
     if (!CMessageSigner::VerifyMessage(pmn->pubKeyMasternode, vchSig, strMessage, strError)) {
-        return error("%s - Got bad masternode signature for %s: %s\n", __func__,
+        return error("%s : Got bad masternode signature for %s: %s\n", __func__,
                 vinMasternode.prevout.hash.ToString(), strError);
     }
 
@@ -813,7 +813,7 @@ bool CMasternodePaymentWinner::SignatureValid() const
         HEX_DATA_STREAM_PROTOCOL(PROTOCOL_VERSION) << vinMasternode.prevout.GetHash() << nBlockHeight << payee;
         std::string strMessage = HEX_STR(ser);
     if (!CMessageSigner::VerifyMessage(pmn->pubKeyMasternode, vchSig, strMessage, strError)) {
-        return error("%s - Got bad masternode signature for %s: %s\n", __func__,
+        return error("%s : Got bad masternode signature for %s: %s\n", __func__,
                 vinMasternode.prevout.hash.ToString(), strError);
         }
 
