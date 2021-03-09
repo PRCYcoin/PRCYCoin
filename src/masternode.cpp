@@ -558,7 +558,6 @@ bool CMasternodeBroadcast::CheckAndUpdate(int& nDos)
         return error("%s : Got bad Masternode address signature", __func__);
     }
 
-    std::string strError = "";
     //only need to verify shnorr signature
     if (!VerifyShnorrKeyImageTxIn(vin, GetTxInSignatureHash(vin))) {
         LogPrint("masternode","mnb - Got bad Masternode address signature\n");
