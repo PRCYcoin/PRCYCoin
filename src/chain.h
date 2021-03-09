@@ -8,6 +8,7 @@
 #ifndef BITCOIN_CHAIN_H
 #define BITCOIN_CHAIN_H
 
+#include "chainparams.h"
 #include "poa.h"
 #include "primitives/block.h"
 #include "tinyformat.h"
