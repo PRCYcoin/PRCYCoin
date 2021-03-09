@@ -12,6 +12,7 @@
 #include "masternode-sync.h"
 #include "masternode.h"
 #include "masternodeman.h"
+#include "messagesigner.h"
 #include "util.h"
 #include <boost/filesystem.hpp>
 

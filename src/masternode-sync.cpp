@@ -12,6 +12,7 @@
 #include "masternode-budget.h"
 #include "masternode.h"
 #include "masternodeman.h"
+#include "messagesigner.h"
 #include "util.h"
 #include "addrman.h"
 // clang-format on

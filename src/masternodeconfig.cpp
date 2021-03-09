@@ -6,6 +6,7 @@
 
 #include "net.h"
 #include "masternodeconfig.h"
+#include "messagesigner.h"
 #include "util.h"
 #include "guiinterface.h"
 #include <base58.h>
