@@ -148,7 +148,7 @@ CMasternodePaymentDB::ReadResult CMasternodePaymentDB::Read(CMasternodePayments&
 uint256 CMasternodePaymentWinner::GetHash() const
 {
     CHashWriter ss(SER_GETHASH, PROTOCOL_VERSION);
-    ss << payee;
+    ss << std::vector<unsigned char> payee;
     ss << nBlockHeight;
     ss << vinMasternode.prevout;
     return ss.GetHash();
@@ -156,7 +156,7 @@ uint256 CMasternodePaymentWinner::GetHash() const
 
 std::string CMasternodePaymentWinner::GetStrMessage() const
 {
-    return vinMasternode.prevout.ToStringShort() + std::to_string(nBlockHeight) + payee.ToString();
+    return vinMasternode.prevout.ToStringShort() + std::to_string(nBlockHeight) + std::vector<unsigned char> payee.ToString();
 }
 
 bool CMasternodePaymentWinner::IsValid(CNode* pnode, std::string& strError)
@@ -306,7 +306,7 @@ bool CMasternodePayments::FillBlockPayee(CMutableTransaction& txNew, int64_t nFe
 
     bool hasPayment = true;
     std::vector<unsigned char> payeeAddr;
-    CScript payee;
+    std::vector<unsigned char> payee;
     CKey mnPaymentPrivTx;
     mnPaymentPrivTx.MakeNewKey(true);
     CPubKey mnPaymentPubTx = mnPaymentPrivTx.GetPubKey();
@@ -390,7 +390,7 @@ bool CMasternodePayments::FillBlockPayee(CMutableTransaction& txNew, int64_t nFe
             txNew.vout[0].nValue = posBlockReward - masternodePayment;
         }
 
-        LogPrintf("Masternode payment of %s to %s\n", FormatMoney(masternodePayment).c_str(), payee.ToString().c_str());
+        LogPrintf("Masternode payment of %s to %s\n", FormatMoney(masternodePayment).c_str(), std::vector<unsigned char> payee.ToString().c_str());
     }
     return true;
 }
@@ -558,6 +558,7 @@ bool CMasternodeBlockPayees::IsTransactionValid(const CTransaction& txNew)
     int nMaxSignatures = 0;
     int nMasternode_Drift_Count = 0;
 
+    std::vector<unsigned char> payee
     std::string strPayeesPossible = "";
     nMasternode_Drift_Count = mnodeman.size() + Params().MasternodeCountDrift();
     CBlockIndex* pindexPrev = chainActive.Tip();
