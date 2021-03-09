@@ -77,7 +77,7 @@ if BUILD_BITCOIN_UTILS
   bin_PROGRAMS += prcycoin-cli prcycoin-tx
 endif
 
-.PHONY: FORCE
+.PHONY: FORCE check-symbols check-security
 # prcycoin core #
 BITCOIN_CORE_H = \
   activemasternode.h \
