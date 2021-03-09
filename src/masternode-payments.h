@@ -216,7 +216,7 @@ public:
         std::string ret = "";
         ret += vinMasternode.ToString();
         ret += ", " + std::to_string(nBlockHeight);
-        ret += ", " + payee.ToString();
+        ret += ", " + std::vector<unsigned char> payee.ToString();
         ret += ", " + std::to_string((int)vchSig.size());
         return ret;
     }
