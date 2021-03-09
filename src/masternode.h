@@ -312,7 +312,12 @@ public:
     uint256 GetHash() const;
 
     void Relay();
-	
+
+    // special sign/verify
+    bool Sign(const CKey& key, const CPubKey& pubKey, const bool fNewSigs);
+    bool Sign(const std::string strSignKey, const bool fNewSigs);
+    bool CheckSignature() const;
+
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
