@@ -2032,7 +2032,6 @@ CFinalizedBudgetBroadcast::CFinalizedBudgetBroadcast() :
 { }
 
 CFinalizedBudgetBroadcast::CFinalizedBudgetBroadcast(const CFinalizedBudget& other) :
-        vchSig()
         CFinalizedBudget(other)
 { }
 
