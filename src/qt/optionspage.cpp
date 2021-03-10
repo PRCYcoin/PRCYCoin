@@ -159,6 +159,8 @@ OptionsPage::OptionsPage(QWidget* parent) : QDialog(parent, Qt::WindowSystemMenu
     connect(ui->minimizeToTray, SIGNAL(stateChanged(int)), this, SLOT(minimizeToTray_clicked(int)));
     connect(ui->minimizeOnClose, SIGNAL(stateChanged(int)), this, SLOT(minimizeOnClose_clicked(int)));
     connect(ui->alwaysRequest2FA, SIGNAL(stateChanged(int)), this, SLOT(alwaysRequest2FA_clicked(int)));
+    connect(ui->hideBalanceStaking, SIGNAL(stateChanged(int)), this, SLOT(hideBalanceStaking_clicked(int)));
+    connect(ui->lockSendStaking, SIGNAL(stateChanged(int)), this, SLOT(lockSendStaking_clicked(int)));
 }
 
 void OptionsPage::setStakingToggle()
@@ -1006,5 +1008,91 @@ void OptionsPage::alwaysRequest2FA_clicked(int state)
         settings.setValue("fAlwaysRequest2FA", true);
     } else {
         settings.setValue("fAlwaysRequest2FA", false);
+    }
+}
+
+void OptionsPage::hideBalanceStaking_clicked(int state) {
+    int status = model->getEncryptionStatus();
+    if (status == WalletModel::Locked || status == WalletModel::UnlockedForAnonymizationOnly) {
+        QMessageBox msgBox;
+        msgBox.setWindowTitle("Balance Settings");
+        msgBox.setIcon(QMessageBox::Information);
+        msgBox.setText("Please unlock the keychain wallet with your passphrase before attempting to change this setting.");
+        msgBox.setStyleSheet(GUIUtil::loadStyleSheet());
+        msgBox.exec();
+        return;
+    }
+    if (ui->hideBalanceStaking->isChecked()) {
+        settings.setValue("fHideBalance", true);
+    } else {
+        QMessageBox::StandardButton reply;
+        reply = QMessageBox::question(this, "Are You Sure?", "Are you sure you would like to disable your Hide Balance in Staking?\nYou will be required to enter your passphrase. Failed or canceled attempts will be logged.", QMessageBox::Yes|QMessageBox::No);
+        if (reply == QMessageBox::Yes) {
+            model->setWalletLocked(true);
+            WalletModel::UnlockContext ctx(model->requestUnlock(AskPassphraseDialog::Context::Unlock_Full, true));
+            if (!ctx.isValid()) {
+                QMessageBox msgBox;
+                msgBox.setWindowTitle("Hide Balance in Staking");
+                msgBox.setIcon(QMessageBox::Information);
+                msgBox.setText("Attempt to view Disable Hide Balance in Staking failed or canceled. Wallet Locked for security.");
+                msgBox.setStyleSheet(GUIUtil::loadStyleSheet());
+                msgBox.exec();
+                LogPrintf("Attempt to view Disable Hide Balance in Staking failed or canceled. Wallet Locked for security.\n");
+                settings.setValue("fHideBalance", true);
+                return;
+            } else {
+                SecureString pass;
+                model->setWalletLocked(false, pass);
+                settings.setValue("fHideBalance", false);
+                LogPrintf("Disabled Hide Balance in Staking successful.\n");
+            }
+        } else {
+            LogPrintf("Attempt to view Disable Hide Balance in Staking canceled.\n");
+            settings.setValue("fHideBalance", true);
+            return;
+        }
+    }
+}
+
+void OptionsPage::lockSendStaking_clicked(int state) {
+    int status = model->getEncryptionStatus();
+    if (status == WalletModel::Locked || status == WalletModel::UnlockedForAnonymizationOnly) {
+        QMessageBox msgBox;
+        msgBox.setWindowTitle("Lock Send Settings");
+        msgBox.setIcon(QMessageBox::Information);
+        msgBox.setText("Please unlock the keychain wallet with your passphrase before attempting to change this setting.");
+        msgBox.setStyleSheet(GUIUtil::loadStyleSheet());
+        msgBox.exec();
+        return;
+    }
+    if (ui->lockSendStaking->isChecked()) {
+        settings.setValue("fLockSendStaking", true);
+    } else {
+        QMessageBox::StandardButton reply;
+        reply = QMessageBox::question(this, "Are You Sure?", "Are you sure you would like to disable your Lock Send Tab in Staking?\nYou will be required to enter your passphrase. Failed or canceled attempts will be logged.", QMessageBox::Yes|QMessageBox::No);
+        if (reply == QMessageBox::Yes) {
+            model->setWalletLocked(true);
+            WalletModel::UnlockContext ctx(model->requestUnlock(AskPassphraseDialog::Context::Unlock_Full, true));
+            if (!ctx.isValid()) {
+                QMessageBox msgBox;
+                msgBox.setWindowTitle("Lock Send Tab in Staking");
+                msgBox.setIcon(QMessageBox::Information);
+                msgBox.setText("Attempt to view Disable Lock Send Tab in Staking failed or canceled. Wallet Locked for security.");
+                msgBox.setStyleSheet(GUIUtil::loadStyleSheet());
+                msgBox.exec();
+                LogPrintf("Attempt to view Disable Lock Send Tab in Staking failed or canceled. Wallet Locked for security.\n");
+                settings.setValue("fLockSendStaking", true);
+                return;
+            } else {
+                SecureString pass;
+                model->setWalletLocked(false, pass);
+                settings.setValue("fLockSendStaking", false);
+                LogPrintf("Disabled Lock Send Tab in Staking successful.\n");
+            }
+        } else {
+            LogPrintf("Attempt to view Disable Lock Send Tab in Staking canceled.\n");
+            settings.setValue("fLockSendStaking", true);
+            return;
+		}
     }
 }
