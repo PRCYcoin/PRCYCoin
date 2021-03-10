@@ -1014,6 +1014,12 @@ void BitcoinGUI::gotoOptionsPage()
 
 void BitcoinGUI::gotoSendCoinsPage(QString addr)
 {
+    QSettings settings;
+    if (settings.value("fLockSendStaking", false).toBool()) {
+       sendCoinsAction->setChecked(false);
+       LogPrintf("gotoSendCoinsPage blocked.\n"); // Remove or adjust after tests
+       return;
+    }
     sendCoinsAction->setChecked(true);
     if (walletFrame) walletFrame->gotoSendCoinsPage(addr);
 }
