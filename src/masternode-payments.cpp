@@ -558,7 +558,7 @@ bool CMasternodeBlockPayees::IsTransactionValid(const CTransaction& txNew)
     int nMaxSignatures = 0;
     int nMasternode_Drift_Count = 0;
 
-    std::vector<unsigned char> payee
+    std::vector<unsigned char> payee;
     std::string strPayeesPossible = "";
     nMasternode_Drift_Count = mnodeman.size() + Params().MasternodeCountDrift();
     CBlockIndex* pindexPrev = chainActive.Tip();
