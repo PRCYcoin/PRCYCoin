@@ -576,7 +576,7 @@
           <item>
            <widget class="QCheckBox" name="hideBalanceStaking">
             <property name="text">
-             <string>Hide balance while wallet is unlocked for Staking</string>
+             <string>Hide Balance when unlocked for Staking</string>
             </property>
            </widget>
           </item>
