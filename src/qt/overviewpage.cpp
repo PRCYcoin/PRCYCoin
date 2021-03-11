@@ -568,6 +568,9 @@ void OverviewPage::checkDollarValueserviceRequestFinished(QNetworkReply* reply)
 {
     reply->deleteLater();
     if(reply->error() == QNetworkReply::NoError) {
+        // Check if balance is 0 for early return
+        int balance = pwalletMain->GetBalance() / COIN;
+        if (balance == 0) return;
         QString defaultCurrency = "USD"; // Will be a setting
         // Parse data
         QByteArray data = reply->readAll();
@@ -576,15 +579,16 @@ void OverviewPage::checkDollarValueserviceRequestFinished(QNetworkReply* reply)
         valueString.chop(2);
         // Convert to double
         double valueDollar = valueString.toDouble();
-        // Get balance
-        int balance = pwalletMain->GetBalance() / COIN;
         // Calculate balance * valueDollar
         int calculatedBalance = balance * valueDollar;
         LogPrintf("%s: balance: %d, value: %d\n", __func__, balance, calculatedBalance);
         valueString = QString::number(calculatedBalance);
+        QSettings settings;
         if (walletModel->getEncryptionStatus() == WalletModel::Locked || walletModel->getEncryptionStatus() == WalletModel::UnlockedForAnonymizationOnly) {
             ui->labelDollarValue->setText("Locked; Hidden");
-        else
+        } else if (settings.value("fHideBalance", false).toBool()) {
+            ui->labelDollarValue->setText("Hidden");
+        } else {
             ui->labelDollarValue->setText(defaultCurrency + " Value: $" + valueString);
         }
     } else {
